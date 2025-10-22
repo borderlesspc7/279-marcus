@@ -1,10 +1,10 @@
-function App() {
+import AppRoutes from "./routes/AppRoutes";
+import { AuthProvider } from "./contexts/AuthContext";
+
+export default function App() {
   return (
-    <div>
-      <h1>Bem-vindo</h1>
-      <p>Sistema pronto para desenvolvimento</p>
-    </div>
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 }
-
-export default App;

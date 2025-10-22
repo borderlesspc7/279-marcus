@@ -2,10 +2,11 @@ export interface User {
   uid: string;
   name: string;
   email: string;
-  password: string;
+  // ⚠️ NUNCA inclua password aqui! Senhas são gerenciadas pelo Firebase Authentication
   createdAt: Date;
   updatedAt: Date;
   role?: "admin" | "user";
+  phone?: string;
 }
 
 export interface AuthState {
