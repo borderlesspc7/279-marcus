@@ -4,27 +4,9 @@ import { RegisterPage } from "../pages/Register/Register";
 import LoginPage from "../pages/Login/Login";
 import ProtectedRoutes from "./ProtectedRoutes";
 import { DashboardLayout } from "../components/layout/DashboardLayout/DashboardLayout";
+import { Dashboard } from "../pages/Dashboard/Dashboard";
 
 export default function AppRoutes() {
-  // Páginas temporárias - depois você pode substituir por componentes reais
-  const DashboardHome = () => (
-    <div>
-      <h1
-        style={{
-          fontSize: "2rem",
-          fontWeight: "700",
-          color: "#1f2937",
-          marginBottom: "1rem",
-        }}
-      >
-        Dashboard
-      </h1>
-      <p style={{ color: "#6b7280" }}>
-        Bem-vindo ao NutriManager! Selecione uma opção no menu lateral.
-      </p>
-    </div>
-  );
-
   const Clientes = () => (
     <div>
       <h1
@@ -104,7 +86,7 @@ export default function AppRoutes() {
           element={
             <ProtectedRoutes>
               <DashboardLayout>
-                <DashboardHome />
+                <Dashboard />
               </DashboardLayout>
             </ProtectedRoutes>
           }

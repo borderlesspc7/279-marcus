@@ -1,0 +1,44 @@
+.occupancy-chart {
+  width: 100%;
+}
+
+.occupancy-chart__stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.occupancy-chart__stat {
+  text-align: center;
+}
+
+.occupancy-chart__stat-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0 0 0.25rem 0;
+}
+
+.occupancy-chart__stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.occupancy-chart__stat-value--primary {
+  color: #667eea;
+}
+
+.occupancy-chart__stat-value--success {
+  color: #10b981;
+}
+
+.occupancy-chart__stat-value--warning {
+  color: #f59e0b;
+}
+
+.occupancy-chart__chart-container {
+  width: 100%;
+  height: 280px;
+}

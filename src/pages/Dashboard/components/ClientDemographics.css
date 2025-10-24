@@ -1,0 +1,65 @@
+.client-demographics {
+  width: 100%;
+}
+
+.client-demographics__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.client-demographics__card {
+  padding: 1rem;
+  border-radius: 12px;
+  color: white;
+  text-align: center;
+}
+
+.client-demographics__card--total {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.client-demographics__card--female {
+  background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+}
+
+.client-demographics__card--male {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.client-demographics__card-icon {
+  margin-bottom: 0.5rem;
+}
+
+.client-demographics__card-label {
+  margin: 0;
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.client-demographics__card-value {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.client-demographics__charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  align-items: center;
+}
+
+.client-demographics__chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.client-demographics__chart-container {
+  width: 100%;
+  height: 250px;
+}
