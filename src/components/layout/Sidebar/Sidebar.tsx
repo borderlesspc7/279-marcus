@@ -74,6 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
             <li key={item.path} className="sidebar__menu-item">
               <NavLink
                 to={item.path}
+                end={item.path === "/dashboard"}
                 className={({ isActive }) =>
                   `sidebar__link ${isActive ? "sidebar__link--active" : ""}`
                 }
