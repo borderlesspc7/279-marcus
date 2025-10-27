@@ -98,7 +98,9 @@ export const ClientList: React.FC = () => {
         />
         <p className="client-list__count">
           {filteredClients.length}{" "}
-          {filteredClients.length === 1 ? "cliente" : "clientes"} encontrados
+          {filteredClients.length === 1
+            ? "cliente encontrado"
+            : "clientes encontrados"}
         </p>
       </div>
 
