@@ -5,24 +5,11 @@ import LoginPage from "../pages/Login/Login";
 import ProtectedRoutes from "./ProtectedRoutes";
 import { DashboardLayout } from "../components/layout/DashboardLayout/DashboardLayout";
 import { Dashboard } from "../pages/Dashboard/Dashboard";
+import { ClientList } from "../pages/Clients/ClientList";
+import { ClientForm } from "../pages/Clients/ClientForm";
+import { ClientProfile } from "../pages/Clients/ClientProfile";
 
 export default function AppRoutes() {
-  const Clientes = () => (
-    <div>
-      <h1
-        style={{
-          fontSize: "2rem",
-          fontWeight: "700",
-          color: "#1f2937",
-          marginBottom: "1rem",
-        }}
-      >
-        Clientes
-      </h1>
-      <p style={{ color: "#6b7280" }}>Gerencie seus clientes aqui.</p>
-    </div>
-  );
-
   const Agenda = () => (
     <div>
       <h1
@@ -96,7 +83,27 @@ export default function AppRoutes() {
           element={
             <ProtectedRoutes>
               <DashboardLayout>
-                <Clientes />
+                <ClientList />
+              </DashboardLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path={paths.clientesNew}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <ClientForm />
+              </DashboardLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path={paths.clientesProfile}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <ClientProfile />
               </DashboardLayout>
             </ProtectedRoutes>
           }
