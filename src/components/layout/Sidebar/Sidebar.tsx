@@ -82,9 +82,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
                 {isOpen && (
                   <>
                     <span className="sidebar__link-label">{item.label}</span>
-                    {item.badge && (
-                      <span className="sidebar__link-badge">{item.badge}</span>
-                    )}
                   </>
                 )}
               </NavLink>
