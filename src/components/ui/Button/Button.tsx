@@ -1,6 +1,4 @@
-"use client";
-
-import "./button.css";
+import "./Button.css";
 import type React from "react";
 
 interface ButtonProps {
