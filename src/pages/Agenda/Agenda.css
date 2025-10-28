@@ -1,0 +1,290 @@
+.agenda {
+  width: 100%;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.agenda__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.agenda__title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.agenda__subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.agenda__add-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.agenda__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: #6b7280;
+  gap: 1rem;
+}
+
+.agenda__spinner {
+  font-size: 2.5rem;
+  color: #667eea;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.agenda__error {
+  background: #fef2f2;
+  border: 2px solid #fecaca;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  color: #991b1b;
+  margin-bottom: 2rem;
+}
+
+.agenda__error p {
+  margin: 0 0 1rem 0;
+}
+
+.agenda__calendar-wrapper {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 2rem;
+}
+
+.agenda__legend {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.agenda__legend-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+}
+
+.agenda__legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.agenda__legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.agenda__legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+/* Customização do React Big Calendar */
+.rbc-calendar {
+  font-family: inherit;
+}
+
+.rbc-header {
+  padding: 1rem 0.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  border-bottom: 2px solid #e5e7eb;
+  background: #f9fafb;
+}
+
+.rbc-today {
+  background-color: rgba(102, 126, 234, 0.1);
+}
+
+.rbc-event {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rbc-event:hover {
+  opacity: 1 !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.rbc-event-label {
+  font-size: 0.75rem;
+}
+
+.rbc-toolbar {
+  padding: 1rem 0;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.rbc-toolbar button {
+  color: #667eea;
+  border: 1px solid #e5e7eb;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.rbc-toolbar button:hover {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.rbc-toolbar button:active,
+.rbc-toolbar button.rbc-active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+  box-shadow: none;
+}
+
+.rbc-toolbar button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.rbc-month-view,
+.rbc-time-view {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.rbc-time-slot {
+  border-top: 1px solid #f3f4f6;
+}
+
+.rbc-current-time-indicator {
+  background-color: #ef4444;
+  height: 2px;
+}
+
+.rbc-time-header-content {
+  border-left: 1px solid #e5e7eb;
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border-top: 1px solid #f3f4f6;
+}
+
+.rbc-time-content {
+  border-top: 2px solid #e5e7eb;
+}
+
+.rbc-agenda-view {
+  border: none;
+}
+
+.rbc-agenda-view table {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.rbc-agenda-date-cell,
+.rbc-agenda-time-cell {
+  padding: 0.75rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.rbc-agenda-event-cell {
+  padding: 0.75rem;
+}
+
+.rbc-slot-selection {
+  background-color: rgba(102, 126, 234, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .agenda__title {
+    font-size: 1.5rem;
+  }
+
+  .agenda__header {
+    flex-direction: column;
+  }
+
+  .agenda__add-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .agenda__calendar-wrapper {
+    padding: 1rem;
+  }
+
+  .agenda__calendar-wrapper > div {
+    height: 500px !important;
+  }
+
+  .rbc-toolbar {
+    flex-direction: column;
+  }
+
+  .rbc-toolbar-label {
+    order: -1;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .agenda__legend-items {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}

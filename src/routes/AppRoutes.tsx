@@ -8,24 +8,9 @@ import { Dashboard } from "../pages/Dashboard/Dashboard";
 import { ClientList } from "../pages/Clients/ClientList";
 import { ClientForm } from "../pages/Clients/ClientForm";
 import { ClientProfile } from "../pages/Clients/ClientProfile";
+import { Agenda } from "../pages/Agenda/Agenda";
 
 export default function AppRoutes() {
-  const Agenda = () => (
-    <div>
-      <h1
-        style={{
-          fontSize: "2rem",
-          fontWeight: "700",
-          color: "#1f2937",
-          marginBottom: "1rem",
-        }}
-      >
-        Agenda
-      </h1>
-      <p style={{ color: "#6b7280" }}>Visualize e gerencie sua agenda.</p>
-    </div>
-  );
-
   const Calculadora = () => (
     <div>
       <h1
