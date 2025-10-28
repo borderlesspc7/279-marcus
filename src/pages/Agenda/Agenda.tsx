@@ -170,7 +170,7 @@ export const Agenda: React.FC = () => {
         <Button
           variant="primary"
           onClick={handleNewAppointment}
-          className="agenda_add-button"
+          className="agenda__add-button"
         >
           <FaPlus /> Novo Agendamento
         </Button>

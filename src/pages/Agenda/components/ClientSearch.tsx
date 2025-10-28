@@ -96,7 +96,7 @@ export const ClientSearch: React.FC<ClientSearchProps> = ({
   return (
     <div className="client-search" ref={wrapperRef}>
       <label className="client-search__label">
-        Selecione o client <span className="client-search__required">*</span>
+        Selecione o Cliente <span className="client-search__required">*</span>
       </label>
 
       {selectedClient ? (
@@ -128,7 +128,7 @@ export const ClientSearch: React.FC<ClientSearchProps> = ({
             className={`client-search__input ${
               error ? "client-search__input--error" : ""
             }`}
-            placeholder="Buscar client por nome, email ou telefone"
+            placeholder="Buscar cliente por nome, email ou telefone..."
             value={searchTerm}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => setIsOpen(true)}
