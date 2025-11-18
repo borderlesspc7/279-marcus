@@ -21,7 +21,7 @@
 }
 
 .user-register-form__header {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   padding: 2rem;
   text-align: center;
   position: relative;
@@ -180,7 +180,7 @@
 }
 
 .user-register-form .input-field__input:focus {
-  border-color: #1f2937;
+  border-color: #16a34a;
   box-shadow: 0 0 0 5px rgba(31, 41, 55, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
   transform: translateY(-2px);
   outline: none;
@@ -201,14 +201,14 @@
 }
 
 .login-form__submit-btn {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%) !important;
+  background: linear-gradient(135deg, #14532d 0%, #064e3b 100%) !important;
   margin-top: 20px;
   width: 50%;
   align-self: center;
 }
 
 .login-form__submit-btn:hover {
-  background: linear-gradient(135deg, #111827 0%, #000000 100%) !important;
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
 }
 .user-register-form .select-field__select {
   padding: 0.875rem 1rem;
@@ -222,7 +222,7 @@
 }
 
 .user-register-form .select-field__select:focus {
-  border-color: #1f2937;
+  border-color: #16a34a;
   box-shadow: 0 0 0 4px rgba(31, 41, 55, 0.1);
   transform: translateY(-1px);
 }
@@ -249,7 +249,7 @@
 .user-register-form__submit-btn {
   min-width: 280px;
   padding: 1rem 2.5rem;
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -284,7 +284,7 @@
 }
 
 .user-register-form__submit-btn:hover {
-  background: linear-gradient(135deg, #111827 0%, #000000 100%) !important;
+  background: linear-gradient(135deg, #15803d 0%, #166534 100%) !important;
   transform: translateY(-3px);
   box-shadow: 0 10px 30px rgba(31, 41, 55, 0.45);
 }
@@ -459,9 +459,9 @@
   display: inline-block;
   padding: 12px 32px;
   background: transparent;
-  color: #1f2937;
+  color: #16a34a;
   text-decoration: none;
-  border: 2px solid #1f2937;
+  border: 2px solid #16a34a;
   border-radius: 10px;
   font-weight: 600;
   font-size: 14px;
@@ -478,7 +478,7 @@
   left: 0;
   width: 0;
   height: 100%;
-  background: #1f2937;
+  background: #16a34a;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: -1;
 }

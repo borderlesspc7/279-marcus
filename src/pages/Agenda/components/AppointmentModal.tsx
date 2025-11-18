@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FaTimes, FaSave, FaSpinner, FaTrash } from "react-icons/fa";
 import { Button } from "../../../components/ui/Button/Button";
 import { ClientSearch } from "./ClientSearch";
@@ -30,6 +30,8 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const lastProcessedAppointmentId = useRef<string | null>(null);
+  const lastProcessedInitialDate = useRef<number | null>(null);
 
   // Form data
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -37,6 +39,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [notes, setNotes] = useState("");
+  const [status, setStatus] = useState<"scheduled" | "completed" | "cancelled" | "no-show">("scheduled");
 
   // Form errors
   const [errors, setErrors] = useState<{
@@ -49,21 +52,32 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   useEffect(() => {
     if (isOpen) {
       if (appointment) {
-        // Modo edição
-        setSelectedClient({
-          id: appointment.clientId,
-          fullName: appointment.clientName,
-        } as Client);
-        setDate(formatDateForInput(appointment.date));
-        setStartTime(appointment.startTime);
-        setEndTime(appointment.endTime);
-        setNotes(appointment.notes || "");
+        // Só atualizar se for um appointment diferente
+        if (lastProcessedAppointmentId.current !== appointment.id) {
+          lastProcessedAppointmentId.current = appointment.id;
+          setSelectedClient({
+            id: appointment.clientId,
+            fullName: appointment.clientName,
+          } as Client);
+          setDate(formatDateForInput(appointment.date));
+          setStartTime(appointment.startTime);
+          setEndTime(appointment.endTime);
+          setNotes(appointment.notes || "");
+          setStatus(appointment.status);
+        }
       } else if (initialDate) {
-        // Modo criação com data inicial
-        setDate(formatDateForInput(initialDate));
+        // Só atualizar se for uma data inicial diferente
+        const initialDateTime = initialDate.getTime();
+        if (lastProcessedInitialDate.current !== initialDateTime) {
+          lastProcessedInitialDate.current = initialDateTime;
+          setDate(formatDateForInput(initialDate));
+          setStatus("scheduled");
+        }
       }
     } else {
       // Limpar form ao fechar
+      lastProcessedAppointmentId.current = null;
+      lastProcessedInitialDate.current = null;
       resetForm();
     }
   }, [isOpen, appointment, initialDate]);
@@ -74,11 +88,14 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
     setStartTime("");
     setEndTime("");
     setNotes("");
+    setStatus("scheduled");
     setErrors({});
     setError(null);
   };
 
   const formatDateForInput = (date: Date): string => {
+    // Normalizar a data para evitar problemas de timezone
+    // Criar uma nova data usando apenas ano, mês e dia no timezone local
     const d = new Date(date);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, "0");
@@ -124,10 +141,15 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
       setLoading(true);
       setError(null);
 
+      // Criar data normalizada (sem horário, apenas data)
+      // Usar timezone local para manter consistência
+      const [year, month, day] = date.split("-").map(Number);
+      const normalizedDate = new Date(year, month - 1, day);
+
       const appointmentData = {
         clientId: selectedClient.id,
         clientName: selectedClient.fullName,
-        date: new Date(date),
+        date: normalizedDate,
         startTime,
         endTime,
         notes,
@@ -135,7 +157,10 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
 
       if (appointment) {
         // Atualizar agendamento existente
-        await updateAppointment(appointment.id, appointmentData);
+        await updateAppointment(appointment.id, {
+          ...appointmentData,
+          status,
+        });
       } else {
         // Criar novo agendamento
         await createAppointment(appointmentData, user.uid);
@@ -273,6 +298,35 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
               )}
             </div>
           </div>
+
+          {/* Status */}
+          {appointment && (
+            <div className="appointment-modal__field">
+              <label className="appointment-modal__label">
+                Status do Agendamento{" "}
+                <span className="appointment-modal__required">*</span>
+              </label>
+              <select
+                className="appointment-modal__input"
+                value={status}
+                onChange={(e) =>
+                  setStatus(
+                    e.target.value as
+                      | "scheduled"
+                      | "completed"
+                      | "cancelled"
+                      | "no-show"
+                  )
+                }
+                disabled={loading}
+              >
+                <option value="scheduled">Agendado</option>
+                <option value="completed">Concluído</option>
+                <option value="cancelled">Cancelado</option>
+                <option value="no-show">Faltou</option>
+              </select>
+            </div>
+          )}
 
           {/* Notas */}
           <div className="appointment-modal__field">

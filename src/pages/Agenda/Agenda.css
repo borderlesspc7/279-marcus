@@ -55,7 +55,7 @@
 
 .agenda__spinner {
   font-size: 2.5rem;
-  color: #667eea;
+  color: #16a34a;
   animation: spin 1s linear infinite;
 }
 
@@ -168,7 +168,7 @@
 }
 
 .rbc-toolbar button {
-  color: #667eea;
+  color: #16a34a;
   border: 1px solid #e5e7eb;
   background: white;
   padding: 0.5rem 1rem;
@@ -178,16 +178,16 @@
 }
 
 .rbc-toolbar button:hover {
-  background: #667eea;
+  background: #16a34a;
   color: white;
-  border-color: #667eea;
+  border-color: #16a34a;
 }
 
 .rbc-toolbar button:active,
 .rbc-toolbar button.rbc-active {
-  background: #667eea;
+  background: #16a34a;
   color: white;
-  border-color: #667eea;
+  border-color: #16a34a;
   box-shadow: none;
 }
 
