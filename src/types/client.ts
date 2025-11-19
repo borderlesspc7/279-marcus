@@ -5,6 +5,8 @@ export interface Client {
   phone: string;
   birthDate: string;
   gender: "masculino" | "feminino" | "outro";
+  height?: number; // altura em cm
+  weight?: number; // peso em kg
   createdAt: Date;
   updatedAt: Date;
   nutritionistId: string;
@@ -33,4 +35,6 @@ export interface CreateClientData {
   phone: string;
   birthDate: string;
   gender: "masculino" | "feminino" | "outro";
+  height?: number; // altura em cm
+  weight?: number; // peso em kg
 }

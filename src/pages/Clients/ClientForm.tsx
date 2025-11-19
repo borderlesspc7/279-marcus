@@ -19,11 +19,13 @@ export const ClientForm: React.FC = () => {
     phone: "",
     birthDate: "",
     gender: "feminino",
+    height: undefined,
+    weight: undefined,
   });
 
   const [formErrors, setFormErrors] = useState<Partial<CreateClientData>>({});
 
-  const handleInputChange = (field: keyof CreateClientData, value: string) => {
+  const handleInputChange = (field: keyof CreateClientData, value: string | number) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -216,6 +218,34 @@ export const ClientForm: React.FC = () => {
                   </label>
                 </div>
               </div>
+            </div>
+
+            <div className="client-form__row">
+              <InputField
+                label="Altura (cm)"
+                type="number"
+                value={formData.height?.toString() || ""}
+                onChange={(value) =>
+                  handleInputChange("height", value ? parseFloat(value) : undefined)
+                }
+                placeholder="Ex: 175"
+                disabled={loading}
+                min="0"
+                step="0.1"
+              />
+
+              <InputField
+                label="Peso (kg)"
+                type="number"
+                value={formData.weight?.toString() || ""}
+                onChange={(value) =>
+                  handleInputChange("weight", value ? parseFloat(value) : undefined)
+                }
+                placeholder="Ex: 70.5"
+                disabled={loading}
+                min="0"
+                step="0.1"
+              />
             </div>
           </div>
 

@@ -51,6 +51,8 @@ export const createClient = async (
       phone: clientData.phone,
       birthDate: clientData.birthDate,
       gender: clientData.gender,
+      height: clientData.height || null,
+      weight: clientData.weight || null,
       nutritionistId,
       authUid: clientUid,
       createdAt: Timestamp.now(),

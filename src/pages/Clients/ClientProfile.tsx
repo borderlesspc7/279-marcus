@@ -27,8 +27,10 @@ import {
   deleteClientNote,
   getClientDocuments,
   deleteClientDocument,
+  updateClient,
 } from "../../services/clientService";
 import type { Client, ClientNote, ClientDocument } from "../../types/client";
+import { AddDocumentModal } from "./components/AddDocumentModal";
 import "./ClientProfile.css";
 
 export const ClientProfile: React.FC = () => {
@@ -48,6 +50,15 @@ export const ClientProfile: React.FC = () => {
   // Estados para edição de nota
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editingNoteContent, setEditingNoteContent] = useState("");
+
+  // Estado para modal de documento
+  const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
+
+  // Estados para edição de altura e peso
+  const [isEditingMeasurements, setIsEditingMeasurements] = useState(false);
+  const [editingHeight, setEditingHeight] = useState<string>("");
+  const [editingWeight, setEditingWeight] = useState<string>("");
+  const [updatingMeasurements, setUpdatingMeasurements] = useState(false);
 
   const loadClientData = useCallback(async () => {
     if (!clientId) return;
@@ -81,6 +92,13 @@ export const ClientProfile: React.FC = () => {
   useEffect(() => {
     loadClientData();
   }, [loadClientData]);
+
+  useEffect(() => {
+    if (client) {
+      setEditingHeight(client.height?.toString() || "");
+      setEditingWeight(client.weight?.toString() || "");
+    }
+  }, [client]);
 
   const handleAddNote = async () => {
     if (!newNote.trim() || !clientId) return;
@@ -153,6 +171,50 @@ export const ClientProfile: React.FC = () => {
       console.error("Erro ao deletar documento:", err);
       alert("Erro ao deletar documento");
     }
+  };
+
+  const handleDocumentAdded = async () => {
+    if (!clientId) return;
+    // Recarrega os documentos
+    const documentsData = await getClientDocuments(clientId);
+    setDocuments(documentsData);
+  };
+
+  const handleStartEditMeasurements = () => {
+    if (client) {
+      setEditingHeight(client.height?.toString() || "");
+      setEditingWeight(client.weight?.toString() || "");
+      setIsEditingMeasurements(true);
+    }
+  };
+
+  const handleSaveMeasurements = async () => {
+    if (!clientId || !client) return;
+
+    try {
+      setUpdatingMeasurements(true);
+      await updateClient(clientId, {
+        height: editingHeight ? parseFloat(editingHeight) : undefined,
+        weight: editingWeight ? parseFloat(editingWeight) : undefined,
+      });
+
+      // Recarrega os dados do cliente
+      await loadClientData();
+      setIsEditingMeasurements(false);
+    } catch (err) {
+      console.error("Erro ao atualizar medidas:", err);
+      alert("Erro ao atualizar medidas");
+    } finally {
+      setUpdatingMeasurements(false);
+    }
+  };
+
+  const handleCancelEditMeasurements = () => {
+    if (client) {
+      setEditingHeight(client.height?.toString() || "");
+      setEditingWeight(client.weight?.toString() || "");
+    }
+    setIsEditingMeasurements(false);
   };
 
   const formatDate = (date: Date) => {
@@ -247,6 +309,133 @@ export const ClientProfile: React.FC = () => {
                 {client.gender}
               </span>
             </div>
+
+            {(client.height || client.weight) && (
+              <>
+                {client.height && (
+                  <div className="client-profile__detail-item">
+                    <span className="client-profile__icon">📏</span>
+                    <span>{client.height} cm</span>
+                  </div>
+                )}
+                {client.weight && (
+                  <div className="client-profile__detail-item">
+                    <span className="client-profile__icon">⚖️</span>
+                    <span>{client.weight} kg</span>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Edição de Altura e Peso */}
+          <div className="client-profile__measurements">
+            <div className="client-profile__measurements-header">
+              <h3 className="client-profile__measurements-title">
+                Medidas Corporais
+              </h3>
+              {!isEditingMeasurements && (
+                <Button
+                  variant="secondary"
+                  size="small"
+                  onClick={handleStartEditMeasurements}
+                >
+                  <FaEdit /> Editar
+                </Button>
+              )}
+            </div>
+
+            {isEditingMeasurements ? (
+              <div className="client-profile__measurements-edit">
+                <div className="client-profile__measurements-row">
+                  <div className="client-profile__measurements-field">
+                    <label className="client-profile__measurements-label">
+                      Altura (cm)
+                    </label>
+                    <input
+                      type="number"
+                      className="client-profile__measurements-input"
+                      value={editingHeight}
+                      onChange={(e) => setEditingHeight(e.target.value)}
+                      placeholder="Ex: 175"
+                      min="0"
+                      step="0.1"
+                    />
+                  </div>
+                  <div className="client-profile__measurements-field">
+                    <label className="client-profile__measurements-label">
+                      Peso (kg)
+                    </label>
+                    <input
+                      type="number"
+                      className="client-profile__measurements-input"
+                      value={editingWeight}
+                      onChange={(e) => setEditingWeight(e.target.value)}
+                      placeholder="Ex: 70.5"
+                      min="0"
+                      step="0.1"
+                    />
+                  </div>
+                </div>
+                <div className="client-profile__measurements-actions">
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={handleCancelEditMeasurements}
+                    disabled={updatingMeasurements}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    variant="primary"
+                    size="small"
+                    onClick={handleSaveMeasurements}
+                    disabled={updatingMeasurements}
+                  >
+                    {updatingMeasurements ? (
+                      <>
+                        <FaSpinner className="client-profile__spinner" /> Salvando...
+                      </>
+                    ) : (
+                      <>
+                        <FaSave /> Salvar
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="client-profile__measurements-display">
+                {client.height || client.weight ? (
+                  <div className="client-profile__measurements-row">
+                    {client.height && (
+                      <div className="client-profile__measurements-item">
+                        <span className="client-profile__measurements-label">
+                          Altura
+                        </span>
+                        <span className="client-profile__measurements-value">
+                          {client.height} cm
+                        </span>
+                      </div>
+                    )}
+                    {client.weight && (
+                      <div className="client-profile__measurements-item">
+                        <span className="client-profile__measurements-label">
+                          Peso
+                        </span>
+                        <span className="client-profile__measurements-value">
+                          {client.weight} kg
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="client-profile__measurements-empty">
+                    Nenhuma medida cadastrada. Clique em "Editar" para adicionar.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -366,7 +555,11 @@ export const ClientProfile: React.FC = () => {
               <FaFileAlt style={{ marginRight: "0.5rem" }} />
               Documentos e Exames
             </h2>
-            <Button variant="primary" size="small">
+            <Button
+              variant="primary"
+              size="small"
+              onClick={() => setIsDocumentModalOpen(true)}
+            >
               <FaPlus /> Adicionar Documento
             </Button>
           </div>
@@ -413,6 +606,16 @@ export const ClientProfile: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de Adicionar Documento */}
+      {clientId && (
+        <AddDocumentModal
+          isOpen={isDocumentModalOpen}
+          onClose={() => setIsDocumentModalOpen(false)}
+          onSuccess={handleDocumentAdded}
+          clientId={clientId}
+        />
+      )}
     </div>
   );
 };

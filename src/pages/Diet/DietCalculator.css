@@ -1,0 +1,290 @@
+.diet-calculator {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.diet-calculator__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  color: #6b7280;
+}
+
+.diet-calculator__spinner {
+  animation: spin 1s linear infinite;
+  font-size: 2rem;
+  color: #16a34a;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.diet-calculator__header {
+  margin-bottom: 2rem;
+}
+
+.diet-calculator__back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.diet-calculator__title-section {
+  margin-bottom: 2rem;
+}
+
+.diet-calculator__title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.diet-calculator__title-icon {
+  color: #16a34a;
+  font-size: 2rem;
+}
+
+.diet-calculator__title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.diet-calculator__subtitle {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.diet-calculator__error {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: #fef2f2;
+  border: 2px solid #fecaca;
+  border-radius: 12px;
+  color: #991b1b;
+  margin-bottom: 2rem;
+}
+
+.diet-calculator__error p {
+  margin: 0;
+  font-weight: 500;
+}
+
+.diet-calculator__form {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  border: 2px solid #e5e7eb;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.diet-calculator__row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.diet-calculator__bmi {
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+}
+
+.diet-calculator__bmi-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+}
+
+.diet-calculator__bmi-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.diet-calculator__bmi-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.diet-calculator__bmi-category {
+  font-size: 0.875rem;
+  margin-left: auto;
+}
+
+.diet-calculator__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.diet-calculator__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.diet-calculator__required {
+  color: #ef4444;
+  margin-left: 0.25rem;
+}
+
+.diet-calculator__input,
+.diet-calculator__select,
+.diet-calculator__textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  color: #1f2937;
+  background: white;
+  transition: all 0.2s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.diet-calculator__input:focus,
+.diet-calculator__select:focus,
+.diet-calculator__textarea:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+.diet-calculator__textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.diet-calculator__client-selected {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: #f0fdf4;
+  border: 2px solid #16a34a;
+  border-radius: 12px;
+  color: #15803d;
+  font-weight: 500;
+}
+
+.diet-calculator__client-clear {
+  margin-left: auto;
+  padding: 0.25rem 0.75rem;
+  background: white;
+  border: 1px solid #16a34a;
+  border-radius: 8px;
+  color: #16a34a;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.diet-calculator__client-clear:hover {
+  background: #16a34a;
+  color: white;
+}
+
+.diet-calculator__summary {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: white;
+}
+
+.diet-calculator__summary-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+}
+
+.diet-calculator__summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.diet-calculator__summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.diet-calculator__summary-label {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.diet-calculator__summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.diet-calculator__summary-value--calories {
+  font-size: 2rem;
+}
+
+.diet-calculator__meals {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.diet-calculator__actions {
+  position: sticky;
+  bottom: 2rem;
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  border: 2px solid #e5e7eb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .diet-calculator {
+    padding: 1rem;
+  }
+
+  .diet-calculator__title {
+    font-size: 1.5rem;
+  }
+
+  .diet-calculator__form {
+    padding: 1.5rem;
+  }
+
+  .diet-calculator__row {
+    grid-template-columns: 1fr;
+  }
+
+  .diet-calculator__summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

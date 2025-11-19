@@ -1,0 +1,155 @@
+.food-search {
+  position: relative;
+  width: 100%;
+}
+
+.food-search__input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.food-search__icon {
+  position: absolute;
+  left: 1rem;
+  color: #6b7280;
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.food-search__spinner {
+  position: absolute;
+  right: 1rem;
+  color: #16a34a;
+  font-size: 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.food-search__input {
+  width: 100%;
+  padding: 0.875rem 1rem 0.875rem 2.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  color: #1f2937;
+  background: white;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.food-search__input:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+.food-search__input::placeholder {
+  color: #9ca3af;
+}
+
+.food-search__dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  max-height: 400px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.food-search__loading,
+.food-search__empty {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.food-search__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.food-search__empty p {
+  margin: 0;
+}
+
+.food-search__list {
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+}
+
+.food-search__item {
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.food-search__item:last-child {
+  border-bottom: none;
+}
+
+.food-search__item:hover {
+  background: #f9fafb;
+}
+
+.food-search__item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.food-search__item-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.food-search__item-category {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.food-search__item-nutrition {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.food-search__item-nutrition span:first-child {
+  font-weight: 600;
+  color: #16a34a;
+}
+
