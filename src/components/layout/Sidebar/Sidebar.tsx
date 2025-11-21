@@ -7,6 +7,7 @@ import {
   FaCalculator,
   FaChartLine,
   FaAppleAlt,
+  FaUtensils,
 } from "react-icons/fa";
 import "./Sidebar.css";
 

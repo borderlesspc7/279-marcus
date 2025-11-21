@@ -53,6 +53,15 @@ export const authService = {
       await setDoc(doc(db, "users", firebaseUser.uid), updateUserData);
       return updateUserData;
     } catch (error) {
+      // Preservar o código do erro original se for um erro do Firebase
+      if (error && typeof error === "object" && "code" in error) {
+        const firebaseErr = error as firebaseError;
+        const message = getFirebaseErrorMessage(firebaseErr);
+        const newError = new Error(message) as Error & { code?: string };
+        newError.code = firebaseErr.code;
+        throw newError;
+      }
+      
       const message = getFirebaseErrorMessage(error as firebaseError | string);
       throw new Error(message);
     }
@@ -96,30 +105,21 @@ export const authService = {
   observeAuthState(callback: (user: User | null) => void): Unsubscribe {
     try {
       return onAuthStateChanged(auth, async (firebaseUser) => {
-        console.log(
-          "🔄 Auth state changed:",
-          firebaseUser ? firebaseUser.uid : "null"
-        );
-
         if (firebaseUser) {
           // Usuário está logado, busca dados completos no Firestore
           try {
             const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
             if (userDoc.exists()) {
               const userData = userDoc.data() as User;
-              console.log("✅ Usuário autenticado:", userData);
               callback(userData);
             } else {
-              console.log("❌ Usuário não encontrado no Firestore");
               callback(null); // Usuário não encontrado no Firestore
             }
           } catch (error) {
-            console.error("❌ Erro ao buscar dados do usuário:", error);
             callback(null);
           }
         } else {
           // Usuário não está logado
-          console.log("🚪 Usuário deslogado");
           callback(null);
         }
       });

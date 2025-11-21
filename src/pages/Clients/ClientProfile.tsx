@@ -17,6 +17,8 @@ import {
   FaExclamationTriangle,
   FaStickyNote,
   FaFileAlt,
+  FaUtensils,
+  FaEye,
 } from "react-icons/fa";
 import { Button } from "../../components/ui/Button/Button";
 import {
@@ -29,7 +31,9 @@ import {
   deleteClientDocument,
   updateClient,
 } from "../../services/clientService";
+import { getDietsByClient, deleteDiet } from "../../services/dietService";
 import type { Client, ClientNote, ClientDocument } from "../../types/client";
+import type { Diet } from "../../types/food";
 import { AddDocumentModal } from "./components/AddDocumentModal";
 import "./ClientProfile.css";
 
@@ -40,6 +44,7 @@ export const ClientProfile: React.FC = () => {
   const [client, setClient] = useState<Client | null>(null);
   const [notes, setNotes] = useState<ClientNote[]>([]);
   const [documents, setDocuments] = useState<ClientDocument[]>([]);
+  const [diets, setDiets] = useState<Diet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,10 +72,11 @@ export const ClientProfile: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      const [clientData, notesData, documentsData] = await Promise.all([
+      const [clientData, notesData, documentsData, dietsData] = await Promise.all([
         getClientById(clientId),
         getClientNotes(clientId),
         getClientDocuments(clientId),
+        getDietsByClient(clientId),
       ]);
 
       if (!clientData) {
@@ -81,6 +87,7 @@ export const ClientProfile: React.FC = () => {
       setClient(clientData);
       setNotes(notesData);
       setDocuments(documentsData);
+      setDiets(dietsData);
     } catch (err) {
       console.error("Erro ao carregar dados do cliente:", err);
       setError("Erro ao carregar dados. Tente novamente.");
@@ -215,6 +222,52 @@ export const ClientProfile: React.FC = () => {
       setEditingWeight(client.weight?.toString() || "");
     }
     setIsEditingMeasurements(false);
+  };
+
+  const handleDeleteDiet = async (dietId: string) => {
+    if (!confirm("Tem certeza que deseja excluir esta dieta?")) return;
+    if (!clientId) return;
+
+    try {
+      await deleteDiet(dietId);
+      // Recarrega as dietas
+      const dietsData = await getDietsByClient(clientId);
+      setDiets(dietsData);
+    } catch (err) {
+      console.error("Erro ao deletar dieta:", err);
+      alert("Erro ao deletar dieta");
+    }
+  };
+
+  const calculateTotalNutrition = (diet: Diet) => {
+    return diet.meals.reduce(
+      (totals, meal) => {
+        const mealTotals = meal.foods.reduce(
+          (mealTotal, mealFood) => {
+            const multiplier =
+              mealFood.unit === "unidades" && mealFood.food.unitWeight
+                ? (mealFood.quantity * mealFood.food.unitWeight) / 100
+                : mealFood.quantity / 100;
+
+            return {
+              calories: mealTotal.calories + mealFood.food.calories * multiplier,
+              protein: mealTotal.protein + mealFood.food.protein * multiplier,
+              carbs: mealTotal.carbs + mealFood.food.carbs * multiplier,
+              fat: mealTotal.fat + mealFood.food.fat * multiplier,
+            };
+          },
+          { calories: 0, protein: 0, carbs: 0, fat: 0 }
+        );
+
+        return {
+          calories: totals.calories + mealTotals.calories,
+          protein: totals.protein + mealTotals.protein,
+          carbs: totals.carbs + mealTotals.carbs,
+          fat: totals.fat + mealTotals.fat,
+        };
+      },
+      { calories: 0, protein: 0, carbs: 0, fat: 0 }
+    );
   };
 
   const formatDate = (date: Date) => {
@@ -441,6 +494,102 @@ export const ClientProfile: React.FC = () => {
       </div>
 
       <div className="client-profile__content">
+        {/* Seção de Dietas */}
+        <div className="client-profile__section client-profile__section--full">
+          <div className="client-profile__section-header">
+            <h2 className="client-profile__section-title">
+              <FaUtensils style={{ marginRight: "0.5rem" }} />
+              Dietas
+            </h2>
+            <Button
+              variant="primary"
+              size="small"
+              onClick={() => navigate(`/dashboard/calculadora?clientId=${clientId}`)}
+            >
+              <FaPlus /> Criar Nova Dieta
+            </Button>
+          </div>
+
+          <div className="client-profile__diets-list">
+            {diets.length === 0 ? (
+              <div className="client-profile__empty">
+                <p>Nenhuma dieta criada ainda.</p>
+                <Button
+                  variant="primary"
+                  onClick={() => navigate(`/dashboard/calculadora?clientId=${clientId}`)}
+                  style={{ marginTop: "1rem" }}
+                >
+                  <FaPlus /> Criar Primeira Dieta
+                </Button>
+              </div>
+            ) : (
+              diets.map((diet) => {
+                const totals = calculateTotalNutrition(diet);
+                return (
+                  <div key={diet.id} className="client-profile__diet-card">
+                    <div className="client-profile__diet-header">
+                      <div>
+                        <h3 className="client-profile__diet-name">{diet.name}</h3>
+                        {diet.description && (
+                          <p className="client-profile__diet-description">
+                            {diet.description}
+                          </p>
+                        )}
+                        <span className="client-profile__diet-date">
+                          Criada em: {diet.createdAt.toLocaleDateString("pt-BR")}
+                        </span>
+                      </div>
+                      <div className="client-profile__diet-actions">
+                        <Button
+                          variant="secondary"
+                          size="small"
+                          onClick={() => navigate(`/dashboard/dietas/${diet.id}`)}
+                        >
+                          <FaEye /> Ver Detalhes
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="small"
+                          onClick={() => handleDeleteDiet(diet.id)}
+                          className="client-profile__diet-delete"
+                        >
+                          <FaTrash />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="client-profile__diet-nutrition">
+                      <div className="client-profile__diet-nutrition-item">
+                        <span className="client-profile__diet-nutrition-label">Calorias</span>
+                        <span className="client-profile__diet-nutrition-value client-profile__diet-nutrition-value--calories">
+                          {totals.calories.toFixed(0)} kcal
+                        </span>
+                      </div>
+                      <div className="client-profile__diet-nutrition-item">
+                        <span className="client-profile__diet-nutrition-label">Proteínas</span>
+                        <span className="client-profile__diet-nutrition-value">
+                          {totals.protein.toFixed(1)}g
+                        </span>
+                      </div>
+                      <div className="client-profile__diet-nutrition-item">
+                        <span className="client-profile__diet-nutrition-label">Carboidratos</span>
+                        <span className="client-profile__diet-nutrition-value">
+                          {totals.carbs.toFixed(1)}g
+                        </span>
+                      </div>
+                      <div className="client-profile__diet-nutrition-item">
+                        <span className="client-profile__diet-nutrition-label">Gorduras</span>
+                        <span className="client-profile__diet-nutrition-value">
+                          {totals.fat.toFixed(1)}g
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
         {/* Seção de Anotações */}
         <div className="client-profile__section">
           <div className="client-profile__section-header">

@@ -22,7 +22,7 @@ export default function LoginForm() {
     try {
       await login({ email, password });
     } catch (error) {
-      console.error("Login failed:", error);
+      // Erro já é tratado pelo AuthContext
     } finally {
       setIsLoading(false);
     }

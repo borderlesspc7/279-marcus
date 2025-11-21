@@ -10,6 +10,8 @@ import { ClientForm } from "../pages/Clients/ClientForm";
 import { ClientProfile } from "../pages/Clients/ClientProfile";
 import { Agenda } from "../pages/Agenda/Agenda";
 import { DietCalculator } from "../pages/Diet/DietCalculator";
+import { DietList } from "../pages/Diet/DietList";
+import { DietDetail } from "../pages/Diet/DietDetail";
 
 export default function AppRoutes() {
 
@@ -93,6 +95,26 @@ export default function AppRoutes() {
             <ProtectedRoutes>
               <DashboardLayout>
                 <DietCalculator />
+              </DashboardLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path={paths.dietas}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <DietList />
+              </DashboardLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path={paths.dietaDetail}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <DietDetail />
               </DashboardLayout>
             </ProtectedRoutes>
           }

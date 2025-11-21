@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   FaArrowLeft,
   FaSave,
@@ -20,6 +20,7 @@ import "./DietCalculator.css";
 
 export const DietCalculator: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
 
   const [clients, setClients] = useState<Client[]>([]);
@@ -52,6 +53,17 @@ export const DietCalculator: React.FC = () => {
         // Carregar clientes
         const clientsData = await getClientsByNutritionist(user.uid);
         setClients(clientsData);
+
+        // Se houver clientId na URL, pré-selecionar o cliente
+        const clientIdFromUrl = searchParams.get("clientId");
+        if (clientIdFromUrl) {
+          const client = clientsData.find((c) => c.id === clientIdFromUrl);
+          if (client) {
+            setSelectedClient(client);
+            if (client.height) setHeight(client.height.toString());
+            if (client.weight) setWeight(client.weight.toString());
+          }
+        }
       } catch (err) {
         console.error("Erro ao inicializar:", err);
         setError("Erro ao carregar dados. Tente novamente.");

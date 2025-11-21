@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Regras para a coleção de usuários
+    match /users/{userId} {
+      // Permite que usuários autenticados leiam e escrevam apenas seus próprios dados
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      
+      // Permite que usuários autenticados leiam dados de outros usuários (se necessário para funcionalidades como busca)
+      // Descomente a linha abaixo se precisar que usuários vejam dados de outros usuários
+      // allow read: if request.auth != null;
+    }
+    
+    // Regras para outras coleções (ajuste conforme necessário)
+    match /clients/{clientId} {
+      // Permite que usuários autenticados leiam e escrevam clientes
+      allow read, write: if request.auth != null;
+    }
+    
+    match /appointments/{appointmentId} {
+      // Permite que usuários autenticados leiam e escrevam agendamentos
+      allow read, write: if request.auth != null;
+    }
+    
+    match /diets/{dietId} {
+      // Permite que usuários autenticados leiam e escrevam dietas
+      allow read, write: if request.auth != null;
+    }
+    
+    match /foods/{foodId} {
+      // Permite que usuários autenticados leiam alimentos (pode ser apenas leitura)
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+    
+    match /clientNotes/{noteId} {
+      // Permite que usuários autenticados leiam e escrevam notas de clientes
+      allow read, write: if request.auth != null;
+    }
+    
+    match /clientDocuments/{documentId} {
+      // Permite que usuários autenticados leiam e escrevam documentos de clientes
+      allow read, write: if request.auth != null;
+    }
+    
+    // Regra padrão: nega acesso a todas as outras coleções
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+

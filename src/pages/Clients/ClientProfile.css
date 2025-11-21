@@ -372,10 +372,112 @@
   margin: 0;
 }
 
+.client-profile__section--full {
+  grid-column: 1 / -1;
+}
+
+/* Dietas */
+.client-profile__diets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.client-profile__diet-card {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.client-profile__diet-card:hover {
+  border-color: #16a34a;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.1);
+}
+
+.client-profile__diet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.client-profile__diet-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.client-profile__diet-description {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.5;
+}
+
+.client-profile__diet-date {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.client-profile__diet-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.client-profile__diet-delete {
+  color: #ef4444;
+  border-color: #fecaca;
+}
+
+.client-profile__diet-delete:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+}
+
+.client-profile__diet-nutrition {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+}
+
+.client-profile__diet-nutrition-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.client-profile__diet-nutrition-label {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.client-profile__diet-nutrition-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.client-profile__diet-nutrition-value--calories {
+  color: #16a34a;
+  font-size: 1.25rem;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .client-profile__content {
     grid-template-columns: 1fr;
+  }
+  
+  .client-profile__section--full {
+    grid-column: 1;
   }
 }
 

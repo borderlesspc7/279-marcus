@@ -8,6 +8,7 @@ import "./MealSection.css";
 interface MealSectionProps {
   meal: Meal;
   onUpdate: (meal: Meal) => void;
+  readOnly?: boolean;
 }
 
 const mealNames: Record<Meal["name"], string> = {
@@ -17,7 +18,7 @@ const mealNames: Record<Meal["name"], string> = {
   jantar: "Jantar",
 };
 
-export const MealSection: React.FC<MealSectionProps> = ({ meal, onUpdate }) => {
+export const MealSection: React.FC<MealSectionProps> = ({ meal, onUpdate, readOnly = false }) => {
   const [editingFoodId, setEditingFoodId] = useState<string | null>(null);
   const [editingQuantity, setEditingQuantity] = useState<number>(0);
 
@@ -109,9 +110,15 @@ export const MealSection: React.FC<MealSectionProps> = ({ meal, onUpdate }) => {
         </div>
       </div>
 
-      <div className="meal-section__search">
-        <FoodSearch onSelect={handleAddFood} placeholder="Adicionar alimento..." />
-      </div>
+      {!readOnly && (
+        <div className="meal-section__search">
+          <FoodSearch 
+            onSelect={handleAddFood} 
+            placeholder="Adicionar alimento..." 
+            mealType={meal.name}
+          />
+        </div>
+      )}
 
       <div className="meal-section__foods">
         {meal.foods.length === 0 ? (
@@ -167,20 +174,22 @@ export const MealSection: React.FC<MealSectionProps> = ({ meal, onUpdate }) => {
                     {mealFood.quantity}{" "}
                     {mealFood.unit === "unidades" ? "un." : "g"}
                   </span>
-                  <div className="meal-section__food-actions">
-                    <button
-                      className="meal-section__food-btn meal-section__food-btn--edit"
-                      onClick={() => handleStartEdit(mealFood)}
-                    >
-                      <FaEdit />
-                    </button>
-                    <button
-                      className="meal-section__food-btn meal-section__food-btn--delete"
-                      onClick={() => handleRemoveFood(mealFood.foodId)}
-                    >
-                      <FaTrash />
-                    </button>
-                  </div>
+                  {!readOnly && (
+                    <div className="meal-section__food-actions">
+                      <button
+                        className="meal-section__food-btn meal-section__food-btn--edit"
+                        onClick={() => handleStartEdit(mealFood)}
+                      >
+                        <FaEdit />
+                      </button>
+                      <button
+                        className="meal-section__food-btn meal-section__food-btn--delete"
+                        onClick={() => handleRemoveFood(mealFood.foodId)}
+                      >
+                        <FaTrash />
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 

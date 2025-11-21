@@ -9,6 +9,7 @@ export interface Food {
   fiber?: number; // por 100g
   unit: "gramas" | "unidades";
   unitWeight?: number; // peso de uma unidade em gramas (para alimentos vendidos por unidade)
+  allowedMeals?: ("cafe-manha" | "almoco" | "lanche" | "jantar")[]; // refeições onde o alimento pode aparecer
   createdAt: Date;
   updatedAt: Date;
 }

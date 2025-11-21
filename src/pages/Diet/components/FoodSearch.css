@@ -67,8 +67,9 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   max-height: 400px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 9999;
   animation: slideDown 0.2s ease-out;
+  pointer-events: auto;
 }
 
 @keyframes slideDown {
@@ -112,6 +113,12 @@
   cursor: pointer;
   transition: all 0.2s ease;
   border-bottom: 1px solid #f3f4f6;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 
 .food-search__item:last-child {
@@ -120,6 +127,11 @@
 
 .food-search__item:hover {
   background: #f9fafb;
+}
+
+.food-search__item:active {
+  background: #f3f4f6;
+  transform: scale(0.98);
 }
 
 .food-search__item-info {

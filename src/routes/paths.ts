@@ -8,5 +8,7 @@ export const paths = {
   clientesProfile: "/dashboard/clientes/:clientId",
   agenda: "/dashboard/agenda",
   calculadora: "/dashboard/calculadora",
+  dietas: "/dashboard/dietas",
+  dietaDetail: "/dashboard/dietas/:dietId",
   financeiro: "/dashboard/financeiro",
 };

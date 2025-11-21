@@ -7,11 +7,13 @@ import "./FoodSearch.css";
 interface FoodSearchProps {
   onSelect: (food: Food) => void;
   placeholder?: string;
+  mealType?: "cafe-manha" | "almoco" | "lanche" | "jantar";
 }
 
 export const FoodSearch: React.FC<FoodSearchProps> = ({
   onSelect,
   placeholder = "Buscar alimento...",
+  mealType,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [foods, setFoods] = useState<Food[]>([]);
@@ -29,11 +31,15 @@ export const FoodSearch: React.FC<FoodSearchProps> = ({
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    if (isOpen) {
+      // Adicionar listener apenas quando o dropdown estiver aberto
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [isOpen]);
 
   useEffect(() => {
     const searchFoods = async () => {
@@ -44,7 +50,12 @@ export const FoodSearch: React.FC<FoodSearchProps> = ({
 
       setLoading(true);
       try {
-        const results = await getFoods(searchTerm, 10);
+        // Buscar até 100 resultados após aplicar os filtros (aumentado para garantir que todos apareçam)
+        const results = await getFoods(searchTerm, mealType, 100);
+        console.log(`[FoodSearch] Busca: "${searchTerm}", Refeição: ${mealType}, Resultados: ${results.length}`);
+        if (results.length > 0) {
+          console.log("[FoodSearch] Alimentos encontrados:", results.map(f => f.name));
+        }
         setFoods(results);
       } catch (error) {
         console.error("Erro ao buscar alimentos:", error);
@@ -56,7 +67,7 @@ export const FoodSearch: React.FC<FoodSearchProps> = ({
 
     const timeoutId = setTimeout(searchFoods, 300);
     return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [searchTerm, mealType]);
 
   const handleSelect = (food: Food) => {
     onSelect(food);
@@ -99,11 +110,27 @@ export const FoodSearch: React.FC<FoodSearchProps> = ({
             </div>
           ) : (
             <ul className="food-search__list">
-              {foods.map((food) => (
+              {foods.map((food, index) => (
                 <li
-                  key={food.id}
+                  key={`${food.id}-${index}`}
                   className="food-search__item"
-                  onClick={() => handleSelect(food)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSelect(food);
+                  }}
+                  onMouseDown={(e) => {
+                    // Permitir o evento mousedown para que o clique funcione
+                    e.stopPropagation();
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleSelect(food);
+                    }
+                  }}
                 >
                   <div className="food-search__item-info">
                     <span className="food-search__item-name">{food.name}</span>

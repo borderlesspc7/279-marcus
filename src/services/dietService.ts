@@ -12,7 +12,8 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "../lib/firebaseconfig";
-import type { Diet, CreateDietData } from "../types/food";
+import { getFoodById } from "./foodService";
+import type { Diet, CreateDietData, Meal, MealFood } from "../types/food";
 
 const DIETS_COLLECTION = "diets";
 
@@ -62,17 +63,68 @@ export const getDietsByClient = async (clientId: string): Promise<Diet[]> => {
     );
 
     const querySnapshot = await getDocs(q);
+    const diets: Diet[] = [];
 
-    return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt.toDate(),
-      updatedAt: doc.data().updatedAt.toDate(),
-    })) as Diet[];
+    for (const docSnap of querySnapshot.docs) {
+      const data = docSnap.data();
+      const meals = await loadMealsWithFoods(data.meals || []);
+
+      diets.push({
+        id: docSnap.id,
+        clientId: data.clientId,
+        name: data.name,
+        description: data.description,
+        meals,
+        height: data.height,
+        weight: data.weight,
+        nutritionistId: data.nutritionistId,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
+      } as Diet);
+    }
+
+    return diets;
   } catch (error) {
     console.error("Erro ao buscar dietas:", error);
     throw error;
   }
+};
+
+// Função auxiliar para carregar dados completos dos alimentos nas refeições
+const loadMealsWithFoods = async (mealsData: any[]): Promise<Meal[]> => {
+  const meals: Meal[] = [];
+  const mealNames = ["cafe-manha", "almoco", "lanche", "jantar"];
+
+  for (let index = 0; index < mealNames.length; index++) {
+    const mealName = mealNames[index] as "cafe-manha" | "almoco" | "lanche" | "jantar";
+    const mealData = mealsData.find((m) => m.name === mealName) || { name: mealName, foods: [] };
+    
+    const mealFoods: MealFood[] = [];
+
+    for (const mealFoodData of mealData.foods || []) {
+      try {
+        const food = await getFoodById(mealFoodData.foodId);
+        if (food) {
+          mealFoods.push({
+            foodId: mealFoodData.foodId,
+            food,
+            quantity: mealFoodData.quantity,
+            unit: mealFoodData.unit,
+          });
+        }
+      } catch (error) {
+        console.error(`Erro ao carregar alimento ${mealFoodData.foodId}:`, error);
+      }
+    }
+
+    meals.push({
+      id: `${mealName}-${index + 1}`,
+      name: mealName,
+      foods: mealFoods,
+    });
+  }
+
+  return meals;
 };
 
 export const getDietById = async (dietId: string): Promise<Diet | null> => {
@@ -81,11 +133,20 @@ export const getDietById = async (dietId: string): Promise<Diet | null> => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
+      const data = docSnap.data();
+      const meals = await loadMealsWithFoods(data.meals || []);
+
       return {
         id: docSnap.id,
-        ...docSnap.data(),
-        createdAt: docSnap.data().createdAt.toDate(),
-        updatedAt: docSnap.data().updatedAt.toDate(),
+        clientId: data.clientId,
+        name: data.name,
+        description: data.description,
+        meals,
+        height: data.height,
+        weight: data.weight,
+        nutritionistId: data.nutritionistId,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
       } as Diet;
     }
 
@@ -118,6 +179,42 @@ export const deleteDiet = async (dietId: string): Promise<void> => {
     await deleteDoc(docRef);
   } catch (error) {
     console.error("Erro ao deletar dieta:", error);
+    throw error;
+  }
+};
+
+export const getDietsByNutritionist = async (nutritionistId: string): Promise<Diet[]> => {
+  try {
+    const q = query(
+      collection(db, DIETS_COLLECTION),
+      where("nutritionistId", "==", nutritionistId),
+      orderBy("createdAt", "desc")
+    );
+
+    const querySnapshot = await getDocs(q);
+    const diets: Diet[] = [];
+
+    for (const docSnap of querySnapshot.docs) {
+      const data = docSnap.data();
+      const meals = await loadMealsWithFoods(data.meals || []);
+
+      diets.push({
+        id: docSnap.id,
+        clientId: data.clientId,
+        name: data.name,
+        description: data.description,
+        meals,
+        height: data.height,
+        weight: data.weight,
+        nutritionistId: data.nutritionistId,
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
+      } as Diet);
+    }
+
+    return diets;
+  } catch (error) {
+    console.error("Erro ao buscar dietas:", error);
     throw error;
   }
 };
