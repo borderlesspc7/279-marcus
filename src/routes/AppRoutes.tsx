@@ -12,6 +12,7 @@ import { Agenda } from "../pages/Agenda/Agenda";
 import { DietCalculator } from "../pages/Diet/DietCalculator";
 import { DietList } from "../pages/Diet/DietList";
 import { DietDetail } from "../pages/Diet/DietDetail";
+import { ImportTacoFoods } from "../pages/Admin/ImportTacoFoods";
 
 export default function AppRoutes() {
 
@@ -125,6 +126,16 @@ export default function AppRoutes() {
             <ProtectedRoutes>
               <DashboardLayout>
                 <Financeiro />
+              </DashboardLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path={paths.importTaco}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <ImportTacoFoods />
               </DashboardLayout>
             </ProtectedRoutes>
           }

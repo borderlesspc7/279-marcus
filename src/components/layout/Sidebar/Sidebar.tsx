@@ -8,6 +8,7 @@ import {
   FaChartLine,
   FaAppleAlt,
   FaUtensils,
+  FaDatabase,
 } from "react-icons/fa";
 import "./Sidebar.css";
 
@@ -50,6 +51,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       path: "/dashboard/financeiro",
       icon: <FaChartLine size={20} />,
       label: "Financeiro",
+    },
+    {
+      path: "/dashboard/admin/import-taco",
+      icon: <FaDatabase size={20} />,
+      label: "Importar TACO",
     },
   ];
 

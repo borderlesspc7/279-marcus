@@ -11,4 +11,5 @@ export const paths = {
   dietas: "/dashboard/dietas",
   dietaDetail: "/dashboard/dietas/:dietId",
   financeiro: "/dashboard/financeiro",
+  importTaco: "/dashboard/admin/import-taco",
 };

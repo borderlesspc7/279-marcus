@@ -1,0 +1,91 @@
+{
+  "description": "Template para dados de alimentos da TACO (Tabela Brasileira de Composição de Alimentos)",
+  "version": "1.0.0",
+  "source": "NEPA/UNICAMP - TACO 4ª edição revisada e ampliada, 2011",
+  "instructions": "Preencha este arquivo com os dados nutricionais extraídos do PDF TACO. Cada alimento deve ter os campos obrigatórios: name, category, calories, protein, carbs, fat, unit. Campos opcionais: fiber, unitWeight, allowedMeals.",
+  "foods": [
+    {
+      "name": "Abacate, cru",
+      "category": "Frutas",
+      "calories": 96,
+      "protein": 1.2,
+      "carbs": 6.0,
+      "fat": 8.4,
+      "fiber": 6.3,
+      "unit": "gramas",
+      "allowedMeals": ["cafe-manha", "lanche"]
+    },
+    {
+      "name": "Abacaxi, cru",
+      "category": "Frutas",
+      "calories": 48,
+      "protein": 0.9,
+      "carbs": 12.3,
+      "fat": 0.1,
+      "fiber": 1.0,
+      "unit": "gramas",
+      "allowedMeals": ["cafe-manha", "lanche"]
+    },
+    {
+      "name": "Arroz, agulhinha, tipo 1, cozido",
+      "category": "Carboidratos",
+      "calories": 128,
+      "protein": 2.5,
+      "carbs": 28.1,
+      "fat": 0.2,
+      "fiber": 1.6,
+      "unit": "gramas",
+      "allowedMeals": ["almoco", "jantar"]
+    },
+    {
+      "name": "Arroz, integral, cozido",
+      "category": "Carboidratos",
+      "calories": 123,
+      "protein": 2.6,
+      "carbs": 25.8,
+      "fat": 1.0,
+      "fiber": 2.7,
+      "unit": "gramas",
+      "allowedMeals": ["almoco", "jantar"]
+    },
+    {
+      "name": "Feijão, carioca, cozido",
+      "category": "Leguminosas",
+      "calories": 76,
+      "protein": 4.8,
+      "carbs": 13.6,
+      "fat": 0.5,
+      "fiber": 8.5,
+      "unit": "gramas",
+      "allowedMeals": ["almoco", "jantar"]
+    },
+    {
+      "name": "Frango, peito, sem pele, grelhado",
+      "category": "Proteínas",
+      "calories": 159,
+      "protein": 32.0,
+      "carbs": 0.0,
+      "fat": 2.5,
+      "unit": "gramas",
+      "allowedMeals": ["almoco", "jantar"]
+    },
+    {
+      "name": "Ovo, de galinha, inteiro, cozido/10minutos",
+      "category": "Proteínas",
+      "calories": 146,
+      "protein": 13.3,
+      "carbs": 0.6,
+      "fat": 9.5,
+      "unit": "unidades",
+      "unitWeight": 50,
+      "allowedMeals": ["cafe-manha", "almoco", "jantar"]
+    }
+  ],
+  "notes": [
+    "Os valores nutricionais são por 100g (ou por unidade quando especificado)",
+    "allowedMeals pode ser omitido para usar valores padrão baseados na categoria",
+    "unitWeight é obrigatório quando unit é 'unidades'",
+    "Para importar, use a função importTacoFoods do arquivo scripts/importTacoFoods.ts"
+  ]
+}
+

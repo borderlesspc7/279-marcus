@@ -12,7 +12,6 @@ import { Button } from "../../components/ui/Button/Button";
 import { MealSection } from "./components/MealSection";
 import { getClientsByNutritionist } from "../../services/clientService";
 import { createDiet } from "../../services/dietService";
-import { initializeDefaultFoods } from "../../services/foodService";
 import { useAuth } from "../../hooks/useAuth";
 import type { Client } from "../../types/client";
 import type { Meal } from "../../types/food";
@@ -47,8 +46,8 @@ export const DietCalculator: React.FC = () => {
 
       try {
         setInitializing(true);
-        // Inicializar alimentos padrão se necessário
-        await initializeDefaultFoods();
+        // Nota: Alimentos devem ser importados via sistema de importação (veja ImportTacoFoods)
+        // Não há mais inicialização automática de alimentos padrão
 
         // Carregar clientes
         const clientsData = await getClientsByNutritionist(user.uid);
