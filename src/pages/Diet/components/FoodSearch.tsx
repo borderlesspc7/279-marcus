@@ -50,11 +50,14 @@ export const FoodSearch: React.FC<FoodSearchProps> = ({
 
       setLoading(true);
       try {
+        console.log(`[FoodSearch] 🔍 Iniciando busca de alimentos do FIRESTORE...`);
         // Buscar até 100 resultados após aplicar os filtros (aumentado para garantir que todos apareçam)
         const results = await getFoods(searchTerm, mealType, 100);
-        console.log(`[FoodSearch] Busca: "${searchTerm}", Refeição: ${mealType}, Resultados: ${results.length}`);
+        console.log(`[FoodSearch] ✅ Busca concluída: "${searchTerm}", Refeição: ${mealType}, Resultados do FIRESTORE: ${results.length}`);
         if (results.length > 0) {
-          console.log("[FoodSearch] Alimentos encontrados:", results.map(f => f.name));
+          console.log("[FoodSearch] Alimentos encontrados no banco:", results.map(f => f.name));
+        } else {
+          console.log("[FoodSearch] ⚠️ Nenhum alimento encontrado no FIRESTORE com os critérios informados");
         }
         setFoods(results);
       } catch (error) {

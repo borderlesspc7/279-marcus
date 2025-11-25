@@ -46,8 +46,9 @@ export const DietCalculator: React.FC = () => {
 
       try {
         setInitializing(true);
-        // Nota: Alimentos devem ser importados via sistema de importação (veja ImportTacoFoods)
-        // Não há mais inicialização automática de alimentos padrão
+        // Nota: Alimentos são buscados diretamente do Firestore através do foodService
+        // O componente FoodSearch (usado em MealSection) utiliza getFoods() que consulta o banco de dados
+        // Alimentos devem ser importados via sistema de importação (veja ImportTacoFoods)
 
         // Carregar clientes
         const clientsData = await getClientsByNutritionist(user.uid);

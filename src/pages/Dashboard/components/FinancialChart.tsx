@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   ComposedChart,
   Bar,
@@ -10,61 +10,96 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { FaArrowUp, FaArrowDown, FaChartLine } from "react-icons/fa";
+import { FaArrowUp, FaArrowDown, FaChartLine, FaSpinner } from "react-icons/fa";
+import { useAuth } from "../../../hooks/useAuth";
+import {
+  getFinancialSummary,
+  getMonthlyFinancialData,
+} from "../../../services/financialService";
+import { getUpcomingAppointments } from "../../../services/appointmentService";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../../lib/firebaseconfig";
+import type { MonthlyFinancialData } from "../../../types/financial";
+import type { User } from "../../../types/user";
 import "./FinancialChart.css";
 
 export const FinancialChart: React.FC = () => {
-  // Dados mock de finanças
-  const data = [
-    {
-      mes: "Jan",
-      receber: 8500,
-      pagar: 3200,
-      projecao: 9000,
-    },
-    {
-      mes: "Fev",
-      receber: 9200,
-      pagar: 3500,
-      projecao: 9500,
-    },
-    {
-      mes: "Mar",
-      receber: 8800,
-      pagar: 3100,
-      projecao: 10200,
-    },
-    {
-      mes: "Abr",
-      receber: 10500,
-      pagar: 3800,
-      projecao: 11000,
-    },
-    {
-      mes: "Mai",
-      receber: 11200,
-      pagar: 4000,
-      projecao: 11500,
-    },
-    {
-      mes: "Jun",
-      receber: 0,
-      pagar: 0,
-      projecao: 12000,
-    },
-  ];
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState({
+    totalIncome: 0,
+    totalExpense: 0,
+    balance: 0,
+    incomeCount: 0,
+    expenseCount: 0,
+  });
+  const [monthlyData, setMonthlyData] = useState<MonthlyFinancialData[]>([]);
+  const [projection, setProjection] = useState(0);
 
-  // Calcular totais
-  const totalReceber = data
-    .filter((d) => d.receber > 0)
-    .reduce((acc, curr) => acc + curr.receber, 0);
-  const totalPagar = data
-    .filter((d) => d.pagar > 0)
-    .reduce((acc, curr) => acc + curr.pagar, 0);
-  const saldo = totalReceber - totalPagar;
-  const projecaoProximos = data
-    .filter((d) => d.receber === 0)
-    .reduce((acc, curr) => acc + curr.projecao, 0);
+  useEffect(() => {
+    const loadData = async () => {
+      if (!user?.uid) return;
+
+      try {
+        setLoading(true);
+
+        // Carregar resumo financeiro (últimos 6 meses)
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+        const summaryData = await getFinancialSummary(
+          user.uid,
+          sixMonthsAgo
+        );
+        setSummary(summaryData);
+
+        // Carregar dados mensais
+        const monthly = await getMonthlyFinancialData(user.uid, 6);
+        setMonthlyData(monthly);
+
+        // Calcular projeção baseada em consultas futuras
+        const upcomingAppointments = await getUpcomingAppointments(user.uid, 30);
+        // Buscar valor padrão do perfil do nutricionista
+        let consultationValue = 200; // Valor padrão fallback
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data() as User;
+            if (userData.defaultConsultationValue) {
+              consultationValue = userData.defaultConsultationValue;
+            }
+          }
+        } catch (error) {
+          console.warn("Erro ao buscar valor padrão de consulta:", error);
+        }
+        const projectionValue =
+          upcomingAppointments.filter((a) => a.status === "scheduled").length *
+          consultationValue;
+        setProjection(projectionValue);
+      } catch (error) {
+        console.error("Erro ao carregar dados financeiros:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [user]);
+
+  // Preparar dados para o gráfico
+  const chartData = monthlyData.map((month) => ({
+    mes: month.month,
+    receber: month.income,
+    pagar: month.expense,
+    projecao: month.projection || 0,
+  }));
+
+  // Adicionar projeção apenas no último mês futuro
+  if (chartData.length > 0 && projection > 0) {
+    const lastMonth = chartData[chartData.length - 1];
+    if (lastMonth.receber === 0 && lastMonth.pagar === 0) {
+      lastMonth.projecao = projection;
+    }
+  }
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
@@ -73,29 +108,42 @@ export const FinancialChart: React.FC = () => {
     }).format(value);
   };
 
+  if (loading) {
+    return (
+      <div className="financial-chart__loading">
+        <FaSpinner className="financial-chart__spinner" />
+        <p>Carregando dados financeiros...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="financial-chart">
       <div className="financial-chart__cards">
         <div className="financial-chart__card financial-chart__card--income">
           <div className="financial-chart__card-header">
             <FaArrowUp size={16} />
-            <p className="financial-chart__card-label">A Receber</p>
+            <p className="financial-chart__card-label">Receitas</p>
           </div>
           <p className="financial-chart__card-value">
-            {formatCurrency(totalReceber)}
+            {formatCurrency(summary.totalIncome)}
           </p>
-          <p className="financial-chart__card-subtitle">Últimos 5 meses</p>
+          <p className="financial-chart__card-subtitle">
+            {summary.incomeCount} transação{summary.incomeCount !== 1 ? "ões" : ""}
+          </p>
         </div>
 
         <div className="financial-chart__card financial-chart__card--expense">
           <div className="financial-chart__card-header">
             <FaArrowDown size={16} />
-            <p className="financial-chart__card-label">A Pagar</p>
+            <p className="financial-chart__card-label">Despesas</p>
           </div>
           <p className="financial-chart__card-value">
-            {formatCurrency(totalPagar)}
+            {formatCurrency(summary.totalExpense)}
           </p>
-          <p className="financial-chart__card-subtitle">Últimos 5 meses</p>
+          <p className="financial-chart__card-subtitle">
+            {summary.expenseCount} transação{summary.expenseCount !== 1 ? "ões" : ""}
+          </p>
         </div>
 
         <div className="financial-chart__card financial-chart__card--balance">
@@ -103,9 +151,11 @@ export const FinancialChart: React.FC = () => {
             <FaChartLine size={16} />
             <p className="financial-chart__card-label">Saldo</p>
           </div>
-          <p className="financial-chart__card-value">{formatCurrency(saldo)}</p>
+          <p className="financial-chart__card-value">
+            {formatCurrency(summary.balance)}
+          </p>
           <p className="financial-chart__card-subtitle">
-            {saldo > 0 ? "Positivo" : "Negativo"}
+            {summary.balance > 0 ? "Positivo" : "Negativo"}
           </p>
         </div>
 
@@ -115,14 +165,14 @@ export const FinancialChart: React.FC = () => {
             <p className="financial-chart__card-label">Projeção</p>
           </div>
           <p className="financial-chart__card-value">
-            {formatCurrency(projecaoProximos)}
+            {formatCurrency(projection)}
           </p>
-          <p className="financial-chart__card-subtitle">Consultas futuras</p>
+          <p className="financial-chart__card-subtitle">Próximas consultas</p>
         </div>
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
-        <ComposedChart data={data}>
+        <ComposedChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis dataKey="mes" stroke="#6b7280" style={{ fontSize: "12px" }} />
           <YAxis

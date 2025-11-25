@@ -61,6 +61,9 @@ export const getFoods = async (
   limitCount?: number
 ): Promise<Food[]> => {
   try {
+    console.log(`[getFoods] 🔍 Buscando alimentos do FIRESTORE (coleção: ${FOODS_COLLECTION})`);
+    console.log(`[getFoods] Parâmetros: searchTerm="${searchTerm || 'nenhum'}", mealType="${mealType || 'nenhum'}", limit=${limitCount || 'nenhum'}`);
+    
     // Buscar todos os alimentos primeiro (sem limite inicial)
     let q = query(collection(db, FOODS_COLLECTION), orderBy("name", "asc"));
     const querySnapshot = await getDocs(q);
@@ -72,7 +75,7 @@ export const getFoods = async (
       updatedAt: doc.data().updatedAt.toDate(),
     })) as Food[];
 
-    console.log(`[getFoods] Total de alimentos no banco: ${foods.length}`);
+    console.log(`[getFoods] ✅ Total de alimentos encontrados no FIRESTORE: ${foods.length}`);
 
     // Remover duplicados baseado no ID
     const uniqueFoods = foods.filter((food, index, self) => 
@@ -185,7 +188,7 @@ export const getFoods = async (
       foods = foods.slice(0, limitCount);
     }
 
-    console.log(`[getFoods] Resultado final: ${foods.length} alimentos`, {
+    console.log(`[getFoods] ✅ Resultado final do FIRESTORE: ${foods.length} alimentos`, {
       searchTerm,
       mealType,
       limitCount,

@@ -42,6 +42,8 @@ As regras foram atualizadas para permitir:
 - ✅ Leitura de agendamentos para usuários autenticados
 - ✅ Escrita de agendamentos para usuários autenticados
 - ✅ Queries com `where` e `orderBy` na coleção de appointments
+- ✅ Leitura e escrita de transações financeiras (apenas do próprio nutricionista)
+- ✅ CRUD completo de transações financeiras com verificação de ownership
 
 ## 🔍 Verificações Adicionais
 

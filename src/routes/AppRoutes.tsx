@@ -13,24 +13,9 @@ import { DietCalculator } from "../pages/Diet/DietCalculator";
 import { DietList } from "../pages/Diet/DietList";
 import { DietDetail } from "../pages/Diet/DietDetail";
 import { ImportTacoFoods } from "../pages/Admin/ImportTacoFoods";
+import { Financeiro } from "../pages/Financeiro/Financeiro";
 
 export default function AppRoutes() {
-
-  const Financeiro = () => (
-    <div>
-      <h1
-        style={{
-          fontSize: "2rem",
-          fontWeight: "700",
-          color: "#1f2937",
-          marginBottom: "1rem",
-        }}
-      >
-        Financeiro
-      </h1>
-      <p style={{ color: "#6b7280" }}>Acompanhe suas finanças e relatórios.</p>
-    </div>
-  );
 
   return (
     <BrowserRouter>

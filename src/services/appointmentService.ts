@@ -17,6 +17,11 @@ import type {
   CreateAppointmentData,
   UpdateAppointmentData,
 } from "../types/appointment";
+import {
+  createIncome,
+  checkIfIncomeExistsForAppointment,
+} from "./financialService";
+import type { User } from "../types/user";
 
 const APPOINTMENTS_COLLECTION = "appointments";
 
@@ -156,6 +161,9 @@ export const updateAppointment = async (
   data: UpdateAppointmentData
 ): Promise<void> => {
   try {
+    // Buscar agendamento atual para verificar mudança de status
+    const currentAppointment = await getAppointmentById(appointmentId);
+    
     const docRef = doc(db, APPOINTMENTS_COLLECTION, appointmentId);
     const updateData: Record<string, unknown> = {
       ...data,
@@ -167,6 +175,61 @@ export const updateAppointment = async (
     }
 
     await updateDoc(docRef, updateData);
+
+    // Se o status mudou para "completed", criar receita automaticamente
+    if (
+      data.status === "completed" &&
+      currentAppointment &&
+      currentAppointment.status !== "completed"
+    ) {
+      try {
+        // Verificar se já existe receita para esta consulta
+        const incomeExists = await checkIfIncomeExistsForAppointment(
+          appointmentId
+        );
+
+        if (!incomeExists) {
+          // Buscar valor padrão de consulta do perfil do nutricionista
+          let consultationValue = 200; // Valor padrão fallback
+          try {
+            const userDoc = await getDoc(
+              doc(db, "users", currentAppointment.nutritionistId)
+            );
+            if (userDoc.exists()) {
+              const userData = userDoc.data() as User;
+              if (userData.defaultConsultationValue) {
+                consultationValue = userData.defaultConsultationValue;
+              }
+            }
+          } catch (error) {
+            console.warn(
+              "Erro ao buscar valor padrão de consulta, usando valor padrão:",
+              error
+            );
+          }
+          
+          await createIncome({
+            nutritionistId: currentAppointment.nutritionistId,
+            amount: consultationValue,
+            description: `Consulta com ${currentAppointment.clientName}`,
+            date: currentAppointment.date,
+            appointmentId: appointmentId,
+            clientId: currentAppointment.clientId,
+            clientName: currentAppointment.clientName,
+          });
+
+          console.log(
+            `[updateAppointment] Receita criada automaticamente para consulta ${appointmentId} (valor: R$ ${consultationValue})`
+          );
+        }
+      } catch (error) {
+        // Não falhar a atualização do agendamento se houver erro ao criar receita
+        console.error(
+          "Erro ao criar receita automaticamente:",
+          error
+        );
+      }
+    }
   } catch (error) {
     console.error("Erro ao atualizar agendamento:", error);
     throw error;

@@ -1,0 +1,152 @@
+.expense-modal__overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.expense-modal__content {
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.expense-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.expense-modal__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+.expense-modal__close {
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expense-modal__close:hover {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.expense-modal__close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.expense-modal__error {
+  margin: 1rem 1.5rem;
+  padding: 0.75rem;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #991b1b;
+}
+
+.expense-modal__error p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.expense-modal__form {
+  padding: 1.5rem;
+}
+
+.expense-modal__field {
+  margin-bottom: 1.5rem;
+}
+
+.expense-modal__label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.expense-modal__required {
+  color: #ef4444;
+}
+
+.expense-modal__input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #1f2937;
+  transition: border-color 0.2s;
+}
+
+.expense-modal__input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.expense-modal__input:disabled {
+  background: #f9fafb;
+  cursor: not-allowed;
+}
+
+.expense-modal__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.expense-modal__spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .expense-modal__content {
+    max-width: 100%;
+  }
+
+  .expense-modal__actions {
+    flex-direction: column-reverse;
+  }
+
+  .expense-modal__actions button {
+    width: 100%;
+  }
+}
+

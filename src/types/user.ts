@@ -7,6 +7,7 @@ export interface User {
   updatedAt: Date;
   role?: "admin" | "user";
   phone?: string;
+  defaultConsultationValue?: number; // Valor padrão de consulta em reais
 }
 
 export interface AuthState {
