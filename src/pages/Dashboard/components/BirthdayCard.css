@@ -124,3 +124,32 @@
   background: #20ba5a;
   transform: translateY(-1px);
 }
+
+.birthday-card__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+  text-align: center;
+  gap: 1rem;
+}
+
+.birthday-card__loading p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.fa-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

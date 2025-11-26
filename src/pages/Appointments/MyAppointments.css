@@ -1,0 +1,134 @@
+.my-appointments {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.my-appointments__header {
+  margin-bottom: 2rem;
+}
+
+.my-appointments__title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.my-appointments__subtitle {
+  color: #6b7280;
+  margin: 0;
+}
+
+.my-appointments__loading,
+.my-appointments__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  text-align: center;
+  color: #6b7280;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.my-appointments__loading {
+  gap: 1rem;
+}
+
+.my-appointments__empty {
+  gap: 1rem;
+}
+
+.my-appointments__empty p {
+  margin: 0;
+  font-size: 1.125rem;
+}
+
+.my-appointments__list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.my-appointments__card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
+}
+
+.my-appointments__card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.my-appointments__card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.my-appointments__date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 1.125rem;
+}
+
+.my-appointments__status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.my-appointments__card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.my-appointments__time {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4b5563;
+  font-size: 1rem;
+}
+
+.my-appointments__notes {
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 3px solid #16a34a;
+}
+
+.my-appointments__notes p {
+  margin: 0;
+  color: #4b5563;
+}
+
+.fa-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+

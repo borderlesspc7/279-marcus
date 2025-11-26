@@ -6,7 +6,7 @@ import {
   type Unsubscribe,
   onAuthStateChanged,
 } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection, addDoc, Timestamp, query, getDocs, where } from "firebase/firestore";
 import type {
   LoginCredentials,
   RegisterCredentials,
@@ -84,6 +84,7 @@ export const authService = {
       );
       const firebaseUser = userCredential.user;
 
+      const role = credentials.role || "user";
       const newUser: User = {
         uid: firebaseUser.uid,
         name: credentials.name,
@@ -91,10 +92,54 @@ export const authService = {
         phone: credentials.phone,
         createdAt: new Date(),
         updatedAt: new Date(),
-        role: credentials.role || "user",
+        role,
       };
 
       await setDoc(doc(db, "users", firebaseUser.uid), newUser);
+
+      // Se o usuário tem role "user", criar automaticamente como cliente
+      if (role === "user") {
+        try {
+          // Buscar um admin/nutricionista padrão para associar o cliente
+          // Busca o primeiro admin disponível
+          let nutritionistId = "";
+          try {
+            const usersQuery = query(
+              collection(db, "users"),
+              where("role", "==", "admin")
+            );
+            const usersSnapshot = await getDocs(usersQuery);
+            if (!usersSnapshot.empty) {
+              nutritionistId = usersSnapshot.docs[0].id;
+            }
+          } catch (error) {
+            console.warn("Erro ao buscar admin padrão:", error);
+            // Se não encontrar admin, deixa vazio e será associado depois
+          }
+
+          const clientDoc = {
+            fullName: credentials.name,
+            email: credentials.email,
+            phone: credentials.phone || "",
+            birthDate: "", // Será preenchido depois pelo cliente ou admin
+            gender: "outro" as const,
+            height: null,
+            weight: null,
+            nutritionistId: nutritionistId, // Admin padrão ou vazio
+            authUid: firebaseUser.uid, // Mesmo UID do usuário
+            createdAt: Timestamp.now(),
+            updatedAt: Timestamp.now(),
+          };
+
+          await addDoc(collection(db, "clients"), clientDoc);
+          console.log("Cliente criado automaticamente para usuário:", firebaseUser.uid);
+        } catch (clientError) {
+          // Não falhar o registro se houver erro ao criar cliente
+          // O cliente pode ser criado manualmente depois
+          console.warn("Erro ao criar cliente automaticamente:", clientError);
+        }
+      }
+
       return newUser;
     } catch (error) {
       const message = getFirebaseErrorMessage(error as firebaseError | string);

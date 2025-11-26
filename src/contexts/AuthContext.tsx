@@ -26,9 +26,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Observar mudanças no estado de autenticação do Firebase
+  // Isso mantém a sessão mesmo após refresh (F5)
   useEffect(() => {
-    setUser(null);
-    setLoading(false);
+    const unsubscribe = authService.observeAuthState((authUser) => {
+      setUser(authUser);
+      setLoading(false);
+    });
+
+    // Cleanup: desinscrever quando o componente for desmontado
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const login = async (credentials: LoginCredentials) => {

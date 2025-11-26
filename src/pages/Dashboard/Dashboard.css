@@ -36,6 +36,18 @@
   margin: 0;
 }
 
+.dashboard__welcome-content {
+  padding: 2rem;
+  text-align: center;
+  color: #4b5563;
+}
+
+.dashboard__welcome-content p {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
 .dashboard__date {
   background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
   color: white;

@@ -3,11 +3,11 @@ import { paths } from "./paths";
 import { useAuth } from "../hooks/useAuth";
 import type { ReactNode } from "react";
 
-interface ProtectedRoutesProps {
+interface AdminRoutesProps {
   children: ReactNode;
 }
 
-export default function ProtectedRoutes({ children }: ProtectedRoutesProps) {
+export default function AdminRoutes({ children }: AdminRoutesProps) {
   const { user, loading } = useAuth();
 
   // Mostrar tela de carregamento enquanto verifica autenticação
@@ -27,10 +27,16 @@ export default function ProtectedRoutes({ children }: ProtectedRoutesProps) {
     );
   }
 
-  // Redirecionar para login se não estiver autenticado
+  // Verificar se o usuário está autenticado
   if (!user) {
     return <Navigate to={paths.login} replace />;
   }
 
+  // Verificar se o usuário é admin
+  if (user.role !== "admin") {
+    return <Navigate to={paths.dashboard} replace />;
+  }
+
   return <>{children}</>;
 }
+

@@ -115,6 +115,34 @@ export const getClientById = async (
   }
 };
 
+export const getClientByAuthUid = async (
+  authUid: string
+): Promise<Client | null> => {
+  try {
+    const q = query(
+      collection(db, CLIENTS_COLLECTION),
+      where("authUid", "==", authUid)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      return null;
+    }
+
+    const clientDoc = querySnapshot.docs[0];
+    return {
+      id: clientDoc.id,
+      ...clientDoc.data(),
+      createdAt: clientDoc.data().createdAt.toDate(),
+      updatedAt: clientDoc.data().updatedAt.toDate(),
+    } as Client;
+  } catch (error) {
+    console.error("Erro ao buscar cliente por authUid:", error);
+    throw error;
+  }
+};
+
 export const updateClient = async (
   clientId: string,
   data: Partial<CreateClientData>

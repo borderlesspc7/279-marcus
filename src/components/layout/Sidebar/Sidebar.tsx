@@ -10,6 +10,7 @@ import {
   FaUtensils,
   FaDatabase,
 } from "react-icons/fa";
+import { useAuth } from "../../../hooks/useAuth";
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -21,10 +22,16 @@ interface MenuItem {
   icon: React.ReactNode;
   label: string;
   badge?: string;
+  adminOnly?: boolean;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
-  const menuItems: MenuItem[] = [
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const isUser = user?.role === "user";
+
+  // Menu para admin (nutricionista)
+  const adminMenuItems: MenuItem[] = [
     {
       path: "/dashboard",
       icon: <FaHome size={20} />,
@@ -34,30 +41,61 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       path: "/dashboard/clientes",
       icon: <FaUsers size={20} />,
       label: "Clientes",
-      badge: "12",
+      adminOnly: true,
     },
     {
       path: "/dashboard/agenda",
       icon: <FaCalendarAlt size={20} />,
       label: "Agenda",
-      badge: "3",
+      adminOnly: true,
+    },
+    {
+      path: "/dashboard/admin/appointment-requests",
+      icon: <FaCalendarAlt size={20} />,
+      label: "Solicitações",
+      adminOnly: true,
     },
     {
       path: "/dashboard/calculadora",
       icon: <FaCalculator size={20} />,
       label: "Calculadora de Dieta",
+      adminOnly: true,
     },
     {
       path: "/dashboard/financeiro",
       icon: <FaChartLine size={20} />,
       label: "Financeiro",
+      adminOnly: true,
     },
     {
       path: "/dashboard/admin/import-taco",
       icon: <FaDatabase size={20} />,
       label: "Importar TACO",
+      adminOnly: true,
     },
   ];
+
+  // Menu para usuário (cliente)
+  const userMenuItems: MenuItem[] = [
+    {
+      path: "/dashboard",
+      icon: <FaHome size={20} />,
+      label: "Home",
+    },
+    {
+      path: "/dashboard/solicitar-consulta",
+      icon: <FaCalendarAlt size={20} />,
+      label: "Solicitar Consulta",
+    },
+    {
+      path: "/dashboard/minhas-consultas",
+      icon: <FaCalendarAlt size={20} />,
+      label: "Minhas Consultas",
+    },
+  ];
+
+  // Filtrar menu baseado no role
+  const menuItems = isAdmin ? adminMenuItems : userMenuItems;
 
   return (
     <aside

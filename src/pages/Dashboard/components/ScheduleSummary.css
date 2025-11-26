@@ -98,3 +98,36 @@
   font-size: 0.8rem;
   font-weight: 500;
 }
+
+.schedule-summary__loading,
+.schedule-summary__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.schedule-summary__loading {
+  gap: 1rem;
+}
+
+.schedule-summary__empty p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.fa-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

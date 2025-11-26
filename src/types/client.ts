@@ -9,7 +9,8 @@ export interface Client {
   weight?: number; // peso em kg
   createdAt: Date;
   updatedAt: Date;
-  nutritionistId: string;
+  nutritionistId: string; // Pode estar vazio inicialmente para clientes auto-cadastrados
+  authUid?: string; // UID do Firebase Auth
 }
 
 export interface ClientNote {

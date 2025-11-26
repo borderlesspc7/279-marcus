@@ -1,9 +1,13 @@
-import React from "react";
-import { FaBirthdayCake, FaPhone, FaWhatsapp } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { FaBirthdayCake, FaPhone, FaWhatsapp, FaSpinner } from "react-icons/fa";
+import { useAuth } from "../../../hooks/useAuth";
+import { getClientsByNutritionist } from "../../../services/clientService";
+import { getAppointmentsByClient } from "../../../services/appointmentService";
+import type { Client } from "../../../types/client";
 import "./BirthdayCard.css";
 
 interface Birthday {
-  id: number;
+  id: string;
   name: string;
   age: number;
   phone: string;
@@ -11,30 +15,83 @@ interface Birthday {
 }
 
 export const BirthdayCard: React.FC = () => {
-  // Dados mock de aniversariantes
-  const birthdays: Birthday[] = [
-    {
-      id: 1,
-      name: "Fernanda Costa",
-      age: 28,
-      phone: "(11) 98765-4321",
-      lastVisit: "15/10/2025",
-    },
-    {
-      id: 2,
-      name: "Roberto Lima",
-      age: 45,
-      phone: "(11) 97654-3210",
-      lastVisit: "20/10/2025",
-    },
-    {
-      id: 3,
-      name: "Juliana Martins",
-      age: 32,
-      phone: "(11) 96543-2109",
-      lastVisit: "22/10/2025",
-    },
-  ];
+  const { user } = useAuth();
+  const [birthdays, setBirthdays] = useState<Birthday[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadBirthdays = async () => {
+      if (!user?.uid) return;
+
+      try {
+        setLoading(true);
+        const clients = await getClientsByNutritionist(user.uid);
+        const today = new Date();
+        const todayMonth = today.getMonth() + 1; // getMonth retorna 0-11
+        const todayDay = today.getDate();
+
+        // Filtrar clientes que fazem aniversário hoje
+        const todayBirthdays = await Promise.all(
+          clients
+            .filter((client) => {
+              if (!client.birthDate) return false;
+              const birthDate = new Date(client.birthDate);
+              return (
+                birthDate.getMonth() + 1 === todayMonth &&
+                birthDate.getDate() === todayDay
+              );
+            })
+            .map(async (client) => {
+              // Buscar última consulta
+              let lastVisit = "Nunca";
+              try {
+                const appointments = await getAppointmentsByClient(client.id);
+                if (appointments.length > 0) {
+                  // Ordenar por data e pegar a mais recente
+                  appointments.sort(
+                    (a, b) => b.date.getTime() - a.date.getTime()
+                  );
+                  const lastAppointment = appointments[0];
+                  lastVisit = lastAppointment.date.toLocaleDateString("pt-BR");
+                }
+              } catch (error) {
+                console.error(
+                  `Erro ao buscar consultas do cliente ${client.id}:`,
+                  error
+                );
+              }
+
+              // Calcular idade
+              const birthDate = new Date(client.birthDate);
+              const age = today.getFullYear() - birthDate.getFullYear();
+              const monthDiff = today.getMonth() - birthDate.getMonth();
+              const dayDiff = today.getDate() - birthDate.getDate();
+              const actualAge =
+                monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)
+                  ? age - 1
+                  : age;
+
+              return {
+                id: client.id,
+                name: client.fullName,
+                age: actualAge,
+                phone: client.phone,
+                lastVisit,
+              };
+            })
+        );
+
+        setBirthdays(todayBirthdays);
+      } catch (error) {
+        console.error("Erro ao carregar aniversariantes:", error);
+        setBirthdays([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadBirthdays();
+  }, [user?.uid]);
 
   const handleWhatsApp = (phone: string, name: string) => {
     const message = encodeURIComponent(
@@ -43,6 +100,17 @@ export const BirthdayCard: React.FC = () => {
     const phoneNumber = phone.replace(/\D/g, "");
     window.open(`https://wa.me/55${phoneNumber}?text=${message}`, "_blank");
   };
+
+  if (loading) {
+    return (
+      <div className="birthday-card">
+        <div className="birthday-card__loading">
+          <FaSpinner className="fa-spin" size={24} />
+          <p>Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (birthdays.length === 0) {
     return (

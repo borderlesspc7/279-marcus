@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   PieChart,
   Pie,
@@ -11,28 +11,126 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { FaMale, FaFemale, FaUsers } from "react-icons/fa";
+import { FaMale, FaFemale, FaUsers, FaSpinner } from "react-icons/fa";
+import { useAuth } from "../../../hooks/useAuth";
+import { getClientsByNutritionist } from "../../../services/clientService";
+import type { Client } from "../../../types/client";
 import "./ClientDemographics.css";
 
 export const ClientDemographics: React.FC = () => {
-  // Dados mock de gênero
-  const genderData = [
-    { name: "Mulheres", value: 68, color: "#ec4899" },
-    { name: "Homens", value: 32, color: "#3b82f6" },
-  ];
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [genderData, setGenderData] = useState<
+    Array<{ name: string; value: number; color: string }>
+  >([]);
+  const [ageData, setAgeData] = useState<
+    Array<{ faixa: string; quantidade: number }>
+  >([]);
+  const [totalClients, setTotalClients] = useState(0);
+  const [womenCount, setWomenCount] = useState(0);
+  const [menCount, setMenCount] = useState(0);
 
-  // Dados mock de faixa etária
-  const ageData = [
-    { faixa: "18-25", quantidade: 15 },
-    { faixa: "26-35", quantidade: 42 },
-    { faixa: "36-45", quantidade: 38 },
-    { faixa: "46-55", quantidade: 25 },
-    { faixa: "56+", quantidade: 12 },
-  ];
+  useEffect(() => {
+    const loadDemographics = async () => {
+      if (!user?.uid) return;
 
-  const totalClients = genderData.reduce((acc, curr) => acc + curr.value, 0);
-  const womenCount = genderData.find((d) => d.name === "Mulheres")?.value || 0;
-  const menCount = genderData.find((d) => d.name === "Homens")?.value || 0;
+      try {
+        setLoading(true);
+        const clients = await getClientsByNutritionist(user.uid);
+
+        // Calcular estatísticas de gênero
+        const women = clients.filter(
+          (c) => c.gender === "feminino"
+        ).length;
+        const men = clients.filter((c) => c.gender === "masculino").length;
+        const other = clients.filter((c) => c.gender === "outro").length;
+        const total = clients.length;
+
+        const womenPercent = total > 0 ? Math.round((women / total) * 100) : 0;
+        const menPercent = total > 0 ? Math.round((men / total) * 100) : 0;
+        const otherPercent = total > 0 ? Math.round((other / total) * 100) : 0;
+
+        const genderDataArray = [
+          { name: "Mulheres", value: womenPercent, color: "#ec4899" },
+          { name: "Homens", value: menPercent, color: "#3b82f6" },
+        ];
+
+        if (otherPercent > 0) {
+          genderDataArray.push({
+            name: "Outros",
+            value: otherPercent,
+            color: "#8b5cf6",
+          });
+        }
+
+        // Calcular estatísticas de idade
+        const today = new Date();
+        const ageGroups: Record<string, number> = {
+          "18-25": 0,
+          "26-35": 0,
+          "36-45": 0,
+          "46-55": 0,
+          "56+": 0,
+        };
+
+        clients.forEach((client) => {
+          if (!client.birthDate) return;
+
+          const birthDate = new Date(client.birthDate);
+          const age = today.getFullYear() - birthDate.getFullYear();
+          const monthDiff = today.getMonth() - birthDate.getMonth();
+          const dayDiff = today.getDate() - birthDate.getDate();
+          const actualAge =
+            monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
+
+          if (actualAge >= 18 && actualAge <= 25) {
+            ageGroups["18-25"]++;
+          } else if (actualAge >= 26 && actualAge <= 35) {
+            ageGroups["26-35"]++;
+          } else if (actualAge >= 36 && actualAge <= 45) {
+            ageGroups["36-45"]++;
+          } else if (actualAge >= 46 && actualAge <= 55) {
+            ageGroups["46-55"]++;
+          } else if (actualAge >= 56) {
+            ageGroups["56+"]++;
+          }
+        });
+
+        const ageDataArray = Object.entries(ageGroups).map(([faixa, quantidade]) => ({
+          faixa,
+          quantidade,
+        }));
+
+        setGenderData(genderDataArray);
+        setAgeData(ageDataArray);
+        setTotalClients(total);
+        setWomenCount(womenPercent);
+        setMenCount(menPercent);
+      } catch (error) {
+        console.error("Erro ao carregar demografia de clientes:", error);
+        setGenderData([]);
+        setAgeData([]);
+        setTotalClients(0);
+        setWomenCount(0);
+        setMenCount(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDemographics();
+  }, [user?.uid]);
+
+  if (loading) {
+    return (
+      <div className="client-demographics">
+        <div className="client-demographics__loading">
+          <FaSpinner className="fa-spin" size={24} />
+          <p>Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="client-demographics">

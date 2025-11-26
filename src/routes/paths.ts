@@ -12,4 +12,9 @@ export const paths = {
   dietaDetail: "/dashboard/dietas/:dietId",
   financeiro: "/dashboard/financeiro",
   importTaco: "/dashboard/admin/import-taco",
+  // Rotas para clientes (role user)
+  solicitarConsulta: "/dashboard/solicitar-consulta",
+  minhasConsultas: "/dashboard/minhas-consultas",
+  // Rotas para admin
+  appointmentRequests: "/dashboard/admin/appointment-requests",
 };

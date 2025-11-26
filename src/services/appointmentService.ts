@@ -343,3 +343,127 @@ export const getUpcomingAppointments = async (
 
   return getAppointmentsByNutritionist(nutritionistId, today, futureDate);
 };
+
+// Criar solicitação de agendamento (status pending)
+export const createAppointmentRequest = async (
+  appointmentData: CreateAppointmentData,
+  nutritionistId: string,
+  requestedBy: string // UID do cliente que está solicitando
+): Promise<string> => {
+  try {
+    const appointmentDoc = {
+      clientId: appointmentData.clientId,
+      clientName: appointmentData.clientName,
+      nutritionistId,
+      date: Timestamp.fromDate(appointmentData.date),
+      startTime: appointmentData.startTime,
+      endTime: appointmentData.endTime,
+      notes: appointmentData.notes || "",
+      status: "pending",
+      requestedBy,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    };
+
+    const docRef = await addDoc(
+      collection(db, APPOINTMENTS_COLLECTION),
+      appointmentDoc
+    );
+
+    return docRef.id;
+  } catch (error) {
+    console.error("Erro ao criar solicitação de agendamento:", error);
+    throw error;
+  }
+};
+
+// Buscar solicitações pendentes para um nutricionista
+export const getPendingAppointmentRequests = async (
+  nutritionistId: string
+): Promise<Appointment[]> => {
+  try {
+    const q = query(
+      collection(db, APPOINTMENTS_COLLECTION),
+      where("nutritionistId", "==", nutritionistId),
+      where("status", "==", "pending"),
+      orderBy("createdAt", "desc")
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    return querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        date: data.date.toDate(),
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
+      } as Appointment;
+    });
+  } catch (error) {
+    console.error("Erro ao buscar solicitações pendentes:", error);
+    throw error;
+  }
+};
+
+// Aprovar solicitação de agendamento
+export const approveAppointmentRequest = async (
+  appointmentId: string
+): Promise<void> => {
+  try {
+    const docRef = doc(db, APPOINTMENTS_COLLECTION, appointmentId);
+    await updateDoc(docRef, {
+      status: "scheduled",
+      updatedAt: Timestamp.now(),
+    });
+  } catch (error) {
+    console.error("Erro ao aprovar solicitação:", error);
+    throw error;
+  }
+};
+
+// Rejeitar solicitação de agendamento
+export const rejectAppointmentRequest = async (
+  appointmentId: string
+): Promise<void> => {
+  try {
+    const docRef = doc(db, APPOINTMENTS_COLLECTION, appointmentId);
+    await updateDoc(docRef, {
+      status: "rejected",
+      updatedAt: Timestamp.now(),
+    });
+  } catch (error) {
+    console.error("Erro ao rejeitar solicitação:", error);
+    throw error;
+  }
+};
+
+// Buscar agendamentos de um cliente
+export const getAppointmentsByClientAuthUid = async (
+  authUid: string
+): Promise<Appointment[]> => {
+  try {
+    const q = query(
+      collection(db, APPOINTMENTS_COLLECTION),
+      where("requestedBy", "==", authUid),
+      orderBy("date", "desc")
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    return querySnapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data,
+        date: data.date.toDate(),
+        createdAt: data.createdAt.toDate(),
+        updatedAt: data.updatedAt.toDate(),
+      } as Appointment;
+    });
+  } catch (error) {
+    console.error("Erro ao buscar agendamentos do cliente:", error);
+    throw error;
+  }
+};

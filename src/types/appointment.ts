@@ -7,9 +7,10 @@ export interface Appointment {
   startTime: string;
   endTime: string;
   notes?: string;
-  status: "scheduled" | "completed" | "cancelled" | "no-show";
+  status: "pending" | "scheduled" | "completed" | "cancelled" | "no-show" | "rejected";
   createdAt: Date;
   updatedAt: Date;
+  requestedBy?: string; // UID do cliente que solicitou
 }
 
 export interface CreateAppointmentData {
@@ -26,7 +27,7 @@ export interface UpdateAppointmentData {
   startTime?: string;
   endTime?: string;
   notes?: string;
-  status?: "scheduled" | "completed" | "cancelled" | "no-show";
+  status?: "pending" | "scheduled" | "completed" | "cancelled" | "no-show" | "rejected";
 }
 
 export interface CalendarEvent {

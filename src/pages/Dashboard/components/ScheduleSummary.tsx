@@ -1,61 +1,82 @@
-import React from "react";
-import { FaClock, FaUser, FaPhone } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { FaClock, FaUser, FaPhone, FaSpinner } from "react-icons/fa";
+import { useAuth } from "../../../hooks/useAuth";
+import { getTodayAppointments } from "../../../services/appointmentService";
+import { getClientById } from "../../../services/clientService";
+import type { Appointment } from "../../../types/appointment";
+import type { Client } from "../../../types/client";
 import "./ScheduleSummary.css";
 
-interface Appointment {
-  id: number;
-  time: string;
-  client: string;
-  phone: string;
-  type: string;
-  status: "confirmed" | "pending" | "completed";
+interface AppointmentWithClient extends Appointment {
+  clientPhone?: string;
 }
 
 export const ScheduleSummary: React.FC = () => {
-  // Dados mock de consultas de hoje
-  const appointments: Appointment[] = [
-    {
-      id: 1,
-      time: "09:00",
-      client: "Maria Silva",
-      phone: "(11) 98765-4321",
-      type: "Primeira Consulta",
-      status: "confirmed",
-    },
-    {
-      id: 2,
-      time: "10:00",
-      client: "João Santos",
-      phone: "(11) 98765-1234",
-      type: "Retorno",
-      status: "confirmed",
-    },
-    {
-      id: 3,
-      time: "14:00",
-      client: "Ana Paula",
-      phone: "(11) 97654-3210",
-      type: "Avaliação",
-      status: "pending",
-    },
-    {
-      id: 4,
-      time: "15:00",
-      client: "Carlos Oliveira",
-      phone: "(11) 96543-2109",
-      type: "Retorno",
-      status: "confirmed",
-    },
-  ];
+  const { user } = useAuth();
+  const [appointments, setAppointments] = useState<AppointmentWithClient[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadTodayAppointments = async () => {
+      if (!user?.uid) return;
+
+      try {
+        setLoading(true);
+        const todayAppointments = await getTodayAppointments(user.uid);
+        
+        // Filtrar apenas agendamentos agendados (não cancelados)
+        const scheduled = todayAppointments.filter(
+          (apt) => apt.status !== "cancelled"
+        );
+
+        // Buscar telefones dos clientes
+        const appointmentsWithClientData = await Promise.all(
+          scheduled.map(async (apt) => {
+            try {
+              const client = await getClientById(apt.clientId);
+              return {
+                ...apt,
+                clientPhone: client?.phone,
+              } as AppointmentWithClient;
+            } catch (error) {
+              console.error(
+                `Erro ao buscar cliente ${apt.clientId}:`,
+                error
+              );
+              return { ...apt } as AppointmentWithClient;
+            }
+          })
+        );
+
+        // Ordenar por horário
+        appointmentsWithClientData.sort((a, b) => {
+          const timeA = a.startTime;
+          const timeB = b.startTime;
+          return timeA.localeCompare(timeB);
+        });
+
+        setAppointments(appointmentsWithClientData);
+      } catch (error) {
+        console.error("Erro ao carregar agendamentos de hoje:", error);
+        setAppointments([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTodayAppointments();
+  }, [user?.uid]);
 
   const getStatusColor = (status: Appointment["status"]) => {
     switch (status) {
-      case "confirmed":
+      case "scheduled":
         return "#10b981";
-      case "pending":
-        return "#f59e0b";
       case "completed":
         return "#6b7280";
+      case "cancelled":
+        return "#ef4444";
+      case "no-show":
+        return "#f59e0b";
       default:
         return "#6b7280";
     }
@@ -63,16 +84,45 @@ export const ScheduleSummary: React.FC = () => {
 
   const getStatusText = (status: Appointment["status"]) => {
     switch (status) {
-      case "confirmed":
+      case "scheduled":
         return "Confirmado";
-      case "pending":
-        return "Pendente";
       case "completed":
         return "Concluído";
+      case "cancelled":
+        return "Cancelado";
+      case "no-show":
+        return "Pendente";
       default:
         return status;
     }
   };
+
+  const getAppointmentType = (notes?: string) => {
+    if (!notes) return "Consulta";
+    // Tentar inferir o tipo pela nota ou usar padrão
+    const noteLower = notes.toLowerCase();
+    if (noteLower.includes("primeira") || noteLower.includes("inicial")) {
+      return "Primeira Consulta";
+    }
+    if (noteLower.includes("retorno")) {
+      return "Retorno";
+    }
+    if (noteLower.includes("avaliação") || noteLower.includes("avaliacao")) {
+      return "Avaliação";
+    }
+    return "Consulta";
+  };
+
+  if (loading) {
+    return (
+      <div className="schedule-summary">
+        <div className="schedule-summary__loading">
+          <FaSpinner className="fa-spin" size={24} />
+          <p>Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="schedule-summary">
@@ -86,46 +136,54 @@ export const ScheduleSummary: React.FC = () => {
         <FaClock size={32} style={{ opacity: 0.8 }} />
       </div>
 
-      <div className="schedule-summary__list">
-        {appointments.map((appointment) => (
-          <div key={appointment.id} className="schedule-summary__appointment">
-            <div className="schedule-summary__appointment-header">
-              <div className="schedule-summary__appointment-time">
-                <FaClock size={14} color="#667eea" />
-                <span className="schedule-summary__time-text">
-                  {appointment.time}
+      {appointments.length === 0 ? (
+        <div className="schedule-summary__empty">
+          <p>Nenhuma consulta agendada para hoje</p>
+        </div>
+      ) : (
+        <div className="schedule-summary__list">
+          {appointments.map((appointment) => (
+            <div key={appointment.id} className="schedule-summary__appointment">
+              <div className="schedule-summary__appointment-header">
+                <div className="schedule-summary__appointment-time">
+                  <FaClock size={14} color="#667eea" />
+                  <span className="schedule-summary__time-text">
+                    {appointment.startTime.substring(0, 5)}
+                  </span>
+                </div>
+                <span
+                  className="schedule-summary__status-badge"
+                  style={{
+                    background: getStatusColor(appointment.status) + "20",
+                    color: getStatusColor(appointment.status),
+                  }}
+                >
+                  {getStatusText(appointment.status)}
                 </span>
               </div>
-              <span
-                className="schedule-summary__status-badge"
-                style={{
-                  background: getStatusColor(appointment.status) + "20",
-                  color: getStatusColor(appointment.status),
-                }}
-              >
-                {getStatusText(appointment.status)}
-              </span>
+              <div className="schedule-summary__appointment-row">
+                <FaUser size={12} color="#6b7280" />
+                <span className="schedule-summary__client-name">
+                  {appointment.clientName}
+                </span>
+              </div>
+              {appointment.clientPhone && (
+                <div className="schedule-summary__appointment-row">
+                  <FaPhone size={12} color="#6b7280" />
+                  <span className="schedule-summary__phone">
+                    {appointment.clientPhone}
+                  </span>
+                </div>
+              )}
+              <div className="schedule-summary__appointment-type">
+                <span className="schedule-summary__type-text">
+                  {getAppointmentType(appointment.notes)}
+                </span>
+              </div>
             </div>
-            <div className="schedule-summary__appointment-row">
-              <FaUser size={12} color="#6b7280" />
-              <span className="schedule-summary__client-name">
-                {appointment.client}
-              </span>
-            </div>
-            <div className="schedule-summary__appointment-row">
-              <FaPhone size={12} color="#6b7280" />
-              <span className="schedule-summary__phone">
-                {appointment.phone}
-              </span>
-            </div>
-            <div className="schedule-summary__appointment-type">
-              <span className="schedule-summary__type-text">
-                {appointment.type}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -4,19 +4,63 @@ import { ScheduleSummary } from "./components/ScheduleSummary";
 import { FinancialChart } from "./components/FinancialChart";
 import { ClientDemographics } from "./components/ClientDemographics";
 import { BirthdayCard } from "./components/BirthdayCard";
+import { useAuth } from "../../hooks/useAuth";
 import "./Dashboard.css";
 
 export const Dashboard: React.FC = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const isUser = user?.role === "user";
   const [occupancyPeriod, setOccupancyPeriod] = useState<
     "day" | "week" | "month"
   >("week");
+
+  // Dashboard simplificado para clientes (role user)
+  if (isUser) {
+    return (
+      <div className="dashboard">
+        <div className="dashboard__header">
+          <div>
+            <h1 className="dashboard__title">Dashboard</h1>
+            <p className="dashboard__subtitle">Bem-vindo ao NutriManager</p>
+          </div>
+          <div className="dashboard__date">
+            {new Date().toLocaleDateString("pt-BR", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
+        </div>
+
+        <div className="dashboard__grid">
+          <div className="dashboard__card dashboard__card--large">
+            <div className="dashboard__card-header">
+              <h2 className="dashboard__card-title">Bem-vindo!</h2>
+            </div>
+            <div className="dashboard__welcome-content">
+              <p>
+                Use o menu lateral para solicitar uma consulta ou visualizar
+                suas consultas agendadas.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard">
       <div className="dashboard__header">
         <div>
           <h1 className="dashboard__title">Dashboard</h1>
-          <p className="dashboard__subtitle">Visão geral do seu consultório</p>
+          <p className="dashboard__subtitle">
+            {isAdmin
+              ? "Visão geral do sistema"
+              : "Visão geral do seu consultório"}
+          </p>
         </div>
         <div className="dashboard__date">
           {new Date().toLocaleDateString("pt-BR", {
@@ -29,7 +73,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       <div className="dashboard__grid">
-        {/* Ocupação de Agenda */}
+        {/* Ocupação de Agenda - Visível para todos */}
         <div className="dashboard__card dashboard__card--large">
           <div className="dashboard__card-header">
             <h2 className="dashboard__card-title">Ocupação de Agenda</h2>
@@ -63,7 +107,7 @@ export const Dashboard: React.FC = () => {
           <OccupancyChart period={occupancyPeriod} />
         </div>
 
-        {/* Agenda Resumida */}
+        {/* Agenda Resumida - Visível para todos */}
         <div className="dashboard__card">
           <div className="dashboard__card-header">
             <h2 className="dashboard__card-title">Agenda Resumida</h2>
@@ -71,7 +115,7 @@ export const Dashboard: React.FC = () => {
           <ScheduleSummary />
         </div>
 
-        {/* Aniversariantes do Dia */}
+        {/* Aniversariantes do Dia - Visível para todos */}
         <div className="dashboard__card">
           <div className="dashboard__card-header">
             <h2 className="dashboard__card-title">🎉 Aniversariantes do Dia</h2>
@@ -79,15 +123,17 @@ export const Dashboard: React.FC = () => {
           <BirthdayCard />
         </div>
 
-        {/* Gráfico Financeiro */}
-        <div className="dashboard__card dashboard__card--large">
-          <div className="dashboard__card-header">
-            <h2 className="dashboard__card-title">Financeiro</h2>
+        {/* Gráfico Financeiro - Apenas para Admin */}
+        {isAdmin && (
+          <div className="dashboard__card dashboard__card--large">
+            <div className="dashboard__card-header">
+              <h2 className="dashboard__card-title">Financeiro</h2>
+            </div>
+            <FinancialChart />
           </div>
-          <FinancialChart />
-        </div>
+        )}
 
-        {/* Demografia de Clientes */}
+        {/* Demografia de Clientes - Visível para todos */}
         <div className="dashboard__card dashboard__card--large">
           <div className="dashboard__card-header">
             <h2 className="dashboard__card-title">Perfil de Clientes</h2>

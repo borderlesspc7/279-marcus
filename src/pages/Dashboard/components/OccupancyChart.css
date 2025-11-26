@@ -42,3 +42,32 @@
   width: 100%;
   height: 280px;
 }
+
+.occupancy-chart__loading,
+.occupancy-chart__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6b7280;
+  min-height: 280px;
+}
+
+.occupancy-chart__empty p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.fa-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

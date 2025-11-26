@@ -3,6 +3,7 @@ import { paths } from "./paths";
 import { RegisterPage } from "../pages/Register/Register";
 import LoginPage from "../pages/Login/Login";
 import ProtectedRoutes from "./ProtectedRoutes";
+import AdminRoutes from "./AdminRoutes";
 import { DashboardLayout } from "../components/layout/DashboardLayout/DashboardLayout";
 import { Dashboard } from "../pages/Dashboard/Dashboard";
 import { ClientList } from "../pages/Clients/ClientList";
@@ -13,7 +14,10 @@ import { DietCalculator } from "../pages/Diet/DietCalculator";
 import { DietList } from "../pages/Diet/DietList";
 import { DietDetail } from "../pages/Diet/DietDetail";
 import { ImportTacoFoods } from "../pages/Admin/ImportTacoFoods";
+import { AppointmentRequests } from "../pages/Admin/AppointmentRequests";
 import { Financeiro } from "../pages/Financeiro/Financeiro";
+import { RequestAppointment } from "../pages/Appointments/RequestAppointment";
+import { MyAppointments } from "../pages/Appointments/MyAppointments";
 
 export default function AppRoutes() {
 
@@ -35,54 +39,55 @@ export default function AppRoutes() {
             </ProtectedRoutes>
           }
         />
+        {/* Rotas apenas para Admin */}
         <Route
           path={paths.clientes}
           element={
-            <ProtectedRoutes>
+            <AdminRoutes>
               <DashboardLayout>
                 <ClientList />
               </DashboardLayout>
-            </ProtectedRoutes>
+            </AdminRoutes>
           }
         />
         <Route
           path={paths.clientesNew}
           element={
-            <ProtectedRoutes>
+            <AdminRoutes>
               <DashboardLayout>
                 <ClientForm />
               </DashboardLayout>
-            </ProtectedRoutes>
+            </AdminRoutes>
           }
         />
         <Route
           path={paths.clientesProfile}
           element={
-            <ProtectedRoutes>
+            <AdminRoutes>
               <DashboardLayout>
                 <ClientProfile />
               </DashboardLayout>
-            </ProtectedRoutes>
+            </AdminRoutes>
           }
         />
         <Route
           path={paths.agenda}
           element={
-            <ProtectedRoutes>
+            <AdminRoutes>
               <DashboardLayout>
                 <Agenda />
               </DashboardLayout>
-            </ProtectedRoutes>
+            </AdminRoutes>
           }
         />
         <Route
           path={paths.calculadora}
           element={
-            <ProtectedRoutes>
+            <AdminRoutes>
               <DashboardLayout>
                 <DietCalculator />
               </DashboardLayout>
-            </ProtectedRoutes>
+            </AdminRoutes>
           }
         />
         <Route
@@ -105,22 +110,54 @@ export default function AppRoutes() {
             </ProtectedRoutes>
           }
         />
+        {/* Rotas apenas para Admin */}
         <Route
           path={paths.financeiro}
           element={
-            <ProtectedRoutes>
+            <AdminRoutes>
               <DashboardLayout>
                 <Financeiro />
               </DashboardLayout>
-            </ProtectedRoutes>
+            </AdminRoutes>
           }
         />
         <Route
           path={paths.importTaco}
           element={
-            <ProtectedRoutes>
+            <AdminRoutes>
               <DashboardLayout>
                 <ImportTacoFoods />
+              </DashboardLayout>
+            </AdminRoutes>
+          }
+        />
+        <Route
+          path={paths.appointmentRequests}
+          element={
+            <AdminRoutes>
+              <DashboardLayout>
+                <AppointmentRequests />
+              </DashboardLayout>
+            </AdminRoutes>
+          }
+        />
+        {/* Rotas para Clientes (role user) */}
+        <Route
+          path={paths.solicitarConsulta}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <RequestAppointment />
+              </DashboardLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path={paths.minhasConsultas}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <MyAppointments />
               </DashboardLayout>
             </ProtectedRoutes>
           }
