@@ -9,6 +9,8 @@ import {
   FaFilter,
   FaDownload,
   FaCalendarAlt,
+  FaUser,
+  FaTag,
 } from "react-icons/fa";
 import { useAuth } from "../../hooks/useAuth";
 import { Button } from "../../components/ui/Button/Button";
@@ -245,72 +247,78 @@ export const Financeiro: React.FC = () => {
       {/* Filtros */}
       <div className="financeiro__filters">
         <div className="financeiro__filter-group">
-          <FaFilter />
-          <span>Filtrar:</span>
-          <button
-            className={`financeiro__filter-btn ${
-              filter === "all" ? "financeiro__filter-btn--active" : ""
-            }`}
-            onClick={() => setFilter("all")}
-          >
-            Todas
-          </button>
-          <button
-            className={`financeiro__filter-btn ${
-              filter === "income" ? "financeiro__filter-btn--active" : ""
-            }`}
-            onClick={() => setFilter("income")}
-          >
-            Receitas
-          </button>
-          <button
-            className={`financeiro__filter-btn ${
-              filter === "expense" ? "financeiro__filter-btn--active" : ""
-            }`}
-            onClick={() => setFilter("expense")}
-          >
-            Despesas
-          </button>
-        </div>
-
-        <div className="financeiro__filter-group">
-          <FaCalendarAlt />
-          <span>Período:</span>
-          <input
-            type="date"
-            className="financeiro__date-input"
-            value={dateFilter.startDate || ""}
-            onChange={(e) =>
-              setDateFilter({ ...dateFilter, startDate: e.target.value })
-            }
-            placeholder="Data inicial"
-          />
-          <span>até</span>
-          <input
-            type="date"
-            className="financeiro__date-input"
-            value={dateFilter.endDate || ""}
-            onChange={(e) =>
-              setDateFilter({ ...dateFilter, endDate: e.target.value })
-            }
-            placeholder="Data final"
-          />
-          {(dateFilter.startDate || dateFilter.endDate) && (
+          <FaFilter size={16} />
+          <span className="financeiro__filter-label">Filtrar:</span>
+          <div className="financeiro__filter-buttons">
             <button
-              className="financeiro__filter-btn"
-              onClick={handleClearDateFilter}
+              className={`financeiro__filter-btn ${
+                filter === "all" ? "financeiro__filter-btn--active" : ""
+              }`}
+              onClick={() => setFilter("all")}
             >
-              Limpar
+              Todas
             </button>
-          )}
+            <button
+              className={`financeiro__filter-btn ${
+                filter === "income" ? "financeiro__filter-btn--active" : ""
+              }`}
+              onClick={() => setFilter("income")}
+            >
+              Receitas
+            </button>
+            <button
+              className={`financeiro__filter-btn ${
+                filter === "expense" ? "financeiro__filter-btn--active" : ""
+              }`}
+              onClick={() => setFilter("expense")}
+            >
+              Despesas
+            </button>
+          </div>
         </div>
 
         <div className="financeiro__filter-group">
+          <FaCalendarAlt size={16} />
+          <span className="financeiro__filter-label">Período:</span>
+          <div className="financeiro__date-inputs">
+            <input
+              type="date"
+              className="financeiro__date-input"
+              value={dateFilter.startDate || ""}
+              onChange={(e) =>
+                setDateFilter({ ...dateFilter, startDate: e.target.value })
+              }
+              placeholder="Data inicial"
+            />
+            <span className="financeiro__date-separator">até</span>
+            <input
+              type="date"
+              className="financeiro__date-input"
+              value={dateFilter.endDate || ""}
+              onChange={(e) =>
+                setDateFilter({ ...dateFilter, endDate: e.target.value })
+              }
+              placeholder="Data final"
+            />
+            {(dateFilter.startDate || dateFilter.endDate) && (
+              <button
+                className="financeiro__filter-btn financeiro__filter-btn--clear"
+                onClick={handleClearDateFilter}
+                title="Limpar filtro de data"
+              >
+                Limpar
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="financeiro__filter-group financeiro__filter-group--export">
           <Button
             variant="secondary"
             size="small"
             onClick={handleExportCSV}
             disabled={transactions.length === 0}
+            className="financeiro__export-btn"
           >
             <FaDownload /> Exportar CSV
           </Button>
@@ -356,12 +364,14 @@ export const Financeiro: React.FC = () => {
                   </div>
                   {transaction.clientName && (
                     <div className="financeiro__transaction-client">
-                      Cliente: {transaction.clientName}
+                      <FaUser size={12} />
+                      <span>Cliente: {transaction.clientName}</span>
                     </div>
                   )}
                   {transaction.category && (
                     <div className="financeiro__transaction-category">
-                      Categoria: {transaction.category}
+                      <FaTag size={12} />
+                      <span>Categoria: {transaction.category}</span>
                     </div>
                   )}
                 </div>

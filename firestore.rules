@@ -3,12 +3,11 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Regras para a coleção de usuários
     match /users/{userId} {
-      // Permite que usuários autenticados leiam e escrevam apenas seus próprios dados
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Permite que usuários autenticados leiam dados de qualquer usuário (necessário para buscar nutricionistas/admins)
+      allow read: if request.auth != null;
       
-      // Permite que usuários autenticados leiam dados de outros usuários (se necessário para funcionalidades como busca)
-      // Descomente a linha abaixo se precisar que usuários vejam dados de outros usuários
-      // allow read: if request.auth != null;
+      // Permite que usuários autenticados escrevam apenas seus próprios dados
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
     
     // Regras para outras coleções (ajuste conforme necessário)

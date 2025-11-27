@@ -17,12 +17,12 @@ export default function getFirebaseErrorMessage(
   const errorCode = (error as any)?.code || error?.code || "";
 
   switch (errorCode) {
-    // Erros de Autenticação
+    // Erros de Autenticação - Credenciais incorretas
     case "auth/user-not-found":
-      return "Usuário não encontrado. Verifique seu email.";
-
     case "auth/wrong-password":
-      return "Senha incorreta. Tente novamente.";
+    case "auth/invalid-credential":
+    case "auth/missing-password":
+      return "Email ou senha incorreto. Verifique suas credenciais e tente novamente.";
 
     case "auth/invalid-email":
       return "Email inválido. Verifique o formato.";
