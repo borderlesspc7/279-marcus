@@ -3,7 +3,6 @@ import { FaBirthdayCake, FaPhone, FaWhatsapp, FaSpinner } from "react-icons/fa";
 import { useAuth } from "../../../hooks/useAuth";
 import { getClientsByNutritionist } from "../../../services/clientService";
 import { getAppointmentsByClient } from "../../../services/appointmentService";
-import type { Client } from "../../../types/client";
 import "./BirthdayCard.css";
 
 interface Birthday {

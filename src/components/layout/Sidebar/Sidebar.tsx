@@ -7,7 +7,6 @@ import {
   FaCalculator,
   FaChartLine,
   FaAppleAlt,
-  FaUtensils,
   FaDatabase,
 } from "react-icons/fa";
 import { useAuth } from "../../../hooks/useAuth";
@@ -28,7 +27,6 @@ interface MenuItem {
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
-  const isUser = user?.role === "user";
 
   // Menu para admin (nutricionista)
   const adminMenuItems: MenuItem[] = [

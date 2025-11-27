@@ -28,7 +28,6 @@ export const DietCalculator: React.FC = () => {
   const [dietDescription, setDietDescription] = useState("");
   const [height, setHeight] = useState<string>("");
   const [weight, setWeight] = useState<string>("");
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [initializing, setInitializing] = useState(true);

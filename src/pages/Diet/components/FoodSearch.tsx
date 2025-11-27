@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaSearch, FaTimes, FaSpinner } from "react-icons/fa";
+import { FaSearch, FaSpinner } from "react-icons/fa";
 import { getFoods } from "../../../services/foodService";
 import type { Food } from "../../../types/food";
 import "./FoodSearch.css";

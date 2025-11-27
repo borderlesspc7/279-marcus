@@ -39,7 +39,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [notes, setNotes] = useState("");
-  const [status, setStatus] = useState<"scheduled" | "completed" | "cancelled" | "no-show">("scheduled");
+  const [status, setStatus] = useState<"pending" | "scheduled" | "completed" | "cancelled" | "no-show" | "rejected">("scheduled");
 
   // Form errors
   const [errors, setErrors] = useState<{
@@ -312,18 +312,22 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
                 onChange={(e) =>
                   setStatus(
                     e.target.value as
+                      | "pending"
                       | "scheduled"
                       | "completed"
                       | "cancelled"
                       | "no-show"
+                      | "rejected"
                   )
                 }
                 disabled={loading}
               >
+                <option value="pending">Pendente</option>
                 <option value="scheduled">Agendado</option>
                 <option value="completed">Concluído</option>
                 <option value="cancelled">Cancelado</option>
                 <option value="no-show">Faltou</option>
+                <option value="rejected">Rejeitado</option>
               </select>
             </div>
           )}

@@ -7,7 +7,6 @@
 
 import React, { useState } from "react";
 import { importTacoFoods, validateTacoFoods } from "../../scripts/importTacoFoods";
-import type { Food } from "../../types/food";
 
 interface ImportStats {
   total: number;

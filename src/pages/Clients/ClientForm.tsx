@@ -25,7 +25,7 @@ export const ClientForm: React.FC = () => {
 
   const [formErrors, setFormErrors] = useState<Partial<CreateClientData>>({});
 
-  const handleInputChange = (field: keyof CreateClientData, value: string | number) => {
+  const handleInputChange = (field: keyof CreateClientData, value: string | number | undefined) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -230,8 +230,8 @@ export const ClientForm: React.FC = () => {
                 }
                 placeholder="Ex: 175"
                 disabled={loading}
-                min="0"
-                step="0.1"
+                min={0}
+                step={0.1}
               />
 
               <InputField
@@ -243,8 +243,8 @@ export const ClientForm: React.FC = () => {
                 }
                 placeholder="Ex: 70.5"
                 disabled={loading}
-                min="0"
-                step="0.1"
+                min={0}
+                step={0.1}
               />
             </div>
           </div>

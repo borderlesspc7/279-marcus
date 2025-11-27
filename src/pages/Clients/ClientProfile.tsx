@@ -517,7 +517,7 @@ export const ClientProfile: React.FC = () => {
                 <Button
                   variant="primary"
                   onClick={() => navigate(`/dashboard/calculadora?clientId=${clientId}`)}
-                  style={{ marginTop: "1rem" }}
+                  className="client-profile__create-diet-btn"
                 >
                   <FaPlus /> Criar Primeira Dieta
                 </Button>

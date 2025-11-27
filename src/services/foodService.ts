@@ -7,10 +7,8 @@ import {
   getDocs,
   getDoc,
   query,
-  where,
   orderBy,
   Timestamp,
-  limit,
 } from "firebase/firestore";
 import { db } from "../lib/firebaseconfig";
 import type { Food } from "../types/food";

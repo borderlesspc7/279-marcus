@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaCalendarAlt, FaClock, FaSave, FaSpinner } from "react-icons/fa";
 import { Button } from "../../components/ui/Button/Button";
-import InputField from "../../components/ui/InputField/InputField";
 import { useAuth } from "../../hooks/useAuth";
 import { getClientByAuthUid } from "../../services/clientService";
 import { createAppointmentRequest } from "../../services/appointmentService";

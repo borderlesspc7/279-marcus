@@ -14,7 +14,6 @@ import {
 import { FaMale, FaFemale, FaUsers, FaSpinner } from "react-icons/fa";
 import { useAuth } from "../../../hooks/useAuth";
 import { getClientsByNutritionist } from "../../../services/clientService";
-import type { Client } from "../../../types/client";
 import "./ClientDemographics.css";
 
 export const ClientDemographics: React.FC = () => {

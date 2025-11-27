@@ -3,7 +3,6 @@ import { FaTimes, FaSave, FaSpinner, FaFileUpload } from "react-icons/fa";
 import { Button } from "../../../components/ui/Button/Button";
 import { uploadFile } from "../../../services/storageService";
 import { addClientDocument } from "../../../services/clientService";
-import type { ClientDocument } from "../../../types/client";
 import "./AddDocumentModal.css";
 
 interface AddDocumentModalProps {

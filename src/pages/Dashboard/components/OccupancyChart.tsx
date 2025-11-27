@@ -10,7 +10,6 @@ import {
 } from "recharts";
 import { useAuth } from "../../../hooks/useAuth";
 import { getAppointmentsByNutritionist } from "../../../services/appointmentService";
-import type { Appointment } from "../../../types/appointment";
 import "./OccupancyChart.css";
 
 interface OccupancyChartProps {

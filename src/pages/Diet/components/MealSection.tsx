@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FaPlus, FaTrash, FaEdit } from "react-icons/fa";
+import { FaTrash, FaEdit } from "react-icons/fa";
 import { FoodSearch } from "./FoodSearch";
 import { Button } from "../../../components/ui/Button/Button";
 import type { Meal, MealFood, Food } from "../../../types/food";

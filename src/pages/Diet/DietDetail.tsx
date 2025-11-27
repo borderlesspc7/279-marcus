@@ -5,13 +5,11 @@ import {
   FaSpinner,
   FaExclamationTriangle,
   FaTrash,
-  FaEdit,
 } from "react-icons/fa";
 import { Button } from "../../components/ui/Button/Button";
 import { MealSection } from "./components/MealSection";
 import { getDietById, deleteDiet } from "../../services/dietService";
 import { getClientById } from "../../services/clientService";
-import { useAuth } from "../../hooks/useAuth";
 import type { Diet } from "../../types/food";
 import type { Client } from "../../types/client";
 import "./DietDetail.css";
@@ -19,7 +17,6 @@ import "./DietDetail.css";
 export const DietDetail: React.FC = () => {
   const navigate = useNavigate();
   const { dietId } = useParams<{ dietId: string }>();
-  const { user } = useAuth();
   const [diet, setDiet] = useState<Diet | null>(null);
   const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);

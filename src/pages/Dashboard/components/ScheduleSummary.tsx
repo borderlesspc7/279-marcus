@@ -4,7 +4,6 @@ import { useAuth } from "../../../hooks/useAuth";
 import { getTodayAppointments } from "../../../services/appointmentService";
 import { getClientById } from "../../../services/clientService";
 import type { Appointment } from "../../../types/appointment";
-import type { Client } from "../../../types/client";
 import "./ScheduleSummary.css";
 
 interface AppointmentWithClient extends Appointment {
