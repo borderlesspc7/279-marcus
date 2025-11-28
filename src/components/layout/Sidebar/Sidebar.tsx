@@ -8,6 +8,8 @@ import {
   FaChartLine,
   FaAppleAlt,
   FaDatabase,
+  FaUtensils,
+  FaExchangeAlt,
 } from "react-icons/fa";
 import { useAuth } from "../../../hooks/useAuth";
 import "./Sidebar.css";
@@ -71,6 +73,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       label: "Importar TACO",
       adminOnly: true,
     },
+    {
+      path: "/dashboard/admin/alimentos",
+      icon: <FaUtensils size={20} />,
+      label: "Gerenciar Alimentos",
+      adminOnly: true,
+    },
   ];
 
   // Menu para usuário (cliente)
@@ -89,6 +97,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       path: "/dashboard/minhas-consultas",
       icon: <FaCalendarAlt size={20} />,
       label: "Minhas Consultas",
+    },
+    {
+      path: "/dashboard/minhas-dietas",
+      icon: <FaUtensils size={20} />,
+      label: "Minhas Dietas",
+    },
+    {
+      path: "/dashboard/minhas-substituicoes",
+      icon: <FaExchangeAlt size={20} />,
+      label: "Minhas Substituições",
     },
   ];
 

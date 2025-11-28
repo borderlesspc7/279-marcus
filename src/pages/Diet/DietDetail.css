@@ -73,6 +73,12 @@
   border-color: #fecaca;
 }
 
+.diet-detail__substitution-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .diet-detail__delete-button:hover {
   background: #fef2f2;
   border-color: #ef4444;

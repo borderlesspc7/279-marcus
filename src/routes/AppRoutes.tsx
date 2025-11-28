@@ -18,6 +18,11 @@ import { AppointmentRequests } from "../pages/Admin/AppointmentRequests";
 import { Financeiro } from "../pages/Financeiro/Financeiro";
 import { RequestAppointment } from "../pages/Appointments/RequestAppointment";
 import { MyAppointments } from "../pages/Appointments/MyAppointments";
+import { MyDiets } from "../pages/Diet/MyDiets";
+import { MyDietDetail } from "../pages/Diet/MyDietDetail";
+import { RequestSubstitution } from "../pages/Diet/RequestSubstitution";
+import { MySubstitutions } from "../pages/Diet/MySubstitutions";
+import { FoodManagement } from "../pages/Food/FoodManagement";
 
 export default function AppRoutes() {
 
@@ -160,6 +165,57 @@ export default function AppRoutes() {
                 <MyAppointments />
               </DashboardLayout>
             </ProtectedRoutes>
+          }
+        />
+        <Route
+          path={paths.minhasDietas}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <MyDiets />
+              </DashboardLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path={paths.minhaDietaDetail}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <MyDietDetail />
+              </DashboardLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path={paths.solicitarSubstituicao}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <RequestSubstitution />
+              </DashboardLayout>
+            </ProtectedRoutes>
+          }
+        />
+        <Route
+          path={paths.minhasSubstituicoes}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <MySubstitutions />
+              </DashboardLayout>
+            </ProtectedRoutes>
+          }
+        />
+        {/* Rotas apenas para Admin */}
+        <Route
+          path={paths.foodManagement}
+          element={
+            <AdminRoutes>
+              <DashboardLayout>
+                <FoodManagement />
+              </DashboardLayout>
+            </AdminRoutes>
           }
         />
       </Routes>

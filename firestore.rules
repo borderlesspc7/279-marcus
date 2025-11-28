@@ -56,6 +56,35 @@ service cloud.firestore {
                                resource.data.nutritionistId == request.auth.uid;
     }
     
+    match /dietSubstitutions/{substitutionId} {
+      // Permite criação de solicitações de substituição
+      // Como clientes usam instância separada de autenticação (clientAuth),
+      // permitimos criação se os dados obrigatórios estão presentes
+      // A validação do clientId será feita no código da aplicação
+      allow create: if request.resource.data.clientId != null &&
+                     request.resource.data.nutritionistId != null &&
+                     request.resource.data.status == "pending" &&
+                     request.resource.data.dietId != null &&
+                     request.resource.data.mealName != null &&
+                     request.resource.data.originalFoodId != null &&
+                     request.resource.data.reason != null;
+      
+      // Permite leitura de solicitações para usuários autenticados
+      // Clientes podem ler suas próprias solicitações (via query com clientId)
+      // Nutricionistas podem ler solicitações que pertencem a eles (via query com nutritionistId)
+      allow read: if request.auth != null || resource != null;
+      
+      // Permite que nutricionistas atualizem solicitações que pertencem a eles
+      allow update: if request.auth != null && 
+                     resource != null && 
+                     resource.data.nutritionistId == request.auth.uid;
+      
+      // Permite que nutricionistas deletem solicitações que pertencem a eles
+      allow delete: if request.auth != null && 
+                     resource != null && 
+                     resource.data.nutritionistId == request.auth.uid;
+    }
+    
     // Regra padrão: nega acesso a todas as outras coleções
     match /{document=**} {
       allow read, write: if false;

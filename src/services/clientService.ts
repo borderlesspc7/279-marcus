@@ -72,20 +72,34 @@ export const getClientsByNutritionist = async (
   nutritionistId: string
 ): Promise<Client[]> => {
   try {
+    // Buscar todos os clientes e filtrar:
+    // 1. Clientes que têm este nutritionistId
+    // 2. Clientes que têm authUid mas não têm nutritionistId (ou têm vazio)
+    //    (esses são clientes auto-cadastrados que ainda não foram associados)
     const q = query(
       collection(db, CLIENTS_COLLECTION),
-      where("nutritionistId", "==", nutritionistId),
       orderBy("createdAt", "desc")
     );
 
     const querySnapshot = await getDocs(q);
 
-    return querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt.toDate(),
-      updatedAt: doc.data().updatedAt.toDate(),
-    })) as Client[];
+    const clients = querySnapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: doc.data().createdAt.toDate(),
+        updatedAt: doc.data().updatedAt.toDate(),
+      })) as Client[];
+
+    // Retornar clientes que:
+    // 1. Têm este nutritionistId específico, OU
+    // 2. Têm authUid mas não têm nutritionistId definido (ou está vazio)
+    //    (clientes auto-cadastrados que ainda não foram associados a nenhum nutricionista)
+    return clients.filter(
+      (client) =>
+        client.nutritionistId === nutritionistId ||
+        (client.authUid && (!client.nutritionistId || client.nutritionistId.trim() === ""))
+    );
   } catch (error) {
     console.error("Erro ao buscar clientes:", error);
     throw error;

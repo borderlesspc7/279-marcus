@@ -15,6 +15,11 @@ export const paths = {
   // Rotas para clientes (role user)
   solicitarConsulta: "/dashboard/solicitar-consulta",
   minhasConsultas: "/dashboard/minhas-consultas",
+  minhasDietas: "/dashboard/minhas-dietas",
+  minhaDietaDetail: "/dashboard/minhas-dietas/:dietId",
+  solicitarSubstituicao: "/dashboard/solicitar-substituicao/:dietId",
+  minhasSubstituicoes: "/dashboard/minhas-substituicoes",
   // Rotas para admin
   appointmentRequests: "/dashboard/admin/appointment-requests",
+  foodManagement: "/dashboard/admin/alimentos",
 };
