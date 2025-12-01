@@ -33,13 +33,13 @@ export const createClient = async (
 ): Promise<string> => {
   try {
     // 1. Criar conta de acesso no Firebase Auth (instância separada para clientes)
-    // Gera senha temporária aleatória
-    const tempPassword = Math.random().toString(36).slice(-12) + "A1!";
+    // Senha inicial = telefone (removendo caracteres não numéricos)
+    const phonePassword = clientData.phone.replace(/\D/g, "");
 
     const userCredential = await createUserWithEmailAndPassword(
       clientAuth,
       clientData.email,
-      tempPassword
+      phonePassword
     );
 
     const clientUid = userCredential.user.uid;

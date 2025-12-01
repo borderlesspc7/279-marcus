@@ -2,6 +2,9 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { paths } from "./paths";
 import { RegisterPage } from "../pages/Register/Register";
 import LoginPage from "../pages/Login/Login";
+import ClientLoginPage from "../pages/ClientLogin/ClientLogin";
+import { TrialExpired } from "../pages/TrialExpired/TrialExpired";
+import { ClientProfile as ClientSelfProfile } from "../pages/ClientProfile/ClientProfile";
 import ProtectedRoutes from "./ProtectedRoutes";
 import AdminRoutes from "./AdminRoutes";
 import { DashboardLayout } from "../components/layout/DashboardLayout/DashboardLayout";
@@ -31,7 +34,9 @@ export default function AppRoutes() {
       <Routes>
         <Route path="/" element={<Navigate to={paths.login} replace />} />
         <Route path={paths.login} element={<LoginPage />} />
+        <Route path={paths.clientLogin} element={<ClientLoginPage />} />
         <Route path={paths.register} element={<RegisterPage />} />
+        <Route path={paths.trialExpired} element={<TrialExpired />} />
 
         {/* Rotas protegidas com DashboardLayout */}
         <Route
@@ -216,6 +221,17 @@ export default function AppRoutes() {
                 <FoodManagement />
               </DashboardLayout>
             </AdminRoutes>
+          }
+        />
+        {/* Rota para perfil do cliente */}
+        <Route
+          path={paths.clientePerfil}
+          element={
+            <ProtectedRoutes>
+              <DashboardLayout>
+                <ClientSelfProfile />
+              </DashboardLayout>
+            </ProtectedRoutes>
           }
         />
       </Routes>

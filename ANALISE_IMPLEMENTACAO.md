@@ -1,14 +1,14 @@
 # Análise de Implementação - Comparação PRDs vs Código Atual
 
 **Data:** 2025-01-27  
-**Versão:** 2.0  
+**Versão:** 3.0  
 **Última Revisão:** 2025-01-27
 
 ## Resumo Executivo
 
 Este documento compara os requisitos definidos nos PRDs (Product Requirement Documents) com o estado atual da implementação do código.
 
-**Estimativa de Completude Geral: ~80%**
+**Estimativa de Completude Geral: ~85%**
 
 ---
 
@@ -52,13 +52,16 @@ Este documento compara os requisitos definidos nos PRDs (Product Requirement Doc
   - Upload de PDFs para exames de sangue e bioimpedância ✅
   - Edição de altura e peso ✅
 
-### Acesso do Cliente ao App (Parcial)
+### Acesso do Cliente ao App
 - ✅ Sistema de autenticação separado para clientes (`clientFirebaseConfig.ts`)
 - ✅ Conta de acesso é criada automaticamente ao cadastrar cliente
 - ✅ Dashboard simplificado para clientes (role "user") implementado
 - ✅ Solicitação de consultas pelo cliente (`RequestAppointment.tsx`) ✅
 - ✅ Visualização de consultas do cliente (`MyAppointments.tsx`) ✅
 - ✅ Sistema de aprovação de solicitações pelo nutricionista (`AppointmentRequests.tsx`) ✅
+- ✅ Visualização de dietas pelo cliente (`MyDiets.tsx` e `MyDietDetail.tsx`) ✅
+- ✅ Solicitação de substituições de alimentos (`RequestSubstitution.tsx`) ✅
+- ✅ Visualização de solicitações de substituição (`MySubstitutions.tsx`) ✅
 
 ---
 
@@ -126,11 +129,39 @@ Este documento compara os requisitos definidos nos PRDs (Product Requirement Doc
   - Dieta salva no perfil do cliente ✅
   - Acessível via `src/pages/Diet/DietList.tsx` e `src/pages/Diet/DietDetail.tsx`
 
+### App do Cliente - Minha Dieta
+- ✅ **Visualização de Dietas**: Implementado em `src/pages/Diet/MyDiets.tsx`
+  - Lista todas as dietas do cliente ✅
+  - Busca e filtros ✅
+  - Histórico completo de dietas ✅
+- ✅ **Detalhes da Dieta**: Implementado em `src/pages/Diet/MyDietDetail.tsx`
+  - Visualização completa da dieta com macros ✅
+  - Resumo nutricional total ✅
+  - Botão para solicitar substituição ✅
+- ✅ **Solicitação de Substituições**: Implementado em `src/pages/Diet/RequestSubstitution.tsx`
+  - Formulário completo para solicitar substituição de alimentos ✅
+  - Seleção de refeição e alimento ✅
+  - Campo para motivo da substituição ✅
+  - Busca de alimentos alternativos ✅
+- ✅ **Visualização de Solicitações**: Implementado em `src/pages/Diet/MySubstitutions.tsx`
+  - Lista todas as solicitações de substituição do cliente ✅
+  - Status das solicitações (pending, approved, rejected, completed) ✅
+  - Detalhes de cada solicitação ✅
+
+### Gerenciamento de Base de Alimentos
+- ✅ **Edição de Base**: Implementado em `src/pages/Food/FoodManagement.tsx`
+  - Adicionar novos alimentos ✅
+  - Editar alimentos existentes ✅
+  - Remover alimentos ✅
+  - Busca e filtros ✅
+  - Campos completos (nome, categoria, macros, unidade, refeições permitidas) ✅
+
 ### Regras de Negócio
 - ✅ Base de dados de alimentos pré-carregada (TACO - 500+ alimentos)
 - ✅ Cálculo de macros baseado em valores de 100g multiplicado pela quantidade
 - ✅ Dieta associada ao perfil do cliente
 - ✅ Apenas o nutricionista que criou pode editar
+- ✅ Cliente pode visualizar suas dietas e solicitar substituições
 
 ---
 
@@ -204,6 +235,15 @@ Este documento compara os requisitos definidos nos PRDs (Product Requirement Doc
    - Exportação de transações para CSV
    - Filtros avançados por período e tipo
 
+8. **Sistema de Substituições de Alimentos**
+   - Cliente pode solicitar substituições de alimentos na dieta
+   - Nutricionista pode aprovar/rejeitar solicitações
+   - Histórico completo de solicitações
+
+9. **Gerenciamento de Base de Alimentos**
+   - Interface completa para CRUD de alimentos
+   - Adição, edição e remoção de alimentos da base
+
 ---
 
 # ❌ **NÃO IMPLEMENTADO**
@@ -212,12 +252,11 @@ Este documento compara os requisitos definidos nos PRDs (Product Requirement Doc
 
 - ❌ **Período de Trial de 10 dias**: Não há sistema de trial implementado
 - ❌ **Validação de e-mail por link de confirmação**: Não implementado
-- ❌ **Visualização de dietas pelo cliente**: Cliente não pode visualizar suas dietas
-  - `DietList.tsx` usa `getDietsByNutritionist` (apenas para nutricionistas)
-  - Não há função `getDietsByClient` exposta para clientes
 - ❌ **Tela de login específica para clientes**: Usa mesma tela, mas autentica em instância separada
 - ❌ **Regra de negócio de senha inicial = telefone**: Atualmente gera senha aleatória
 - ❌ **Edição de informações do cliente pelo próprio cliente no app**: Não implementado
+  - Cliente não pode editar nome, e-mail, telefone, data de nascimento ou sexo
+  - Apenas o nutricionista pode editar essas informações via `ClientProfile.tsx`
 
 ---
 
@@ -230,14 +269,8 @@ Este documento compara os requisitos definidos nos PRDs (Product Requirement Doc
 
 ## PRD 003: Base de Alimentos e Calculadora de Macros
 
-- ❌ **App do Cliente - Minha Dieta**: Cliente não pode visualizar suas dietas
-  - `DietList.tsx` usa `getDietsByNutritionist` (apenas para nutricionistas)
-  - Não há função `getDietsByClient` exposta para clientes
-- ❌ **Histórico de Dietas no App**: Cliente não pode visualizar dietas antigas
-- ❌ **Solicitação de Substituições**: Cliente não pode solicitar substituições pelo app
 - ❌ **Receitas**: Sistema não sugere ou gera receitas automaticamente
 - ❌ **IA para Dieta**: Não há IA para sugerir dietas ou alimentos
-- ❌ **Edição de Base**: Nutricionista não pode adicionar/editar/remover alimentos da base principal
 
 ---
 
@@ -269,16 +302,18 @@ Todas as funcionalidades do dashboard master estão ausentes:
 ## Resumo por Status
 
 ### ✅ **Totalmente Implementado**
-- PRD 001: Autenticação e Gestão de Clientes (exceto trial e visualização de dietas pelo cliente)
-- PRD 002: Módulo de Agendamentos (exceto notificações - agendamento online pelo cliente implementado)
-- PRD 003: Base de Alimentos e Calculadora de Macros (exceto visualização de dietas pelo cliente)
+- PRD 001: Autenticação e Gestão de Clientes (exceto trial, validação de e-mail e edição de perfil pelo cliente)
+- PRD 002: Módulo de Agendamentos (exceto notificações - agendamento online pelo cliente totalmente implementado)
+- PRD 003: Base de Alimentos e Calculadora de Macros (totalmente implementado, incluindo app do cliente)
 - PRD 004: Módulo Financeiro Simplificado (exceto integração de pagamento e conciliação bancária)
 
 ### ⚠️ **Parcialmente Implementado**
 - PRD 001: App do Cliente
   - ✅ Dashboard do cliente
   - ✅ Solicitação e visualização de consultas
-  - ❌ Visualização de dietas pelo cliente
+  - ✅ Visualização de dietas pelo cliente
+  - ✅ Solicitação de substituições
+  - ❌ Edição de informações pessoais pelo cliente
 - PRD 002: Agendamento Online pelo Cliente
   - ✅ Solicitação de consultas implementada
   - ✅ Sistema de aprovação implementado
@@ -289,28 +324,35 @@ Todas as funcionalidades do dashboard master estão ausentes:
 ## Prioridades Sugeridas para Próximas Implementações
 
 ### 🔴 **Alta Prioridade**
-1. **Visualização de Dietas pelo Cliente** (PRD 003)
-   - Implementar `getDietsByClient` para clientes
-   - Criar interface para cliente visualizar suas dietas
-   - Histórico de dietas do cliente
+1. **Edição de Perfil pelo Cliente** (PRD 001)
+   - Criar interface para cliente editar suas próprias informações
+   - Permitir edição de nome, e-mail, telefone (com validações)
+   - Manter histórico de alterações
 
-### 🟡 **Média Prioridade**
-2. **Sistema de Trial** (PRD 001)
-   - Implementar período de 10 dias gratuito
-   - Controle de expiração do trial
-
-3. **Notificações Básicas** (PRD 002)
+2. **Notificações Básicas** (PRD 002)
    - E-mails de confirmação de agendamento
    - Lembretes de consultas
+   - Notificações de aprovação/rejeição de solicitações
+
+### 🟡 **Média Prioridade**
+3. **Sistema de Trial** (PRD 001)
+   - Implementar período de 10 dias gratuito
+   - Controle de expiração do trial
+   - Bloqueio de funcionalidades após expiração
+
+4. **Validação de E-mail** (PRD 001)
+   - Envio de e-mail de confirmação
+   - Link de verificação
+   - Bloqueio de funcionalidades até verificação
 
 ### 🟢 **Baixa Prioridade**
-4. **Dashboard Master** (PRD 005)
+5. **Dashboard Master** (PRD 005)
    - Requer sistema de assinaturas primeiro
    - Métricas de SaaS
 
-5. **Funcionalidades Avançadas**
-   - Solicitação de substituições de dieta
-   - Validação de e-mail
+6. **Funcionalidades Avançadas**
+   - Receitas automáticas
+   - IA para sugestão de dietas
    - Melhorias na interface do cliente
 
 ---
@@ -334,11 +376,14 @@ Todas as funcionalidades do dashboard master estão ausentes:
 ### Infraestrutura de Cliente
 - ✅ Sistema de autenticação separado para clientes (`clientFirebaseConfig.ts`)
 - ✅ Criação automática de conta ao cadastrar cliente
-- ✅ Interface/app do cliente parcialmente implementada
+- ✅ Interface/app do cliente totalmente implementada
   - Dashboard simplificado para clientes ✅
   - Solicitação de consultas ✅
   - Visualização de consultas ✅
-  - ❌ Visualização de dietas (não implementada)
+  - Visualização de dietas ✅
+  - Solicitação de substituições ✅
+  - Visualização de solicitações de substituição ✅
+  - ❌ Edição de perfil pelo cliente (não implementada)
 
 ---
 
@@ -351,29 +396,40 @@ O projeto está **bem avançado** nas funcionalidades principais para nutricioni
 - ✅ Calculadora de dietas com base TACO
 
 As principais **lacunas** são:
-- ❌ Visualização de dietas pelo cliente (app do cliente parcialmente implementado)
+- ❌ Edição de perfil pelo cliente (cliente não pode editar suas próprias informações)
 - ❌ Dashboard administrativo master
 - ❌ Sistema de trial
 - ❌ Notificações (e-mail, SMS, push)
+- ❌ Validação de e-mail por link de confirmação
 - ❌ Integração de pagamento e conciliação bancária (requer serviços externos)
 
-**Estimativa de Completude Geral: ~80%**
+**Estimativa de Completude Geral: ~85%**
 
-### Principais Descobertas da Reanálise
+### Principais Descobertas da Reanálise (Versão 3.0)
 
-1. **App do Cliente está mais avançado do que documentado anteriormente:**
+1. **App do Cliente está COMPLETAMENTE implementado:**
    - Dashboard para clientes implementado ✅
    - Solicitação de consultas online implementada ✅
    - Visualização de status de consultas implementada ✅
    - Sistema de aprovação pelo nutricionista implementado ✅
+   - **Visualização de dietas pelo cliente implementada** ✅ (NOVO)
+   - **Solicitação de substituições implementada** ✅ (NOVO)
+   - **Visualização de solicitações de substituição implementada** ✅ (NOVO)
 
-2. **Todos os gráficos e dados do Dashboard usam dados reais:**
+2. **Gerenciamento de Base de Alimentos:**
+   - **CRUD completo de alimentos implementado** ✅ (NOVO)
+   - Interface para adicionar, editar e remover alimentos ✅
+   - Busca e filtros funcionais ✅
+
+3. **Todos os gráficos e dados do Dashboard usam dados reais:**
    - Não há mais dados mock no sistema ✅
    - Todos os componentes foram atualizados para usar Firestore ✅
 
-3. **Módulo Financeiro mais completo:**
+4. **Módulo Financeiro mais completo:**
    - Exportação CSV implementada ✅
    - Filtros por período implementados ✅
 
-4. **Agendamento Online pelo Cliente:**
-   - Funcionalidade completa implementada (não estava documentada) ✅
+5. **Funcionalidades Adicionais Descobertas:**
+   - Sistema completo de substituições de alimentos ✅
+   - Gerenciamento completo da base de alimentos ✅
+   - Histórico de dietas para clientes ✅

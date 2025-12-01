@@ -22,4 +22,9 @@ export const paths = {
   // Rotas para admin
   appointmentRequests: "/dashboard/admin/appointment-requests",
   foodManagement: "/dashboard/admin/alimentos",
+  // Rotas de autenticação
+  clientLogin: "/cliente/login",
+  trialExpired: "/trial-expirado",
+  // Rotas para cliente
+  clientePerfil: "/dashboard/cliente/perfil",
 };

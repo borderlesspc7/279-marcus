@@ -37,6 +37,15 @@ export default function AdminRoutes({ children }: AdminRoutesProps) {
     return <Navigate to={paths.dashboard} replace />;
   }
 
+  // Verificar se o trial expirou
+  if (user.trialEndDate) {
+    const now = new Date();
+    const trialEnd = new Date(user.trialEndDate);
+    if (now > trialEnd) {
+      return <Navigate to={paths.trialExpired} replace />;
+    }
+  }
+
   return <>{children}</>;
 }
 

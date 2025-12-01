@@ -2,12 +2,12 @@ export interface User {
   uid: string;
   name: string;
   email: string;
-  // ⚠️ NUNCA inclua password aqui! Senhas são gerenciadas pelo Firebase Authentication
   createdAt: Date;
   updatedAt: Date;
   role?: "admin" | "user";
   phone?: string;
   defaultConsultationValue?: number; // Valor padrão de consulta em reais
+  trialEndDate?: Date; // Data de término do período de trial (10 dias após cadastro)
 }
 
 export interface AuthState {

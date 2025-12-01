@@ -85,6 +85,11 @@ export const authService = {
       const firebaseUser = userCredential.user;
 
       const role = credentials.role || "user";
+      
+      // Calcular data de término do trial (10 dias a partir de hoje)
+      const trialEndDate = new Date();
+      trialEndDate.setDate(trialEndDate.getDate() + 10);
+      
       const newUser: User = {
         uid: firebaseUser.uid,
         name: credentials.name,
@@ -93,6 +98,7 @@ export const authService = {
         createdAt: new Date(),
         updatedAt: new Date(),
         role,
+        trialEndDate: role === "admin" ? trialEndDate : undefined, // Apenas admins têm trial
       };
 
       await setDoc(doc(db, "users", firebaseUser.uid), newUser);

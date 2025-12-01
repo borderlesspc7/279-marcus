@@ -1,0 +1,242 @@
+.client-profile {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.client-profile__header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.client-profile__header-content {
+  flex: 1;
+}
+
+.client-profile__title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.client-profile__subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.client-profile__container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.client-profile__error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #dc2626;
+}
+
+.client-profile__card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.client-profile__card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.client-profile__avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.client-profile__card-title {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.client-profile__card-title h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.client-profile__card-content {
+  padding: 1.5rem;
+}
+
+.client-profile__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.client-profile__gender {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.client-profile__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.client-profile__required {
+  color: #dc2626;
+}
+
+.client-profile__gender-options {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.client-profile__radio {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.client-profile__radio:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.client-profile__radio input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+}
+
+.client-profile__radio input[type="radio"]:checked + span {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.client-profile__form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.client-profile__info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.client-profile__info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+}
+
+.client-profile__info-icon {
+  color: #3b82f6;
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.client-profile__info-item > div {
+  flex: 1;
+}
+
+.client-profile__info-item label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.client-profile__info-item p {
+  margin: 0;
+  font-size: 1rem;
+  color: #1f2937;
+  font-weight: 500;
+}
+
+.client-profile__loading,
+.client-profile__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+}
+
+.client-profile__spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .client-profile {
+    padding: 1rem;
+  }
+
+  .client-profile__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .client-profile__card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .client-profile__card-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .client-profile__form-actions {
+    flex-direction: column;
+  }
+
+  .client-profile__gender-options {
+    flex-direction: column;
+  }
+}
+
