@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Header } from "../Header/Header";
 import { Sidebar } from "../Sidebar/Sidebar";
+import { TrialWarningModal } from "../../ui/TrialWarningModal/TrialWarningModal";
 import "./DashboardLayout.css";
 
 interface DashboardLayoutProps {
@@ -26,6 +27,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             : "dashboard-layout__content--sidebar-closed"
         }`}
       >
+        <TrialWarningModal />
         <Header onToggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
         <main className="dashboard-layout__main">
           <div className="dashboard-layout__container">{children}</div>

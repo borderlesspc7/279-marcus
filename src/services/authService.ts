@@ -44,9 +44,16 @@ export const authService = {
         throw new Error("Usuário não encontrado");
       }
 
-      const userData = userDoc.data() as User;
-      const updateUserData = {
+      const userData = userDoc.data();
+      // Converter Timestamps para Date se necessário
+      const convertedUser: User = {
         ...userData,
+        createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : userData.createdAt,
+        updatedAt: userData.updatedAt?.toDate ? userData.updatedAt.toDate() : userData.updatedAt,
+        trialEndDate: userData.trialEndDate?.toDate ? userData.trialEndDate.toDate() : userData.trialEndDate,
+      } as User;
+      const updateUserData = {
+        ...convertedUser,
         lastLogin: new Date(),
       };
 
@@ -161,8 +168,15 @@ export const authService = {
           try {
             const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
             if (userDoc.exists()) {
-              const userData = userDoc.data() as User;
-              callback(userData);
+              const userData = userDoc.data();
+              // Converter Timestamps para Date se necessário
+              const convertedUser: User = {
+                ...userData,
+                createdAt: userData.createdAt?.toDate ? userData.createdAt.toDate() : userData.createdAt,
+                updatedAt: userData.updatedAt?.toDate ? userData.updatedAt.toDate() : userData.updatedAt,
+                trialEndDate: userData.trialEndDate?.toDate ? userData.trialEndDate.toDate() : userData.trialEndDate,
+              } as User;
+              callback(convertedUser);
             } else {
               callback(null); // Usuário não encontrado no Firestore
             }

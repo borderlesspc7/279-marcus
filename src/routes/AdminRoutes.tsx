@@ -1,6 +1,9 @@
+import React from "react";
 import { Navigate } from "react-router-dom";
 import { paths } from "./paths";
 import { useAuth } from "../hooks/useAuth";
+import { useTrial } from "../hooks/useTrial";
+import { TrialBlockModal } from "../components/ui/TrialBlockModal/TrialBlockModal";
 import type { ReactNode } from "react";
 
 interface AdminRoutesProps {
@@ -9,6 +12,7 @@ interface AdminRoutesProps {
 
 export default function AdminRoutes({ children }: AdminRoutesProps) {
   const { user, loading } = useAuth();
+  const { isExpired, shouldBlock } = useTrial();
 
   // Mostrar tela de carregamento enquanto verifica autenticação
   if (loading) {
@@ -37,13 +41,24 @@ export default function AdminRoutes({ children }: AdminRoutesProps) {
     return <Navigate to={paths.dashboard} replace />;
   }
 
-  // Verificar se o trial expirou
-  if (user.trialEndDate) {
-    const now = new Date();
-    const trialEnd = new Date(user.trialEndDate);
-    if (now > trialEnd) {
-      return <Navigate to={paths.trialExpired} replace />;
-    }
+  // Verificar se o trial expirou - redirecionar para página de trial expirado
+  if (isExpired) {
+    return <Navigate to={paths.trialExpired} replace />;
+  }
+
+  // Bloquear funcionalidades durante trial - mostrar modal de bloqueio
+  // O modal pode ser fechado para permitir exploração, mas funcionalidades críticas devem ser bloqueadas
+  if (shouldBlock) {
+    const [isModalOpen, setIsModalOpen] = React.useState(true);
+    
+    return (
+      <>
+        {isModalOpen && (
+          <TrialBlockModal onClose={() => setIsModalOpen(false)} />
+        )}
+        {children}
+      </>
+    );
   }
 
   return <>{children}</>;
