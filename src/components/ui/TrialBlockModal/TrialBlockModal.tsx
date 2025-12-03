@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaLock, FaCreditCard } from "react-icons/fa";
 import { Button } from "../Button/Button";
 import { useTrial } from "../../../hooks/useTrial";
+import { useAuth } from "../../../hooks/useAuth";
+import { paths } from "../../../routes/paths";
 import "./TrialBlockModal.css";
 
 interface TrialBlockModalProps {
@@ -9,7 +12,21 @@ interface TrialBlockModalProps {
 }
 
 export const TrialBlockModal: React.FC<TrialBlockModalProps> = ({ onClose }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const { daysRemaining, trialEndDate } = useTrial();
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+
+  // Verificar se o usuário já optou por não mostrar mais
+  useEffect(() => {
+    if (user?.uid) {
+      const dontShowKey = `trial-block-dont-show-${user.uid}`;
+      const shouldNotShow = localStorage.getItem(dontShowKey) === "true";
+      if (shouldNotShow && onClose) {
+        onClose();
+      }
+    }
+  }, [user, onClose]);
 
   const formatDate = (date: Date | null) => {
     if (!date) return "";
@@ -23,6 +40,18 @@ export const TrialBlockModal: React.FC<TrialBlockModalProps> = ({ onClose }) => 
   };
 
   const handleAssinar = () => {
+    navigate(paths.subscription);
+    if (onClose) {
+      onClose();
+    }
+  };
+
+  const handleClose = () => {
+    // Se o usuário marcou "não mostrar mais", salvar no localStorage
+    if (dontShowAgain && user?.uid) {
+      const dontShowKey = `trial-block-dont-show-${user.uid}`;
+      localStorage.setItem(dontShowKey, "true");
+    }
     if (onClose) {
       onClose();
     }
@@ -54,12 +83,23 @@ export const TrialBlockModal: React.FC<TrialBlockModalProps> = ({ onClose }) => 
             )}
           </div>
         )}
+        <div className="trial-block-modal__dont-show">
+          <label className="trial-block-modal__checkbox-label">
+            <input
+              type="checkbox"
+              checked={dontShowAgain}
+              onChange={(e) => setDontShowAgain(e.target.checked)}
+              className="trial-block-modal__checkbox"
+            />
+            <span>Não mostrar mais este aviso</span>
+          </label>
+        </div>
         <div className="trial-block-modal__actions">
           <Button variant="primary" onClick={handleAssinar}>
             <FaCreditCard /> Assinar Plano
           </Button>
           {onClose && (
-            <Button variant="secondary" onClick={onClose}>
+            <Button variant="secondary" onClick={handleClose}>
               Continuar Explorando
             </Button>
           )}

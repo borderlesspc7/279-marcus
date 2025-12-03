@@ -4,6 +4,9 @@ import { RegisterPage } from "../pages/Register/Register";
 import LoginPage from "../pages/Login/Login";
 import ClientLoginPage from "../pages/ClientLogin/ClientLogin";
 import { TrialExpired } from "../pages/TrialExpired/TrialExpired";
+import { Subscription } from "../pages/Subscription/Subscription";
+import { Checkout } from "../pages/Checkout/Checkout";
+import { CheckoutSuccess } from "../pages/CheckoutSuccess/CheckoutSuccess";
 import { ClientProfile as ClientSelfProfile } from "../pages/ClientProfile/ClientProfile";
 import ProtectedRoutes from "./ProtectedRoutes";
 import AdminRoutes from "./AdminRoutes";
@@ -37,6 +40,9 @@ export default function AppRoutes() {
         <Route path={paths.clientLogin} element={<ClientLoginPage />} />
         <Route path={paths.register} element={<RegisterPage />} />
         <Route path={paths.trialExpired} element={<TrialExpired />} />
+        <Route path={paths.subscription} element={<Subscription />} />
+        <Route path={paths.checkout} element={<Checkout />} />
+        <Route path={paths.checkoutSuccess} element={<CheckoutSuccess />} />
 
         {/* Rotas protegidas com DashboardLayout */}
         <Route

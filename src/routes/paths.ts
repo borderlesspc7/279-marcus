@@ -25,6 +25,9 @@ export const paths = {
   // Rotas de autenticação
   clientLogin: "/cliente/login",
   trialExpired: "/trial-expirado",
+  subscription: "/assinatura",
+  checkout: "/checkout",
+  checkoutSuccess: "/checkout/sucesso",
   // Rotas para cliente
   clientePerfil: "/dashboard/cliente/perfil",
 };

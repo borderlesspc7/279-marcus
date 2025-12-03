@@ -1,14 +1,25 @@
 # Análise de Implementação - Comparação PRDs vs Código Atual
 
 **Data:** 2025-01-27  
-**Versão:** 3.0  
+**Versão:** 5.0  
 **Última Revisão:** 2025-01-27
 
 ## Resumo Executivo
 
-Este documento compara os requisitos definidos nos PRDs (Product Requirement Documents) com o estado atual da implementação do código.
+Este documento compara os requisitos definidos nos PRDs (Product Requirement Documents) e One-Pager com o estado atual da implementação do código.
 
-**Estimativa de Completude Geral: ~85%**
+**Estimativa de Completude Geral (Dentro do Escopo): ~88%**
+
+### ⚠️ **Importante: Funcionalidades Fora do Escopo**
+
+Algumas funcionalidades foram implementadas, mas **não estavam no escopo da primeira versão** conforme definido nos PRDs e One-Pager:
+
+- **Edição de Perfil pelo Cliente**: Implementado, mas PRD 001 especifica "Fora do Escopo para esta Etapa"
+- **Sistema de Substituições de Alimentos**: Implementado, mas One-Pager lista como "O que não fazer agora"
+- **Gerenciamento de Base de Alimentos (CRUD)**: Implementado, mas PRD 003 especifica que está "Fora do Escopo"
+- **IA para Dietas e Receitas**: Não implementado e explicitamente fora do escopo (PRD 003 e One-Pager)
+
+Estas funcionalidades estão marcadas com ⚠️ no documento para indicar que foram implementadas mas não fazem parte do escopo validado.
 
 ---
 
@@ -44,7 +55,7 @@ Este documento compara os requisitos definidos nos PRDs (Product Requirement Doc
 - ✅ **Formulário de Cadastro**: Implementado em `src/pages/Clients/ClientForm.tsx`
   - Campos: Nome Completo, E-mail, Telefone, Data de Nascimento, Sexo
   - Criação automática de conta de acesso para o app do cliente ✅
-  - Geração de senha temporária automática
+  - **Senha inicial = telefone (removendo caracteres não numéricos)** ✅
 
 - ✅ **Ficha do Cliente**: Implementado em `src/pages/Clients/ClientProfile.tsx`
   - Visualização de dados básicos
@@ -60,8 +71,14 @@ Este documento compara os requisitos definidos nos PRDs (Product Requirement Doc
 - ✅ Visualização de consultas do cliente (`MyAppointments.tsx`) ✅
 - ✅ Sistema de aprovação de solicitações pelo nutricionista (`AppointmentRequests.tsx`) ✅
 - ✅ Visualização de dietas pelo cliente (`MyDiets.tsx` e `MyDietDetail.tsx`) ✅
-- ✅ Solicitação de substituições de alimentos (`RequestSubstitution.tsx`) ✅
-- ✅ Visualização de solicitações de substituição (`MySubstitutions.tsx`) ✅
+- ⚠️ Solicitação de substituições de alimentos (`RequestSubstitution.tsx`) ⚠️
+  - ⚠️ **Nota**: Funcionalidade implementada, mas está FORA DO ESCOPO da primeira versão (One-Pager: "Substituição de dieta pelo app" - O que não fazer agora)
+- ⚠️ Visualização de solicitações de substituição (`MySubstitutions.tsx`) ⚠️
+  - ⚠️ **Nota**: Funcionalidade implementada, mas está FORA DO ESCOPO da primeira versão
+- ⚠️ **Edição de perfil pelo cliente** (`src/pages/ClientProfile/ClientProfile.tsx`) ⚠️
+  - Cliente pode editar nome, e-mail, telefone, data de nascimento e sexo
+  - Rota: `/dashboard/cliente/perfil`
+  - ⚠️ **Nota**: Funcionalidade implementada, mas está FORA DO ESCOPO da primeira versão (PRD 001 - Fora do Escopo)
 
 ---
 
@@ -137,24 +154,16 @@ Este documento compara os requisitos definidos nos PRDs (Product Requirement Doc
 - ✅ **Detalhes da Dieta**: Implementado em `src/pages/Diet/MyDietDetail.tsx`
   - Visualização completa da dieta com macros ✅
   - Resumo nutricional total ✅
-  - Botão para solicitar substituição ✅
-- ✅ **Solicitação de Substituições**: Implementado em `src/pages/Diet/RequestSubstitution.tsx`
-  - Formulário completo para solicitar substituição de alimentos ✅
-  - Seleção de refeição e alimento ✅
-  - Campo para motivo da substituição ✅
-  - Busca de alimentos alternativos ✅
-- ✅ **Visualização de Solicitações**: Implementado em `src/pages/Diet/MySubstitutions.tsx`
-  - Lista todas as solicitações de substituição do cliente ✅
-  - Status das solicitações (pending, approved, rejected, completed) ✅
-  - Detalhes de cada solicitação ✅
+  - ⚠️ Botão para solicitar substituição (FORA DO ESCOPO - implementado mas não estava no escopo inicial)
 
 ### Gerenciamento de Base de Alimentos
-- ✅ **Edição de Base**: Implementado em `src/pages/Food/FoodManagement.tsx`
+- ⚠️ **Edição de Base**: Implementado em `src/pages/Food/FoodManagement.tsx` ⚠️
   - Adicionar novos alimentos ✅
   - Editar alimentos existentes ✅
   - Remover alimentos ✅
   - Busca e filtros ✅
   - Campos completos (nome, categoria, macros, unidade, refeições permitidas) ✅
+  - ⚠️ **Nota**: Funcionalidade implementada, mas está FORA DO ESCOPO da primeira versão (PRD 003 - Fora do Escopo: "Edição de Base: O nutricionista não poderá adicionar, editar ou remover alimentos da base de dados principal")
 
 ### Regras de Negócio
 - ✅ Base de dados de alimentos pré-carregada (TACO - 500+ alimentos)
@@ -235,14 +244,16 @@ Este documento compara os requisitos definidos nos PRDs (Product Requirement Doc
    - Exportação de transações para CSV
    - Filtros avançados por período e tipo
 
-8. **Sistema de Substituições de Alimentos**
+8. **Sistema de Substituições de Alimentos** ⚠️
    - Cliente pode solicitar substituições de alimentos na dieta
    - Nutricionista pode aprovar/rejeitar solicitações
    - Histórico completo de solicitações
+   - ⚠️ **Nota**: FORA DO ESCOPO da primeira versão (One-Pager: "Substituição de dieta pelo app" - O que não fazer agora)
 
-9. **Gerenciamento de Base de Alimentos**
+9. **Gerenciamento de Base de Alimentos** ⚠️
    - Interface completa para CRUD de alimentos
    - Adição, edição e remoção de alimentos da base
+   - ⚠️ **Nota**: FORA DO ESCOPO da primeira versão (PRD 003: "Edição de Base: O nutricionista não poderá adicionar, editar ou remover alimentos da base de dados principal")
 
 ---
 
@@ -250,13 +261,23 @@ Este documento compara os requisitos definidos nos PRDs (Product Requirement Doc
 
 ## PRD 001: Módulo de Autenticação e Gestão de Clientes
 
-- ❌ **Período de Trial de 10 dias**: Não há sistema de trial implementado
+- ⚠️ **Período de Trial de 10 dias**: **PARCIALMENTE IMPLEMENTADO**
+  - ✅ Campo `trialEndDate` criado no registro (10 dias após cadastro)
+  - ✅ Página `TrialExpired.tsx` implementada
+  - ✅ Verificação em `AdminRoutes.tsx` redireciona se trial expirou
+  - ❌ Não há bloqueio completo de funcionalidades durante o trial
+  - ❌ Não há aviso antes da expiração
 - ❌ **Validação de e-mail por link de confirmação**: Não implementado
-- ❌ **Tela de login específica para clientes**: Usa mesma tela, mas autentica em instância separada
-- ❌ **Regra de negócio de senha inicial = telefone**: Atualmente gera senha aleatória
-- ❌ **Edição de informações do cliente pelo próprio cliente no app**: Não implementado
-  - Cliente não pode editar nome, e-mail, telefone, data de nascimento ou sexo
-  - Apenas o nutricionista pode editar essas informações via `ClientProfile.tsx`
+  - Não há envio de e-mail de verificação
+  - Não há bloqueio de funcionalidades até verificação
+- ❌ **Tela de login específica para clientes**: Usa tela separada (`ClientLogin.tsx`), mas autentica em instância separada do Firebase
+- ✅ **Regra de negócio de senha inicial = telefone**: **IMPLEMENTADO**
+  - Senha inicial é o telefone (removendo caracteres não numéricos)
+  - Implementado em `src/services/clientService.ts` linha 37
+- ⚠️ **Edição de informações do cliente pelo próprio cliente no app**: **IMPLEMENTADO MAS FORA DO ESCOPO**
+  - Cliente pode editar nome, e-mail, telefone, data de nascimento e sexo
+  - Implementado em `src/pages/ClientProfile/ClientProfile.tsx`
+  - ⚠️ **Nota**: Funcionalidade implementada, mas está FORA DO ESCOPO da primeira versão (PRD 001 - Fora do Escopo: "Edição de informações do cliente pelo próprio cliente no app")
 
 ---
 
@@ -269,8 +290,10 @@ Este documento compara os requisitos definidos nos PRDs (Product Requirement Doc
 
 ## PRD 003: Base de Alimentos e Calculadora de Macros
 
-- ❌ **Receitas**: Sistema não sugere ou gera receitas automaticamente
-- ❌ **IA para Dieta**: Não há IA para sugerir dietas ou alimentos
+- ❌ **Receitas**: Sistema não sugere ou gera receitas automaticamente (FORA DO ESCOPO - conforme PRD 003 e One-Pager)
+- ❌ **IA para Dieta**: Não há IA para sugerir dietas ou alimentos (FORA DO ESCOPO - conforme PRD 003 e One-Pager)
+- ⚠️ **Substituições de Alimentos pelo Cliente**: Implementado mas FORA DO ESCOPO (One-Pager: "Substituição de dieta pelo app" - O que não fazer agora)
+- ⚠️ **Gerenciamento de Base de Alimentos**: Implementado mas FORA DO ESCOPO (PRD 003: "Edição de Base: O nutricionista não poderá adicionar, editar ou remover alimentos da base de dados principal")
 
 ---
 
@@ -301,59 +324,62 @@ Todas as funcionalidades do dashboard master estão ausentes:
 
 ## Resumo por Status
 
-### ✅ **Totalmente Implementado**
-- PRD 001: Autenticação e Gestão de Clientes (exceto trial, validação de e-mail e edição de perfil pelo cliente)
+### ✅ **Totalmente Implementado (Dentro do Escopo)**
+- PRD 001: Autenticação e Gestão de Clientes (exceto validação de e-mail - trial parcialmente implementado)
 - PRD 002: Módulo de Agendamentos (exceto notificações - agendamento online pelo cliente totalmente implementado)
-- PRD 003: Base de Alimentos e Calculadora de Macros (totalmente implementado, incluindo app do cliente)
+- PRD 003: Base de Alimentos e Calculadora de Macros (totalmente implementado, incluindo app do cliente - exceto funcionalidades fora do escopo)
 - PRD 004: Módulo Financeiro Simplificado (exceto integração de pagamento e conciliação bancária)
 
 ### ⚠️ **Parcialmente Implementado**
-- PRD 001: App do Cliente
-  - ✅ Dashboard do cliente
-  - ✅ Solicitação e visualização de consultas
-  - ✅ Visualização de dietas pelo cliente
-  - ✅ Solicitação de substituições
-  - ❌ Edição de informações pessoais pelo cliente
+- PRD 001: Sistema de Trial
+  - ✅ Campo `trialEndDate` criado no registro
+  - ✅ Página de trial expirado implementada
+  - ✅ Redirecionamento quando trial expira
+  - ❌ Bloqueio completo de funcionalidades durante trial
+  - ❌ Avisos antes da expiração
 - PRD 002: Agendamento Online pelo Cliente
   - ✅ Solicitação de consultas implementada
   - ✅ Sistema de aprovação implementado
   - ❌ Notificações não implementadas
 
+### ⚠️ **Implementado mas FORA DO ESCOPO da Primeira Versão**
+- **Edição de Perfil pelo Cliente**: Implementado mas não estava no escopo inicial (PRD 001 - Fora do Escopo)
+- **Sistema de Substituições de Alimentos**: Implementado mas não estava no escopo inicial (One-Pager: "O que não fazer agora")
+- **Gerenciamento de Base de Alimentos (CRUD)**: Implementado mas não estava no escopo inicial (PRD 003 - Fora do Escopo)
+
 ---
 
 ## Prioridades Sugeridas para Próximas Implementações
 
-### 🔴 **Alta Prioridade**
-1. **Edição de Perfil pelo Cliente** (PRD 001)
-   - Criar interface para cliente editar suas próprias informações
-   - Permitir edição de nome, e-mail, telefone (com validações)
-   - Manter histórico de alterações
+### 🔴 **Alta Prioridade (Dentro do Escopo)**
+1. **Completar Sistema de Trial**
+   - Bloqueio completo de funcionalidades durante trial
+   - Avisos antes da expiração do trial
 
-2. **Notificações Básicas** (PRD 002)
+2. **Notificações Básicas**
    - E-mails de confirmação de agendamento
    - Lembretes de consultas
    - Notificações de aprovação/rejeição de solicitações
 
 ### 🟡 **Média Prioridade**
-3. **Sistema de Trial** (PRD 001)
-   - Implementar período de 10 dias gratuito
-   - Controle de expiração do trial
-   - Bloqueio de funcionalidades após expiração
-
-4. **Validação de E-mail** (PRD 001)
+3. **Validação de E-mail**
    - Envio de e-mail de confirmação
    - Link de verificação
    - Bloqueio de funcionalidades até verificação
 
 ### 🟢 **Baixa Prioridade**
-5. **Dashboard Master** (PRD 005)
+4. **Dashboard Master** (PRD 005)
    - Requer sistema de assinaturas primeiro
    - Métricas de SaaS
 
-6. **Funcionalidades Avançadas**
-   - Receitas automáticas
-   - IA para sugestão de dietas
-   - Melhorias na interface do cliente
+### 📋 **Funcionalidades Implementadas mas FORA DO ESCOPO**
+As seguintes funcionalidades foram implementadas, mas não estavam no escopo da primeira versão conforme os PRDs e One-Pager:
+
+- **Edição de Perfil pelo Cliente**: Implementado mas PRD 001 especifica "Fora do Escopo"
+- **Sistema de Substituições de Alimentos**: Implementado mas One-Pager lista "Substituição de dieta pelo app" como "O que não fazer agora"
+- **Gerenciamento de Base de Alimentos (CRUD)**: Implementado mas PRD 003 especifica "Edição de Base: O nutricionista não poderá adicionar, editar ou remover alimentos da base de dados principal"
+
+**Nota**: Essas funcionalidades podem ser úteis, mas não fazem parte do escopo validado para a primeira versão.
 
 ---
 
@@ -381,9 +407,10 @@ Todas as funcionalidades do dashboard master estão ausentes:
   - Solicitação de consultas ✅
   - Visualização de consultas ✅
   - Visualização de dietas ✅
-  - Solicitação de substituições ✅
-  - Visualização de solicitações de substituição ✅
-  - ❌ Edição de perfil pelo cliente (não implementada)
+  - **Funcionalidades FORA DO ESCOPO mas implementadas:**
+    - Solicitação de substituições ⚠️ (FORA DO ESCOPO)
+    - Visualização de solicitações de substituição ⚠️ (FORA DO ESCOPO)
+    - Edição de perfil pelo cliente ⚠️ (FORA DO ESCOPO)
 
 ---
 
@@ -395,41 +422,60 @@ O projeto está **bem avançado** nas funcionalidades principais para nutricioni
 - ✅ Sistema de agendamentos funcional
 - ✅ Calculadora de dietas com base TACO
 
-As principais **lacunas** são:
-- ❌ Edição de perfil pelo cliente (cliente não pode editar suas próprias informações)
-- ❌ Dashboard administrativo master
-- ❌ Sistema de trial
-- ❌ Notificações (e-mail, SMS, push)
-- ❌ Validação de e-mail por link de confirmação
-- ❌ Integração de pagamento e conciliação bancária (requer serviços externos)
+As principais **lacunas** (dentro do escopo) são:
+- ⚠️ Sistema de trial (parcialmente implementado - falta bloqueio completo e avisos)
+- ❌ Dashboard administrativo master (PRD 005)
+- ❌ Notificações (e-mail, SMS, push) - FORA DO ESCOPO mas seria útil
+- ❌ Validação de e-mail por link de confirmação - FORA DO ESCOPO
+- ❌ Integração de pagamento e conciliação bancária (requer serviços externos) - FORA DO ESCOPO
 
-**Estimativa de Completude Geral: ~85%**
+**Funcionalidades implementadas mas FORA DO ESCOPO:**
+- ⚠️ Edição de perfil pelo cliente (PRD 001 - Fora do Escopo)
+- ⚠️ Sistema de substituições de alimentos (One-Pager - O que não fazer agora)
+- ⚠️ Gerenciamento de base de alimentos (PRD 003 - Fora do Escopo)
 
-### Principais Descobertas da Reanálise (Versão 3.0)
+**Estimativa de Completude Geral: ~88%**
 
-1. **App do Cliente está COMPLETAMENTE implementado:**
+### Principais Descobertas da Reanálise (Versão 4.0)
+
+1. **Edição de Perfil pelo Cliente IMPLEMENTADA (mas FORA DO ESCOPO):**
+   - ✅ Cliente pode editar nome, e-mail, telefone, data de nascimento e sexo
+   - ✅ Implementado em `src/pages/ClientProfile/ClientProfile.tsx`
+   - ✅ Rota `/dashboard/cliente/perfil` configurada
+   - ⚠️ **Nota**: Funcionalidade implementada, mas está FORA DO ESCOPO da primeira versão (PRD 001 - Fora do Escopo)
+
+2. **Sistema de Trial PARCIALMENTE IMPLEMENTADO:**
+   - ✅ Campo `trialEndDate` criado no registro (10 dias após cadastro)
+   - ✅ Página `TrialExpired.tsx` implementada
+   - ✅ Verificação em `AdminRoutes.tsx` redireciona quando trial expira
+   - ❌ Não há bloqueio completo de funcionalidades durante trial
+   - ❌ Não há avisos antes da expiração
+
+3. **Senha Inicial = Telefone IMPLEMENTADO:**
+   - ✅ Senha inicial do cliente é o telefone (removendo caracteres não numéricos)
+   - ✅ Implementado em `src/services/clientService.ts` linha 37
+
+4. **App do Cliente - Funcionalidades do Escopo:**
    - Dashboard para clientes implementado ✅
    - Solicitação de consultas online implementada ✅
    - Visualização de status de consultas implementada ✅
    - Sistema de aprovação pelo nutricionista implementado ✅
-   - **Visualização de dietas pelo cliente implementada** ✅ (NOVO)
-   - **Solicitação de substituições implementada** ✅ (NOVO)
-   - **Visualização de solicitações de substituição implementada** ✅ (NOVO)
+   - Visualização de dietas pelo cliente implementada ✅
+   - **Funcionalidades FORA DO ESCOPO mas implementadas:**
+     - Solicitação de substituições implementada ⚠️ (FORA DO ESCOPO)
+     - Visualização de solicitações de substituição implementada ⚠️ (FORA DO ESCOPO)
+     - Edição de perfil pelo cliente implementada ⚠️ (FORA DO ESCOPO)
 
-2. **Gerenciamento de Base de Alimentos:**
-   - **CRUD completo de alimentos implementado** ✅ (NOVO)
-   - Interface para adicionar, editar e remover alimentos ✅
-   - Busca e filtros funcionais ✅
+5. **Gerenciamento de Base de Alimentos (FORA DO ESCOPO mas implementado):**
+   - CRUD completo de alimentos implementado ⚠️
+   - Interface para adicionar, editar e remover alimentos ⚠️
+   - Busca e filtros funcionais ⚠️
+   - **Nota**: PRD 003 especifica que "Edição de Base" está fora do escopo
 
-3. **Todos os gráficos e dados do Dashboard usam dados reais:**
-   - Não há mais dados mock no sistema ✅
-   - Todos os componentes foram atualizados para usar Firestore ✅
+6. **Todos os gráficos e dados do Dashboard usam dados reais:**
+   - Não há dados mock no sistema ✅
+   - Todos os componentes usam Firestore ✅
 
-4. **Módulo Financeiro mais completo:**
+7. **Módulo Financeiro completo:**
    - Exportação CSV implementada ✅
    - Filtros por período implementados ✅
-
-5. **Funcionalidades Adicionais Descobertas:**
-   - Sistema completo de substituições de alimentos ✅
-   - Gerenciamento completo da base de alimentos ✅
-   - Histórico de dietas para clientes ✅

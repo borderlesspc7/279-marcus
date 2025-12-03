@@ -23,9 +23,7 @@ export const TrialExpired: React.FC = () => {
           <Button
             variant="primary"
             onClick={() => {
-              // Aqui você pode redirecionar para uma página de assinatura
-              // Por enquanto, apenas volta para o login
-              navigate(paths.login);
+              navigate(paths.subscription);
             }}
           >
             <FaCreditCard /> Assinar Plano

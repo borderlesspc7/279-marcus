@@ -48,8 +48,16 @@ export default function AdminRoutes({ children }: AdminRoutesProps) {
 
   // Bloquear funcionalidades durante trial - mostrar modal de bloqueio
   // O modal pode ser fechado para permitir exploração, mas funcionalidades críticas devem ser bloqueadas
+  // O modal sempre aparece ao fazer login/recarregar, exceto se o usuário optou por não mostrar mais
   if (shouldBlock) {
-    const [isModalOpen, setIsModalOpen] = React.useState(true);
+    const [isModalOpen, setIsModalOpen] = React.useState(() => {
+      // Verificar se o usuário optou por não mostrar mais
+      if (user?.uid) {
+        const dontShowKey = `trial-block-dont-show-${user.uid}`;
+        return localStorage.getItem(dontShowKey) !== "true";
+      }
+      return true;
+    });
     
     return (
       <>

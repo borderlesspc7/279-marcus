@@ -1,9 +1,12 @@
 import React from "react";
-import { FaExclamationTriangle, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { FaExclamationTriangle, FaTimes, FaCreditCard } from "react-icons/fa";
 import { useTrial } from "../../../hooks/useTrial";
+import { paths } from "../../../routes/paths";
 import "./TrialWarningBanner.css";
 
 export const TrialWarningBanner: React.FC = () => {
+  const navigate = useNavigate();
   const { shouldShowWarning, daysRemaining, trialEndDate } = useTrial();
   const [isDismissed, setIsDismissed] = React.useState(false);
 
@@ -45,16 +48,31 @@ export const TrialWarningBanner: React.FC = () => {
             </span>
           )}
           <span className="trial-warning-banner__action">
-            Para continuar usando todas as funcionalidades, assine um plano.
+            Para continuar usando todas as funcionalidades,{" "}
+            <button
+              className="trial-warning-banner__link"
+              onClick={() => navigate(paths.subscription)}
+            >
+              assine um plano
+            </button>
+            .
           </span>
         </div>
-        <button
-          className="trial-warning-banner__close"
-          onClick={() => setIsDismissed(true)}
-          aria-label="Fechar aviso"
-        >
-          <FaTimes />
-        </button>
+        <div className="trial-warning-banner__actions">
+          <button
+            className="trial-warning-banner__button"
+            onClick={() => navigate(paths.subscription)}
+          >
+            <FaCreditCard /> Assinar
+          </button>
+          <button
+            className="trial-warning-banner__close"
+            onClick={() => setIsDismissed(true)}
+            aria-label="Fechar aviso"
+          >
+            <FaTimes />
+          </button>
+        </div>
       </div>
     </div>
   );

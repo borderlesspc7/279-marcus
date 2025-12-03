@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaExclamationTriangle, FaTimes, FaCreditCard } from "react-icons/fa";
 import { Button } from "../Button/Button";
 import { useTrial } from "../../../hooks/useTrial";
+import { useAuth } from "../../../hooks/useAuth";
+import { paths } from "../../../routes/paths";
 import "./TrialWarningModal.css";
 
 interface TrialWarningModalProps {
@@ -9,15 +12,28 @@ interface TrialWarningModalProps {
 }
 
 export const TrialWarningModal: React.FC<TrialWarningModalProps> = ({ onClose }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const { shouldShowWarning, daysRemaining, trialEndDate } = useTrial();
-  const [isDismissed, setIsDismissed] = React.useState(() => {
-    // Verificar se o modal já foi fechado hoje
-    const dismissedKey = `trial-warning-dismissed-${daysRemaining}`;
-    return localStorage.getItem(dismissedKey) === "true";
-  });
+  const [dontShowAgain, setDontShowAgain] = useState(false);
+  const [shouldShow, setShouldShow] = useState(true);
 
-  // Não mostrar se não deve mostrar aviso ou se foi dispensado
-  if (!shouldShowWarning || isDismissed) {
+  // Verificar se o usuário já optou por não mostrar mais
+  useEffect(() => {
+    if (user?.uid && shouldShowWarning) {
+      const dontShowKey = `trial-warning-dont-show-${user.uid}`;
+      const shouldNotShow = localStorage.getItem(dontShowKey) === "true";
+      if (shouldNotShow) {
+        setShouldShow(false);
+        if (onClose) {
+          onClose();
+        }
+      }
+    }
+  }, [user, shouldShowWarning, onClose]);
+
+  // Não mostrar se não deve mostrar aviso ou se o usuário optou por não mostrar mais
+  if (!shouldShowWarning || !shouldShow) {
     return null;
   }
 
@@ -43,11 +59,10 @@ export const TrialWarningModal: React.FC<TrialWarningModalProps> = ({ onClose })
   };
 
   const handleClose = () => {
-    setIsDismissed(true);
-    // Salvar no localStorage para não mostrar novamente hoje (baseado nos dias restantes)
-    if (daysRemaining !== null) {
-      const dismissedKey = `trial-warning-dismissed-${daysRemaining}`;
-      localStorage.setItem(dismissedKey, "true");
+    // Se o usuário marcou "não mostrar mais", salvar no localStorage
+    if (dontShowAgain && user?.uid) {
+      const dontShowKey = `trial-warning-dont-show-${user.uid}`;
+      localStorage.setItem(dontShowKey, "true");
     }
     if (onClose) {
       onClose();
@@ -55,7 +70,7 @@ export const TrialWarningModal: React.FC<TrialWarningModalProps> = ({ onClose })
   };
 
   const handleAssinar = () => {
-    // Futuramente, redirecionar para página de assinatura
+    navigate(paths.subscription);
     handleClose();
   };
 
@@ -95,6 +110,18 @@ export const TrialWarningModal: React.FC<TrialWarningModalProps> = ({ onClose })
             )}
           </div>
         )}
+        
+        <div className="trial-warning-modal__dont-show">
+          <label className="trial-warning-modal__checkbox-label">
+            <input
+              type="checkbox"
+              checked={dontShowAgain}
+              onChange={(e) => setDontShowAgain(e.target.checked)}
+              className="trial-warning-modal__checkbox"
+            />
+            <span>Não mostrar mais este aviso</span>
+          </label>
+        </div>
         
         <div className="trial-warning-modal__actions">
           <Button variant="primary" onClick={handleAssinar}>
