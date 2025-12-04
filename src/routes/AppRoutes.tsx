@@ -29,218 +29,235 @@ import { MyDietDetail } from "../pages/Diet/MyDietDetail";
 import { RequestSubstitution } from "../pages/Diet/RequestSubstitution";
 import { MySubstitutions } from "../pages/Diet/MySubstitutions";
 import { FoodManagement } from "../pages/Food/FoodManagement";
+import { NotificationTest } from "../pages/NotificationTest/NotificationTest";
+import { NotificationProvider } from "../contexts/NotificationContext";
+import { ToastContainer } from "../components/ui/Toast/ToastContainer";
 
 export default function AppRoutes() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to={paths.login} replace />} />
-        <Route path={paths.login} element={<LoginPage />} />
-        <Route path={paths.clientLogin} element={<ClientLoginPage />} />
-        <Route path={paths.register} element={<RegisterPage />} />
-        <Route path={paths.trialExpired} element={<TrialExpired />} />
-        <Route path={paths.subscription} element={<Subscription />} />
-        <Route path={paths.checkout} element={<Checkout />} />
-        <Route path={paths.checkoutSuccess} element={<CheckoutSuccess />} />
+      <NotificationProvider>
+        <Routes>
+          <Route path="/" element={<Navigate to={paths.login} replace />} />
+          <Route path={paths.login} element={<LoginPage />} />
+          <Route path={paths.clientLogin} element={<ClientLoginPage />} />
+          <Route path={paths.register} element={<RegisterPage />} />
+          <Route path={paths.trialExpired} element={<TrialExpired />} />
+          <Route path={paths.subscription} element={<Subscription />} />
+          <Route path={paths.checkout} element={<Checkout />} />
+          <Route path={paths.checkoutSuccess} element={<CheckoutSuccess />} />
 
-        {/* Rotas protegidas com DashboardLayout */}
-        <Route
-          path={paths.dashboard}
-          element={
-            <ProtectedRoutes>
-              <DashboardLayout>
-                <Dashboard />
-              </DashboardLayout>
-            </ProtectedRoutes>
-          }
-        />
-        {/* Rotas apenas para Admin */}
-        <Route
-          path={paths.clientes}
-          element={
-            <AdminRoutes>
-              <DashboardLayout>
-                <ClientList />
-              </DashboardLayout>
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path={paths.clientesNew}
-          element={
-            <AdminRoutes>
-              <DashboardLayout>
-                <ClientForm />
-              </DashboardLayout>
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path={paths.clientesProfile}
-          element={
-            <AdminRoutes>
-              <DashboardLayout>
-                <ClientProfile />
-              </DashboardLayout>
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path={paths.agenda}
-          element={
-            <AdminRoutes>
-              <DashboardLayout>
-                <Agenda />
-              </DashboardLayout>
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path={paths.calculadora}
-          element={
-            <AdminRoutes>
-              <DashboardLayout>
-                <DietCalculator />
-              </DashboardLayout>
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path={paths.dietas}
-          element={
-            <ProtectedRoutes>
-              <DashboardLayout>
-                <DietList />
-              </DashboardLayout>
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path={paths.dietaDetail}
-          element={
-            <ProtectedRoutes>
-              <DashboardLayout>
-                <DietDetail />
-              </DashboardLayout>
-            </ProtectedRoutes>
-          }
-        />
-        {/* Rotas apenas para Admin */}
-        <Route
-          path={paths.financeiro}
-          element={
-            <AdminRoutes>
-              <DashboardLayout>
-                <Financeiro />
-              </DashboardLayout>
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path={paths.importTaco}
-          element={
-            <AdminRoutes>
-              <DashboardLayout>
-                <ImportTacoFoods />
-              </DashboardLayout>
-            </AdminRoutes>
-          }
-        />
-        <Route
-          path={paths.appointmentRequests}
-          element={
-            <AdminRoutes>
-              <DashboardLayout>
-                <AppointmentRequests />
-              </DashboardLayout>
-            </AdminRoutes>
-          }
-        />
-        {/* Rotas para Clientes (role user) */}
-        <Route
-          path={paths.solicitarConsulta}
-          element={
-            <ProtectedRoutes>
-              <DashboardLayout>
-                <RequestAppointment />
-              </DashboardLayout>
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path={paths.minhasConsultas}
-          element={
-            <ProtectedRoutes>
-              <DashboardLayout>
-                <MyAppointments />
-              </DashboardLayout>
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path={paths.minhasDietas}
-          element={
-            <ProtectedRoutes>
-              <DashboardLayout>
-                <MyDiets />
-              </DashboardLayout>
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path={paths.minhaDietaDetail}
-          element={
-            <ProtectedRoutes>
-              <DashboardLayout>
-                <MyDietDetail />
-              </DashboardLayout>
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path={paths.solicitarSubstituicao}
-          element={
-            <ProtectedRoutes>
-              <DashboardLayout>
-                <RequestSubstitution />
-              </DashboardLayout>
-            </ProtectedRoutes>
-          }
-        />
-        <Route
-          path={paths.minhasSubstituicoes}
-          element={
-            <ProtectedRoutes>
-              <DashboardLayout>
-                <MySubstitutions />
-              </DashboardLayout>
-            </ProtectedRoutes>
-          }
-        />
-        {/* Rotas apenas para Admin */}
-        <Route
-          path={paths.foodManagement}
-          element={
-            <AdminRoutes>
-              <DashboardLayout>
-                <FoodManagement />
-              </DashboardLayout>
-            </AdminRoutes>
-          }
-        />
-        {/* Rota para perfil do cliente */}
-        <Route
-          path={paths.clientePerfil}
-          element={
-            <ProtectedRoutes>
-              <DashboardLayout>
-                <ClientSelfProfile />
-              </DashboardLayout>
-            </ProtectedRoutes>
-          }
-        />
-      </Routes>
+          {/* Rotas protegidas com DashboardLayout */}
+          <Route
+            path={paths.dashboard}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <Dashboard />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+          {/* Rotas apenas para Admin */}
+          <Route
+            path={paths.clientes}
+            element={
+              <AdminRoutes>
+                <DashboardLayout>
+                  <ClientList />
+                </DashboardLayout>
+              </AdminRoutes>
+            }
+          />
+          <Route
+            path={paths.clientesNew}
+            element={
+              <AdminRoutes>
+                <DashboardLayout>
+                  <ClientForm />
+                </DashboardLayout>
+              </AdminRoutes>
+            }
+          />
+          <Route
+            path={paths.clientesProfile}
+            element={
+              <AdminRoutes>
+                <DashboardLayout>
+                  <ClientProfile />
+                </DashboardLayout>
+              </AdminRoutes>
+            }
+          />
+          <Route
+            path={paths.agenda}
+            element={
+              <AdminRoutes>
+                <DashboardLayout>
+                  <Agenda />
+                </DashboardLayout>
+              </AdminRoutes>
+            }
+          />
+          <Route
+            path={paths.calculadora}
+            element={
+              <AdminRoutes>
+                <DashboardLayout>
+                  <DietCalculator />
+                </DashboardLayout>
+              </AdminRoutes>
+            }
+          />
+          <Route
+            path={paths.dietas}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <DietList />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path={paths.dietaDetail}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <DietDetail />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+          {/* Rotas apenas para Admin */}
+          <Route
+            path={paths.financeiro}
+            element={
+              <AdminRoutes>
+                <DashboardLayout>
+                  <Financeiro />
+                </DashboardLayout>
+              </AdminRoutes>
+            }
+          />
+          <Route
+            path={paths.importTaco}
+            element={
+              <AdminRoutes>
+                <DashboardLayout>
+                  <ImportTacoFoods />
+                </DashboardLayout>
+              </AdminRoutes>
+            }
+          />
+          <Route
+            path={paths.appointmentRequests}
+            element={
+              <AdminRoutes>
+                <DashboardLayout>
+                  <AppointmentRequests />
+                </DashboardLayout>
+              </AdminRoutes>
+            }
+          />
+          {/* Rotas para Clientes (role user) */}
+          <Route
+            path={paths.solicitarConsulta}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <RequestAppointment />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path={paths.minhasConsultas}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <MyAppointments />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path={paths.minhasDietas}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <MyDiets />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path={paths.minhaDietaDetail}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <MyDietDetail />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path={paths.solicitarSubstituicao}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <RequestSubstitution />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+          <Route
+            path={paths.minhasSubstituicoes}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <MySubstitutions />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+          {/* Rotas apenas para Admin */}
+          <Route
+            path={paths.foodManagement}
+            element={
+              <AdminRoutes>
+                <DashboardLayout>
+                  <FoodManagement />
+                </DashboardLayout>
+              </AdminRoutes>
+            }
+          />
+          {/* Rota para perfil do cliente */}
+          <Route
+            path={paths.clientePerfil}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <ClientSelfProfile />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+          {/* Rota de teste de notificações */}
+          <Route
+            path={paths.notificationTest}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <NotificationTest />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+        </Routes>
+        <ToastContainer />
+      </NotificationProvider>
     </BrowserRouter>
   );
 }

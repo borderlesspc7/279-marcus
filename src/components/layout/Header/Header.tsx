@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   FaUserCircle,
   FaBell,
   FaSignOutAlt,
   FaBars,
   FaTimes,
+  FaCheck,
 } from "react-icons/fa";
 import { useAuth } from "../../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../../routes/paths";
+import { useNotifications } from "../../../hooks/useNotifications";
 import "./Header.css";
 
 interface HeaderProps {
@@ -22,8 +24,30 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { user, logOut } = useAuth();
   const navigate = useNavigate();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+
+  // Fechar dropdowns ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        notificationsRef.current &&
+        !notificationsRef.current.contains(event.target as Node)
+      ) {
+        setShowNotifications(false);
+      }
+    };
+
+    if (showNotifications) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showNotifications]);
 
   const handleLogout = async () => {
     try {
@@ -32,6 +56,54 @@ export const Header: React.FC<HeaderProps> = ({
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
     }
+  };
+
+  const formatTimeAgo = (date: Date): string => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+      return "agora";
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} min atrás`;
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return `${diffInHours} ${diffInHours === 1 ? "hora" : "horas"} atrás`;
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+      return `${diffInDays} ${diffInDays === 1 ? "dia" : "dias"} atrás`;
+    }
+
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+    }).format(date);
+  };
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case "success":
+        return "✓";
+      case "error":
+        return "✕";
+      case "warning":
+        return "⚠";
+      case "info":
+        return "ℹ";
+      default:
+        return "•";
+    }
+  };
+
+  const handleNotificationClick = (id: string) => {
+    markAsRead(id);
   };
 
   return (
@@ -52,38 +124,66 @@ export const Header: React.FC<HeaderProps> = ({
 
       <div className="header__right">
         {/* Notificações */}
-        <div className="header__notifications">
+        <div className="header__notifications" ref={notificationsRef}>
           <button
             className="header__icon-btn"
             onClick={() => setShowNotifications(!showNotifications)}
             aria-label="Notificações"
           >
             <FaBell size={20} />
-            <span className="header__badge">3</span>
+            {unreadCount > 0 && (
+              <span className="header__badge">{unreadCount > 99 ? "99+" : unreadCount}</span>
+            )}
           </button>
 
           {showNotifications && (
             <div className="header__dropdown header__notifications-dropdown">
               <div className="header__dropdown-header">
                 <h3>Notificações</h3>
+                {unreadCount > 0 && (
+                  <button
+                    className="header__mark-all-read"
+                    onClick={markAllAsRead}
+                    title="Marcar todas como lidas"
+                  >
+                    <FaCheck size={12} />
+                    <span>Marcar todas</span>
+                  </button>
+                )}
               </div>
               <div className="header__dropdown-content">
-                <div className="notification-item">
-                  <p className="notification-item__text">
-                    Nova consulta agendada
-                  </p>
-                  <span className="notification-item__time">5 min atrás</span>
-                </div>
-                <div className="notification-item">
-                  <p className="notification-item__text">
-                    Dieta aprovada por cliente
-                  </p>
-                  <span className="notification-item__time">1 hora atrás</span>
-                </div>
-                <div className="notification-item">
-                  <p className="notification-item__text">Pagamento recebido</p>
-                  <span className="notification-item__time">2 horas atrás</span>
-                </div>
+                {notifications.length === 0 ? (
+                  <div className="notification-item notification-item--empty">
+                    <p className="notification-item__text">
+                      Nenhuma notificação
+                    </p>
+                  </div>
+                ) : (
+                  notifications.slice(0, 10).map((notification) => (
+                    <div
+                      key={notification.id}
+                      className={`notification-item ${!notification.read ? "notification-item--unread" : ""} notification-item--${notification.type}`}
+                      onClick={() => handleNotificationClick(notification.id)}
+                    >
+                      <div className="notification-item__icon">
+                        {getNotificationIcon(notification.type)}
+                      </div>
+                      <div className="notification-item__content">
+                        <p className="notification-item__text">
+                          {notification.title}
+                        </p>
+                        {notification.message && (
+                          <p className="notification-item__message">
+                            {notification.message}
+                          </p>
+                        )}
+                        <span className="notification-item__time">
+                          {formatTimeAgo(notification.timestamp)}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           )}

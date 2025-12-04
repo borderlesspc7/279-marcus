@@ -1,19 +1,36 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { OccupancyChart } from "./components/OccupancyChart";
 import { ScheduleSummary } from "./components/ScheduleSummary";
 import { FinancialChart } from "./components/FinancialChart";
 import { ClientDemographics } from "./components/ClientDemographics";
 import { BirthdayCard } from "./components/BirthdayCard";
 import { useAuth } from "../../hooks/useAuth";
+import { useNotifications } from "../../hooks/useNotifications";
 import "./Dashboard.css";
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
+  const { info, success } = useNotifications();
   const isAdmin = user?.role === "admin";
   const isUser = user?.role === "user";
   const [occupancyPeriod, setOccupancyPeriod] = useState<
     "day" | "week" | "month"
   >("week");
+
+  // Exemplo: Adicionar notificação de boas-vindas ao carregar o dashboard
+  useEffect(() => {
+    if (user) {
+      // Adicionar notificação de boas-vindas após um pequeno delay
+      const timer = setTimeout(() => {
+        info(
+          "Bem-vindo ao NutriManager!",
+          "Sistema de notificações ativo. Use o ícone de sino no header para ver suas notificações."
+        );
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [user, info]);
 
   // Dashboard simplificado para clientes (role user)
   if (isUser) {
