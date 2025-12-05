@@ -1,0 +1,47 @@
+.monthly-trend-chart {
+  padding: 1rem 0;
+}
+
+.monthly-trend-chart__header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.monthly-trend-chart__title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.monthly-trend-chart__subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.monthly-trend-chart__loading,
+.monthly-trend-chart__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: #6b7280;
+}
+
+.monthly-trend-chart__loading .spinner {
+  font-size: 2rem;
+  color: #16a34a;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

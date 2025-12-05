@@ -4,13 +4,18 @@ import { ScheduleSummary } from "./components/ScheduleSummary";
 import { FinancialChart } from "./components/FinancialChart";
 import { ClientDemographics } from "./components/ClientDemographics";
 import { BirthdayCard } from "./components/BirthdayCard";
+import { StatsCards } from "./components/StatsCards";
+import { ClientStatsCards } from "./components/ClientStatsCards";
+import { ClientAppointmentStatusChart } from "./components/ClientAppointmentStatusChart";
+import { ClientWeeklyAppointmentsChart } from "./components/ClientWeeklyAppointmentsChart";
+import { ClientMonthlyTrendChart } from "./components/ClientMonthlyTrendChart";
 import { useAuth } from "../../hooks/useAuth";
 import { useNotifications } from "../../hooks/useNotifications";
 import "./Dashboard.css";
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuth();
-  const { info, success } = useNotifications();
+  const { info } = useNotifications();
   const isAdmin = user?.role === "admin";
   const isUser = user?.role === "user";
   const [occupancyPeriod, setOccupancyPeriod] = useState<
@@ -32,7 +37,7 @@ export const Dashboard: React.FC = () => {
     }
   }, [user, info]);
 
-  // Dashboard simplificado para clientes (role user)
+  // Dashboard para clientes (role user)
   if (isUser) {
     return (
       <div className="dashboard">
@@ -52,16 +57,33 @@ export const Dashboard: React.FC = () => {
         </div>
 
         <div className="dashboard__grid">
+          {/* Cards de Estatísticas */}
+          <div className="dashboard__card dashboard__card--full">
+            <ClientStatsCards />
+          </div>
+
+          {/* Status de Consultas */}
+          <div className="dashboard__card">
+            <div className="dashboard__card-header">
+              <h2 className="dashboard__card-title">Status das Minhas Consultas</h2>
+            </div>
+            <ClientAppointmentStatusChart />
+          </div>
+
+          {/* Consultas por Dia da Semana */}
           <div className="dashboard__card dashboard__card--large">
             <div className="dashboard__card-header">
-              <h2 className="dashboard__card-title">Bem-vindo!</h2>
+              <h2 className="dashboard__card-title">Minhas Consultas por Dia da Semana</h2>
             </div>
-            <div className="dashboard__welcome-content">
-              <p>
-                Use o menu lateral para solicitar uma consulta ou visualizar
-                suas consultas agendadas.
-              </p>
+            <ClientWeeklyAppointmentsChart />
+          </div>
+
+          {/* Evolução Mensal */}
+          <div className="dashboard__card dashboard__card--large">
+            <div className="dashboard__card-header">
+              <h2 className="dashboard__card-title">Evolução das Minhas Consultas</h2>
             </div>
+            <ClientMonthlyTrendChart />
           </div>
         </div>
       </div>
@@ -90,31 +112,33 @@ export const Dashboard: React.FC = () => {
       </div>
 
       <div className="dashboard__grid">
+        {/* Cards de Estatísticas */}
+        <div className="dashboard__card dashboard__card--full">
+          <StatsCards />
+        </div>
+
         {/* Ocupação de Agenda - Visível para todos */}
         <div className="dashboard__card dashboard__card--large">
           <div className="dashboard__card-header">
             <h2 className="dashboard__card-title">Ocupação de Agenda</h2>
             <div className="dashboard__period-selector">
               <button
-                className={`dashboard__period-btn ${
-                  occupancyPeriod === "day" ? "active" : ""
-                }`}
+                className={`dashboard__period-btn ${occupancyPeriod === "day" ? "active" : ""
+                  }`}
                 onClick={() => setOccupancyPeriod("day")}
               >
                 Dia
               </button>
               <button
-                className={`dashboard__period-btn ${
-                  occupancyPeriod === "week" ? "active" : ""
-                }`}
+                className={`dashboard__period-btn ${occupancyPeriod === "week" ? "active" : ""
+                  }`}
                 onClick={() => setOccupancyPeriod("week")}
               >
                 Semana
               </button>
               <button
-                className={`dashboard__period-btn ${
-                  occupancyPeriod === "month" ? "active" : ""
-                }`}
+                className={`dashboard__period-btn ${occupancyPeriod === "month" ? "active" : ""
+                  }`}
                 onClick={() => setOccupancyPeriod("month")}
               >
                 Mês
@@ -157,6 +181,7 @@ export const Dashboard: React.FC = () => {
           </div>
           <ClientDemographics />
         </div>
+
       </div>
     </div>
   );

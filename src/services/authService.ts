@@ -52,13 +52,22 @@ export const authService = {
         updatedAt: userData.updatedAt?.toDate ? userData.updatedAt.toDate() : userData.updatedAt,
         trialEndDate: userData.trialEndDate?.toDate ? userData.trialEndDate.toDate() : userData.trialEndDate,
       } as User;
-      const updateUserData = {
+
+      // Criar objeto de atualização removendo campos undefined
+      const updateUserData: Record<string, unknown> = {
         ...convertedUser,
         lastLogin: new Date(),
       };
 
+      // Remover campos undefined antes de salvar no Firestore
+      Object.keys(updateUserData).forEach(key => {
+        if (updateUserData[key] === undefined) {
+          delete updateUserData[key];
+        }
+      });
+
       await setDoc(doc(db, "users", firebaseUser.uid), updateUserData);
-      return updateUserData;
+      return updateUserData as unknown as User;
     } catch (error) {
       // Preservar o código do erro original se for um erro do Firebase
       if (error && typeof error === "object" && "code" in error) {
@@ -68,7 +77,7 @@ export const authService = {
         newError.code = firebaseErr.code;
         throw newError;
       }
-      
+
       const message = getFirebaseErrorMessage(error as firebaseError | string);
       throw new Error(message);
     }
@@ -92,11 +101,32 @@ export const authService = {
       const firebaseUser = userCredential.user;
 
       const role = credentials.role || "user";
-      
-      // Calcular data de término do trial (10 dias a partir de hoje)
-      const trialEndDate = new Date();
-      trialEndDate.setDate(trialEndDate.getDate() + 10);
-      
+
+      // Calcular data de término do trial (10 dias a partir de hoje) - apenas para admins
+      const trialEndDate = role === "admin" ? (() => {
+        const date = new Date();
+        date.setDate(date.getDate() + 10);
+        return date;
+      })() : undefined;
+
+      const newUserData: Record<string, unknown> = {
+        uid: firebaseUser.uid,
+        name: credentials.name,
+        email: credentials.email,
+        phone: credentials.phone,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        role,
+      };
+
+      // Adicionar trialEndDate apenas se for admin (não incluir undefined)
+      if (trialEndDate) {
+        newUserData.trialEndDate = trialEndDate;
+      }
+
+      await setDoc(doc(db, "users", firebaseUser.uid), newUserData);
+
+      // Criar objeto User para retorno
       const newUser: User = {
         uid: firebaseUser.uid,
         name: credentials.name,
@@ -105,10 +135,8 @@ export const authService = {
         createdAt: new Date(),
         updatedAt: new Date(),
         role,
-        trialEndDate: role === "admin" ? trialEndDate : undefined, // Apenas admins têm trial
+        ...(trialEndDate && { trialEndDate }),
       };
-
-      await setDoc(doc(db, "users", firebaseUser.uid), newUser);
 
       // Se o usuário tem role "user", criar automaticamente como cliente
       if (role === "user") {
@@ -153,7 +181,7 @@ export const authService = {
         }
       }
 
-      return newUser;
+      return newUser as unknown as User;
     } catch (error) {
       const message = getFirebaseErrorMessage(error as firebaseError | string);
       throw new Error(message);
@@ -180,7 +208,7 @@ export const authService = {
             } else {
               callback(null); // Usuário não encontrado no Firestore
             }
-          } catch (error) {
+          } catch {
             callback(null);
           }
         } else {

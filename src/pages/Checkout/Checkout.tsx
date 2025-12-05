@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   FaCreditCard,
@@ -8,7 +8,12 @@ import {
   FaRocket,
   FaStar,
   FaCrown,
+  FaQrcode,
+  FaBarcode,
+  FaTimes,
+  FaCopy,
 } from "react-icons/fa";
+import { QRCodeSVG } from "qrcode.react";
 import { Button } from "../../components/ui/Button/Button";
 import InputField from "../../components/ui/InputField/InputField";
 import { paths } from "../../routes/paths";
@@ -54,6 +59,8 @@ const plans: Record<string, Plan> = {
   },
 };
 
+type PaymentMethod = "credit_card" | "pix" | "boleto";
+
 interface PaymentData {
   cardNumber: string;
   cardName: string;
@@ -73,7 +80,10 @@ export const Checkout: React.FC = () => {
 
   const selectedPlan = plans[planId] || plans.professional;
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("credit_card");
   const [errors, setErrors] = useState<Partial<PaymentData>>({});
+  const [showPixModal, setShowPixModal] = useState(false);
+  const [pixCode, setPixCode] = useState<string>("");
 
   const [paymentData, setPaymentData] = useState<PaymentData>({
     cardNumber: "",
@@ -90,8 +100,8 @@ export const Checkout: React.FC = () => {
     return monthlyPrice * 12 * 0.8;
   };
 
-  const finalPrice = period === "monthly" 
-    ? selectedPlan.price 
+  const finalPrice = period === "monthly"
+    ? selectedPlan.price
     : getYearlyPrice(selectedPlan.price);
 
   const formatCardNumber = (value: string) => {
@@ -157,26 +167,29 @@ export const Checkout: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: Partial<PaymentData> = {};
 
-    if (!paymentData.cardNumber.replace(/\s/g, "")) {
-      newErrors.cardNumber = "Número do cartão é obrigatório";
-    } else if (paymentData.cardNumber.replace(/\s/g, "").length < 13) {
-      newErrors.cardNumber = "Número do cartão inválido";
-    }
+    // Validar campos do cartão apenas se o método de pagamento for cartão
+    if (paymentMethod === "credit_card") {
+      if (!paymentData.cardNumber.replace(/\s/g, "")) {
+        newErrors.cardNumber = "Número do cartão é obrigatório";
+      } else if (paymentData.cardNumber.replace(/\s/g, "").length < 13) {
+        newErrors.cardNumber = "Número do cartão inválido";
+      }
 
-    if (!paymentData.cardName.trim()) {
-      newErrors.cardName = "Nome no cartão é obrigatório";
-    }
+      if (!paymentData.cardName.trim()) {
+        newErrors.cardName = "Nome no cartão é obrigatório";
+      }
 
-    if (!paymentData.expiryDate) {
-      newErrors.expiryDate = "Data de validade é obrigatória";
-    } else if (!/^\d{2}\/\d{2}$/.test(paymentData.expiryDate)) {
-      newErrors.expiryDate = "Data inválida (MM/AA)";
-    }
+      if (!paymentData.expiryDate) {
+        newErrors.expiryDate = "Data de validade é obrigatória";
+      } else if (!/^\d{2}\/\d{2}$/.test(paymentData.expiryDate)) {
+        newErrors.expiryDate = "Data inválida (MM/AA)";
+      }
 
-    if (!paymentData.cvv) {
-      newErrors.cvv = "CVV é obrigatório";
-    } else if (paymentData.cvv.length < 3) {
-      newErrors.cvv = "CVV inválido";
+      if (!paymentData.cvv) {
+        newErrors.cvv = "CVV é obrigatório";
+      } else if (paymentData.cvv.length < 3) {
+        newErrors.cvv = "CVV inválido";
+      }
     }
 
     if (!paymentData.billingName.trim()) {
@@ -203,6 +216,14 @@ export const Checkout: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const generatePixCode = (): string => {
+    // Gerar código PIX mockado no formato EMV
+    // Formato simplificado: chave aleatória + valor + identificador
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substring(2, 15);
+    return `00020126580014br.gov.bcb.pix0136${randomId}${timestamp}520400005303986540${finalPrice.toFixed(2)}5802BR5925NUTRIMANAGER LTDA6009SAO PAULO62070503***6304`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -213,11 +234,17 @@ export const Checkout: React.FC = () => {
     setLoading(true);
 
     try {
-      // TODO: Integrar com gateway de pagamento (Stripe, Mercado Pago, etc.)
-      // Simular processamento
+      if (paymentMethod === "pix") {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const code = generatePixCode();
+        setPixCode(code);
+        setShowPixModal(true);
+        setLoading(false);
+        return;
+      }
+
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      // Redirecionar para página de sucesso
       navigate(`${paths.checkoutSuccess}?plan=${planId}&period=${period}`);
     } catch (error) {
       console.error("Erro ao processar pagamento:", error);
@@ -225,6 +252,17 @@ export const Checkout: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCopyPixCode = () => {
+    navigator.clipboard.writeText(pixCode);
+    alert("Código PIX copiado para a área de transferência!");
+  };
+
+  const handlePixPaymentComplete = () => {
+    // Simular pagamento confirmado e redirecionar
+    setShowPixModal(false);
+    navigate(`${paths.checkoutSuccess}?plan=${planId}&period=${period}&method=pix`);
   };
 
   return (
@@ -300,55 +338,92 @@ export const Checkout: React.FC = () => {
             <form onSubmit={handleSubmit} className="checkout-form">
               <div className="checkout-form__section">
                 <h2 className="checkout-form__section-title">
-                  <FaCreditCard /> Dados do Cartão
+                  Meio de Pagamento
                 </h2>
-
-                <InputField
-                  label="Número do Cartão"
-                  type="text"
-                  value={paymentData.cardNumber}
-                  onChange={(value) => handleInputChange("cardNumber", value)}
-                  placeholder="0000 0000 0000 0000"
-                  error={errors.cardNumber}
-                  required
-                  disabled={loading}
-                />
-
-                <InputField
-                  label="Nome no Cartão"
-                  type="text"
-                  value={paymentData.cardName}
-                  onChange={(value) => handleInputChange("cardName", value)}
-                  placeholder="Nome como está no cartão"
-                  error={errors.cardName}
-                  required
-                  disabled={loading}
-                />
-
-                <div className="checkout-form__row">
-                  <InputField
-                    label="Validade"
-                    type="text"
-                    value={paymentData.expiryDate}
-                    onChange={(value) => handleInputChange("expiryDate", value)}
-                    placeholder="MM/AA"
-                    error={errors.expiryDate}
-                    required
-                    disabled={loading}
-                  />
-
-                  <InputField
-                    label="CVV"
-                    type="text"
-                    value={paymentData.cvv}
-                    onChange={(value) => handleInputChange("cvv", value)}
-                    placeholder="123"
-                    error={errors.cvv}
-                    required
-                    disabled={loading}
-                  />
+                <div className="checkout-payment-methods">
+                  <button
+                    type="button"
+                    className={`checkout-payment-method ${paymentMethod === "credit_card" ? "checkout-payment-method--active" : ""
+                      }`}
+                    onClick={() => setPaymentMethod("credit_card")}
+                  >
+                    <FaCreditCard />
+                    <span>Cartão de Crédito</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`checkout-payment-method ${paymentMethod === "pix" ? "checkout-payment-method--active" : ""
+                      }`}
+                    onClick={() => setPaymentMethod("pix")}
+                  >
+                    <FaQrcode />
+                    <span>PIX</span>
+                  </button>
+                  <button
+                    type="button"
+                    className={`checkout-payment-method ${paymentMethod === "boleto" ? "checkout-payment-method--active" : ""
+                      }`}
+                    onClick={() => setPaymentMethod("boleto")}
+                  >
+                    <FaBarcode />
+                    <span>Boleto</span>
+                  </button>
                 </div>
               </div>
+
+              {paymentMethod === "credit_card" && (
+                <div className="checkout-form__section">
+                  <h2 className="checkout-form__section-title">
+                    <FaCreditCard /> Dados do Cartão
+                  </h2>
+
+                  <InputField
+                    label="Número do Cartão"
+                    type="text"
+                    value={paymentData.cardNumber}
+                    onChange={(value) => handleInputChange("cardNumber", value)}
+                    placeholder="0000 0000 0000 0000"
+                    error={errors.cardNumber}
+                    required
+                    disabled={loading}
+                  />
+
+                  <InputField
+                    label="Nome no Cartão"
+                    type="text"
+                    value={paymentData.cardName}
+                    onChange={(value) => handleInputChange("cardName", value)}
+                    placeholder="Nome como está no cartão"
+                    error={errors.cardName}
+                    required
+                    disabled={loading}
+                  />
+
+                  <div className="checkout-form__row">
+                    <InputField
+                      label="Validade"
+                      type="text"
+                      value={paymentData.expiryDate}
+                      onChange={(value) => handleInputChange("expiryDate", value)}
+                      placeholder="MM/AA"
+                      error={errors.expiryDate}
+                      required
+                      disabled={loading}
+                    />
+
+                    <InputField
+                      label="CVV"
+                      type="text"
+                      value={paymentData.cvv}
+                      onChange={(value) => handleInputChange("cvv", value)}
+                      placeholder="123"
+                      error={errors.cvv}
+                      required
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              )}
 
               <div className="checkout-form__section">
                 <h2 className="checkout-form__section-title">
@@ -416,6 +491,8 @@ export const Checkout: React.FC = () => {
                     <>
                       <FaLock /> Confirmar e Pagar R${" "}
                       {finalPrice.toFixed(2).replace(".", ",")}
+                      {paymentMethod === "pix" && " via PIX"}
+                      {paymentMethod === "boleto" && " via Boleto"}
                     </>
                   )}
                 </Button>
@@ -424,6 +501,98 @@ export const Checkout: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal de QR Code PIX */}
+      {showPixModal && (
+        <div className="checkout-pix-modal-overlay" onClick={() => setShowPixModal(false)}>
+          <div className="checkout-pix-modal" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="checkout-pix-modal__close"
+              onClick={() => setShowPixModal(false)}
+              aria-label="Fechar"
+            >
+              <FaTimes />
+            </button>
+
+            <div className="checkout-pix-modal__content">
+              <div className="checkout-pix-modal__icon">
+                <FaQrcode />
+              </div>
+
+              <h2 className="checkout-pix-modal__title">Realize o Pagamento via PIX</h2>
+
+              <p className="checkout-pix-modal__subtitle">
+                Escaneie o QR Code abaixo com o app do seu banco para realizar o pagamento
+              </p>
+
+              <div className="checkout-pix-modal__qrcode">
+                <QRCodeSVG
+                  value={pixCode}
+                  size={256}
+                  level="H"
+                  includeMargin={true}
+                />
+              </div>
+
+              <div className="checkout-pix-modal__amount">
+                <span className="checkout-pix-modal__amount-label">Valor:</span>
+                <span className="checkout-pix-modal__amount-value">
+                  R$ {finalPrice.toFixed(2).replace(".", ",")}
+                </span>
+              </div>
+
+              <div className="checkout-pix-modal__code-section">
+                <label className="checkout-pix-modal__code-label">
+                  Ou copie o código PIX:
+                </label>
+                <div className="checkout-pix-modal__code-container">
+                  <input
+                    type="text"
+                    readOnly
+                    value={pixCode}
+                    className="checkout-pix-modal__code-input"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCopyPixCode}
+                    className="checkout-pix-modal__copy-button"
+                  >
+                    <FaCopy /> Copiar
+                  </button>
+                </div>
+              </div>
+
+              <div className="checkout-pix-modal__instructions">
+                <p><strong>Instruções:</strong></p>
+                <ol>
+                  <li>Abra o app do seu banco</li>
+                  <li>Escaneie o QR Code ou cole o código PIX</li>
+                  <li>Confirme o pagamento</li>
+                  <li>Clique em "Pagamento Realizado" abaixo</li>
+                </ol>
+              </div>
+
+              <div className="checkout-pix-modal__actions">
+                <Button
+                  variant="primary"
+                  fullWidth
+                  onClick={handlePixPaymentComplete}
+                  className="checkout-pix-modal__confirm-button"
+                >
+                  <FaCheck /> Pagamento Realizado
+                </Button>
+                <Button
+                  variant="secondary"
+                  fullWidth
+                  onClick={() => setShowPixModal(false)}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
