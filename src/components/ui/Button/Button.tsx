@@ -7,7 +7,7 @@ interface ButtonProps {
   size?: "small" | "medium" | "large";
   disabled?: boolean;
   type?: "button" | "submit" | "reset";
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
   className?: string;
   fullWidth?: boolean;
 }

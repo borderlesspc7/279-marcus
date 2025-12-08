@@ -9,6 +9,7 @@ interface StatusData {
   name: string;
   value: number;
   color: string;
+  [key: string]: string | number;
 }
 
 export const AppointmentStatusChart: React.FC = () => {
@@ -103,9 +104,10 @@ export const AppointmentStatusChart: React.FC = () => {
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={(entry: StatusData & { percent?: number }) =>
-              entry.percent ? `${entry.name}: ${(entry.percent * 100).toFixed(0)}%` : entry.name
-            }
+            label={(props: any) => {
+              const entry = props as StatusData & { percent?: number };
+              return entry.percent ? `${entry.name}: ${(entry.percent * 100).toFixed(0)}%` : entry.name;
+            }}
             outerRadius={100}
             fill="#8884d8"
             dataKey="value"

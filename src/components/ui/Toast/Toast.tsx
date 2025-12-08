@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { FaCheckCircle, FaExclamationCircle, FaExclamationTriangle, FaInfoCircle, FaTimes } from "react-icons/fa";
-import { useNotifications } from "../../../contexts/NotificationContext";
 import "./Toast.css";
 
 // Definir tipos localmente para evitar problemas de importação

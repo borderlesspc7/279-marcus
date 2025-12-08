@@ -9,6 +9,8 @@ import { ClientStatsCards } from "./components/ClientStatsCards";
 import { ClientAppointmentStatusChart } from "./components/ClientAppointmentStatusChart";
 import { ClientWeeklyAppointmentsChart } from "./components/ClientWeeklyAppointmentsChart";
 import { ClientMonthlyTrendChart } from "./components/ClientMonthlyTrendChart";
+import { MasterStatsCards } from "./components/MasterStatsCards";
+import { EngagementChart } from "./components/EngagementChart";
 import { useAuth } from "../../hooks/useAuth";
 import { useNotifications } from "../../hooks/useNotifications";
 import "./Dashboard.css";
@@ -112,6 +114,31 @@ export const Dashboard: React.FC = () => {
       </div>
 
       <div className="dashboard__grid">
+        {/* Dashboard Master - Apenas para Admin */}
+        {isAdmin && (
+          <>
+            <div className="dashboard__card dashboard__card--full">
+              <div className="dashboard__card-header">
+                <h2 className="dashboard__card-title">Métricas do Sistema (PRD 005)</h2>
+                <p className="dashboard__card-subtitle">
+                  Visão geral das métricas de negócio e engajamento
+                </p>
+              </div>
+              <MasterStatsCards />
+            </div>
+
+            <div className="dashboard__card dashboard__card--large">
+              <div className="dashboard__card-header">
+                <h2 className="dashboard__card-title">Gráfico de Engajamento</h2>
+                <p className="dashboard__card-subtitle">
+                  Total de Agendamentos e Dietas Salvas (Agregação Geral)
+                </p>
+              </div>
+              <EngagementChart />
+            </div>
+          </>
+        )}
+
         {/* Cards de Estatísticas */}
         <div className="dashboard__card dashboard__card--full">
           <StatsCards />

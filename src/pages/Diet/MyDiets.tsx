@@ -6,7 +6,6 @@ import { getDietsByClient } from "../../services/dietService";
 import { getClientByAuthUid } from "../../services/clientService";
 import { useAuth } from "../../hooks/useAuth";
 import type { Diet } from "../../types/food";
-import type { Client } from "../../types/client";
 import "./DietList.css";
 
 export const MyDiets: React.FC = () => {
@@ -17,7 +16,6 @@ export const MyDiets: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [client, setClient] = useState<Client | null>(null);
 
   const loadDiets = useCallback(async () => {
     if (!user?.uid) return;
@@ -33,8 +31,6 @@ export const MyDiets: React.FC = () => {
         setLoading(false);
         return;
       }
-      
-      setClient(clientData);
       
       // Buscar dietas do cliente
       const dietsData = await getDietsByClient(clientData.id);
@@ -74,8 +70,8 @@ export const MyDiets: React.FC = () => {
     navigate(`/dashboard/minhas-dietas/${dietId}`);
   };
 
-  const handleRequestSubstitution = (dietId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleRequestSubstitution = (dietId: string, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     navigate(`/dashboard/solicitar-substituicao/${dietId}`);
   };
 
@@ -222,7 +218,7 @@ export const MyDiets: React.FC = () => {
                   <Button
                     variant="secondary"
                     size="small"
-                    onClick={(e) => handleRequestSubstitution(diet.id, e)}
+                    onClick={() => handleRequestSubstitution(diet.id)}
                     className="diet-card__substitution-button"
                   >
                     <FaExchangeAlt /> Solicitar Substituição

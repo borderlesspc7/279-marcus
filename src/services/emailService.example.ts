@@ -8,7 +8,6 @@
  */
 
 import {
-  configureEmailService,
   sendAppointmentConfirmationEmail,
   sendAppointmentReminderEmail,
   sendAppointmentApprovedEmail,

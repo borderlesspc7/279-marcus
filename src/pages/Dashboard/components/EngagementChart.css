@@ -1,0 +1,53 @@
+.engagement-chart {
+  width: 100%;
+  padding: 1.5rem;
+}
+
+.engagement-chart__header {
+  margin-bottom: 1.5rem;
+}
+
+.engagement-chart__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.engagement-chart__subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.engagement-chart__loading,
+.engagement-chart__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  color: #6b7280;
+  min-height: 400px;
+}
+
+.engagement-chart__loading .spinner {
+  animation: spin 1s linear infinite;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #3b82f6;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.engagement-chart__error {
+  color: #ef4444;
+}

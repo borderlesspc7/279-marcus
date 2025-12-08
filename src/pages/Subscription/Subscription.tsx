@@ -2,11 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FaCheck,
-  FaTimes,
   FaCreditCard,
-  FaUsers,
-  FaChartLine,
-  FaClipboardList,
   FaCrown,
   FaRocket,
   FaStar,
@@ -93,10 +89,8 @@ export const Subscription: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<"monthly" | "yearly">(
     "monthly"
   );
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
 
   const handleSelectPlan = (planId: string) => {
-    setSelectedPlan(planId);
     // Redirecionar para página de checkout com o plano selecionado
     navigate(`${paths.checkout}?plan=${planId}&period=${selectedPeriod}`);
   };

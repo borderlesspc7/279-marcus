@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
+import type { ReactNode } from "react";
 
 export type NotificationType = "success" | "error" | "warning" | "info";
 
@@ -135,7 +136,4 @@ export function useNotifications() {
   }
   return context;
 }
-
-// Re-exportar tipos explicitamente
-export type { Notification, NotificationType };
 

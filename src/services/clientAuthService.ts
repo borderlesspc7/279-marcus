@@ -1,11 +1,10 @@
-import { clientAuth, clientDb } from "../lib/clientFirebaseConfig";
+import { clientAuth } from "../lib/clientFirebaseConfig";
 import {
   signInWithEmailAndPassword,
   signOut,
   type Unsubscribe,
   onAuthStateChanged,
 } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
 import { getClientByAuthUid } from "./clientService";
 import type { Client } from "../types/client";
 import getFirebaseErrorMessage from "../components/ui/ErrorMessage";

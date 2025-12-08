@@ -32,7 +32,7 @@ export function isEmailServiceEnabled(): boolean {
 /**
  * Gera o assunto do email baseado no template
  */
-function getEmailSubject(template: EmailTemplate, data: Record<string, any>): string {
+function getEmailSubject(template: EmailTemplate, _data: Record<string, any>): string {
   const subjects: Record<EmailTemplate, string> = {
     appointment_confirmation: "Confirmação de Agendamento - NutriManager",
     appointment_reminder: "Lembrete de Consulta - NutriManager",
@@ -51,7 +51,9 @@ function getEmailSubject(template: EmailTemplate, data: Record<string, any>): st
 
 /**
  * Gera o corpo do email em HTML baseado no template
+ * @internal - Será usado quando o envio real de email for implementado
  */
+// @ts-ignore - Função será usada quando o envio de email for implementado
 function getEmailBody(template: EmailTemplate, data: Record<string, any>): string {
   const templates: Record<EmailTemplate, (data: Record<string, any>) => string> = {
     appointment_confirmation: (data) => `
@@ -433,12 +435,13 @@ export async function sendEmail(emailData: EmailData): Promise<EmailResult> {
 
     // Gerar assunto e corpo do email
     const subject = emailData.subject || getEmailSubject(emailData.template, emailData.data);
-    const htmlBody = getEmailBody(emailData.template, emailData.data);
+    // TODO: htmlBody será usado quando o envio real for implementado
+    // const htmlBody = getEmailBody(emailData.template, emailData.data);
 
     // TODO: Implementar envio real via:
     // 1. Firebase Cloud Functions (https://firebase.google.com/docs/functions)
     // 2. API externa (SendGrid, Resend, AWS SES, etc.)
-    
+
     // Exemplo de integração com Firebase Cloud Functions:
     // const functions = getFunctions();
     // const sendEmailFunction = httpsCallable(functions, 'sendEmail');

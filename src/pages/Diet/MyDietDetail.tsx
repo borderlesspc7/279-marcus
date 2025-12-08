@@ -12,7 +12,6 @@ import { getDietById } from "../../services/dietService";
 import { getClientByAuthUid } from "../../services/clientService";
 import { useAuth } from "../../hooks/useAuth";
 import type { Diet } from "../../types/food";
-import type { Client } from "../../types/client";
 import "./DietDetail.css";
 
 export const MyDietDetail: React.FC = () => {
@@ -20,7 +19,6 @@ export const MyDietDetail: React.FC = () => {
   const { dietId } = useParams<{ dietId: string }>();
   const { user } = useAuth();
   const [diet, setDiet] = useState<Diet | null>(null);
-  const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,7 +41,6 @@ export const MyDietDetail: React.FC = () => {
           setLoading(false);
           return;
         }
-        setClient(clientData);
 
         const dietData = await getDietById(dietId);
         if (!dietData) {

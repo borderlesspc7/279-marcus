@@ -8,7 +8,7 @@ import {
   isEmailServiceEnabled,
   configureEmailService,
 } from "../services/emailService";
-import type { EmailData, EmailServiceConfig } from "../types/email";
+import type { EmailData } from "../types/email";
 
 /**
  * Hook para facilitar o uso do serviço de email

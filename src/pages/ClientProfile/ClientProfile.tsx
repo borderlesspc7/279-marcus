@@ -13,7 +13,6 @@ import {
 } from "react-icons/fa";
 import { Button } from "../../components/ui/Button/Button";
 import InputField from "../../components/ui/InputField/InputField";
-import { clientAuthService } from "../../services/clientAuthService";
 import { getClientByAuthUid, updateClient } from "../../services/clientService";
 import { clientAuth } from "../../lib/clientFirebaseConfig";
 import type { Client, CreateClientData } from "../../types/client";

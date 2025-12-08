@@ -1,14 +1,16 @@
 # Análise de Implementação - Comparação PRDs vs Código Atual
 
 **Data:** 2025-01-27  
-**Versão:** 5.0  
+**Versão:** 5.1  
 **Última Revisão:** 2025-01-27
 
 ## Resumo Executivo
 
 Este documento compara os requisitos definidos nos PRDs (Product Requirement Documents) e One-Pager com o estado atual da implementação do código.
 
-**Estimativa de Completude Geral (Dentro do Escopo): ~88%**
+**Estimativa de Completude Geral (Dentro do Escopo): ~90%**
+
+**Nota**: A estimativa aumentou devido à implementação completa do sistema de trial com avisos e bloqueios.
 
 ### ⚠️ **Importante: Funcionalidades Fora do Escopo**
 
@@ -261,12 +263,15 @@ Estas funcionalidades estão marcadas com ⚠️ no documento para indicar que f
 
 ## PRD 001: Módulo de Autenticação e Gestão de Clientes
 
-- ⚠️ **Período de Trial de 10 dias**: **PARCIALMENTE IMPLEMENTADO**
+- ✅ **Período de Trial de 10 dias**: **IMPLEMENTADO**
   - ✅ Campo `trialEndDate` criado no registro (10 dias após cadastro)
   - ✅ Página `TrialExpired.tsx` implementada
   - ✅ Verificação em `AdminRoutes.tsx` redireciona se trial expirou
-  - ❌ Não há bloqueio completo de funcionalidades durante o trial
-  - ❌ Não há aviso antes da expiração
+  - ✅ Modal de bloqueio durante trial (`TrialBlockModal`) implementado
+  - ✅ Modal de aviso antes da expiração (`TrialWarningModal`) implementado - aparece quando faltam 3 dias ou menos
+  - ✅ Banner de aviso (`TrialWarningBanner`) implementado
+  - ✅ Hook `useTrial` com lógica de bloqueio e avisos implementado
+  - ⚠️ **Nota**: O modal de bloqueio pode ser fechado pelo usuário (permite exploração, mas funcionalidades críticas podem estar limitadas)
 - ❌ **Validação de e-mail por link de confirmação**: Não implementado
   - Não há envio de e-mail de verificação
   - Não há bloqueio de funcionalidades até verificação
@@ -283,7 +288,14 @@ Estas funcionalidades estão marcadas com ⚠️ no documento para indicar que f
 
 ## PRD 002: Módulo de Agendamentos
 
-- ❌ **Notificações**: Não há e-mails, SMS ou notificações push sobre agendamentos
+- ⚠️ **Notificações por E-mail**: **ESTRUTURA IMPLEMENTADA, MAS ENVIO REAL NÃO IMPLEMENTADO**
+  - ✅ Serviço de email (`emailService.ts`) implementado com templates
+  - ✅ Hook `useEmail` implementado
+  - ✅ Templates de email para confirmação, lembretes, aprovação/rejeição implementados
+  - ❌ Envio real de email não implementado (apenas simulação no console)
+  - ❌ Não está sendo chamado automaticamente nos agendamentos
+  - ❌ Não há integração com serviço de email externo (SendGrid, Resend, AWS SES, etc.)
+- ❌ **Notificações SMS/Push**: Não implementado
 - ❌ **Integração com Pagamento**: Não há integração com meios de pagamento
 
 ---
@@ -325,22 +337,19 @@ Todas as funcionalidades do dashboard master estão ausentes:
 ## Resumo por Status
 
 ### ✅ **Totalmente Implementado (Dentro do Escopo)**
-- PRD 001: Autenticação e Gestão de Clientes (exceto validação de e-mail - trial parcialmente implementado)
-- PRD 002: Módulo de Agendamentos (exceto notificações - agendamento online pelo cliente totalmente implementado)
+- PRD 001: Autenticação e Gestão de Clientes (trial totalmente implementado - exceto validação de e-mail)
+- PRD 002: Módulo de Agendamentos (agendamento online pelo cliente totalmente implementado - exceto envio real de notificações por e-mail)
 - PRD 003: Base de Alimentos e Calculadora de Macros (totalmente implementado, incluindo app do cliente - exceto funcionalidades fora do escopo)
 - PRD 004: Módulo Financeiro Simplificado (exceto integração de pagamento e conciliação bancária)
 
 ### ⚠️ **Parcialmente Implementado**
-- PRD 001: Sistema de Trial
-  - ✅ Campo `trialEndDate` criado no registro
-  - ✅ Página de trial expirado implementada
-  - ✅ Redirecionamento quando trial expira
-  - ❌ Bloqueio completo de funcionalidades durante trial
-  - ❌ Avisos antes da expiração
-- PRD 002: Agendamento Online pelo Cliente
-  - ✅ Solicitação de consultas implementada
-  - ✅ Sistema de aprovação implementado
-  - ❌ Notificações não implementadas
+- PRD 002: Notificações por E-mail
+  - ✅ Estrutura completa de email implementada
+  - ✅ Templates de email implementados
+  - ✅ Hook `useEmail` implementado
+  - ❌ Envio real de email não implementado (apenas simulação)
+  - ❌ Não está sendo chamado automaticamente nos agendamentos
+  - ❌ Não há integração com serviço de email externo
 
 ### ⚠️ **Implementado mas FORA DO ESCOPO da Primeira Versão**
 - **Edição de Perfil pelo Cliente**: Implementado mas não estava no escopo inicial (PRD 001 - Fora do Escopo)
@@ -352,14 +361,11 @@ Todas as funcionalidades do dashboard master estão ausentes:
 ## Prioridades Sugeridas para Próximas Implementações
 
 ### 🔴 **Alta Prioridade (Dentro do Escopo)**
-1. **Completar Sistema de Trial**
-   - Bloqueio completo de funcionalidades durante trial
-   - Avisos antes da expiração do trial
-
-2. **Notificações Básicas**
-   - E-mails de confirmação de agendamento
-   - Lembretes de consultas
-   - Notificações de aprovação/rejeição de solicitações
+1. **Implementar Envio Real de E-mails**
+   - Integrar serviço de email externo (SendGrid, Resend, AWS SES, etc.)
+   - Chamar automaticamente nos agendamentos (criação, aprovação, rejeição)
+   - Implementar envio de lembretes de consultas
+   - Testar envio real de emails
 
 ### 🟡 **Média Prioridade**
 3. **Validação de E-mail**
@@ -423,9 +429,9 @@ O projeto está **bem avançado** nas funcionalidades principais para nutricioni
 - ✅ Calculadora de dietas com base TACO
 
 As principais **lacunas** (dentro do escopo) são:
-- ⚠️ Sistema de trial (parcialmente implementado - falta bloqueio completo e avisos)
+- ⚠️ Envio real de e-mails (estrutura implementada, mas falta integração com serviço externo e chamadas automáticas)
 - ❌ Dashboard administrativo master (PRD 005)
-- ❌ Notificações (e-mail, SMS, push) - FORA DO ESCOPO mas seria útil
+- ❌ Notificações SMS/Push - FORA DO ESCOPO mas seria útil
 - ❌ Validação de e-mail por link de confirmação - FORA DO ESCOPO
 - ❌ Integração de pagamento e conciliação bancária (requer serviços externos) - FORA DO ESCOPO
 
@@ -434,7 +440,27 @@ As principais **lacunas** (dentro do escopo) são:
 - ⚠️ Sistema de substituições de alimentos (One-Pager - O que não fazer agora)
 - ⚠️ Gerenciamento de base de alimentos (PRD 003 - Fora do Escopo)
 
-**Estimativa de Completude Geral: ~88%**
+**Estimativa de Completude Geral: ~90%**
+
+**Nota**: A estimativa aumentou devido à implementação completa do sistema de trial com avisos e bloqueios.
+
+### Principais Descobertas da Reanálise (Versão 5.0)
+
+1. **Sistema de Trial TOTALMENTE IMPLEMENTADO:**
+   - ✅ Modal de bloqueio durante trial (`TrialBlockModal`) implementado e ativo
+   - ✅ Modal de aviso antes da expiração (`TrialWarningModal`) implementado - aparece quando faltam 3 dias ou menos
+   - ✅ Banner de aviso (`TrialWarningBanner`) implementado
+   - ✅ Hook `useTrial` com lógica completa de bloqueio (`shouldBlock`) e avisos (`shouldShowWarning`)
+   - ✅ Integração completa em `AdminRoutes.tsx` e `DashboardLayout.tsx`
+   - ⚠️ **Nota**: O modal de bloqueio pode ser fechado pelo usuário (permite exploração, mas funcionalidades críticas podem estar limitadas)
+
+2. **Sistema de E-mail - Estrutura Implementada:**
+   - ✅ Serviço completo de email (`emailService.ts`) implementado
+   - ✅ Templates de email para todos os cenários implementados
+   - ✅ Hook `useEmail` implementado
+   - ❌ Envio real de email não implementado (apenas simulação no console)
+   - ❌ Não está sendo chamado automaticamente nos agendamentos
+   - ❌ Falta integração com serviço de email externo (SendGrid, Resend, AWS SES, etc.)
 
 ### Principais Descobertas da Reanálise (Versão 4.0)
 
@@ -444,12 +470,15 @@ As principais **lacunas** (dentro do escopo) são:
    - ✅ Rota `/dashboard/cliente/perfil` configurada
    - ⚠️ **Nota**: Funcionalidade implementada, mas está FORA DO ESCOPO da primeira versão (PRD 001 - Fora do Escopo)
 
-2. **Sistema de Trial PARCIALMENTE IMPLEMENTADO:**
+2. **Sistema de Trial IMPLEMENTADO:**
    - ✅ Campo `trialEndDate` criado no registro (10 dias após cadastro)
    - ✅ Página `TrialExpired.tsx` implementada
    - ✅ Verificação em `AdminRoutes.tsx` redireciona quando trial expira
-   - ❌ Não há bloqueio completo de funcionalidades durante trial
-   - ❌ Não há avisos antes da expiração
+   - ✅ Modal de bloqueio durante trial (`TrialBlockModal`) implementado
+   - ✅ Modal de aviso antes da expiração (`TrialWarningModal`) implementado - aparece quando faltam 3 dias ou menos
+   - ✅ Banner de aviso (`TrialWarningBanner`) implementado
+   - ✅ Hook `useTrial` com lógica completa de bloqueio e avisos
+   - ⚠️ **Nota**: O modal de bloqueio pode ser fechado pelo usuário (permite exploração)
 
 3. **Senha Inicial = Telefone IMPLEMENTADO:**
    - ✅ Senha inicial do cliente é o telefone (removendo caracteres não numéricos)
