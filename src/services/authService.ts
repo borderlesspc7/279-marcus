@@ -3,10 +3,11 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  deleteUser,
   type Unsubscribe,
   onAuthStateChanged,
 } from "firebase/auth";
-import { doc, setDoc, getDoc, collection, addDoc, Timestamp, query, getDocs, where } from "firebase/firestore";
+import { doc, setDoc, getDoc, deleteDoc, collection, addDoc, Timestamp, query, getDocs, where } from "firebase/firestore";
 import type {
   LoginCredentials,
   RegisterCredentials,
@@ -93,6 +94,19 @@ export const authService = {
         throw new Error("A senha deve ter pelo menos 6 caracteres");
       }
 
+      // Verificar se já existe um admin antes de criar novo
+      // Apenas um admin pode existir no sistema
+      if (credentials.role === "admin") {
+        const adminQuery = query(
+          collection(db, "users"),
+          where("role", "==", "admin")
+        );
+        const adminSnapshot = await getDocs(adminQuery);
+        if (!adminSnapshot.empty) {
+          throw new Error("Já existe um administrador no sistema. Apenas um admin pode existir. Novos cadastros devem ser de nutricionista.");
+        }
+      }
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         credentials.email,
@@ -100,10 +114,12 @@ export const authService = {
       );
       const firebaseUser = userCredential.user;
 
-      const role = credentials.role || "user";
+      // Determinar role: se não especificado, criar como nutricionista
+      // Novos cadastros via formulário são sempre nutricionistas
+      const role = credentials.role || "nutritionist";
 
-      // Calcular data de término do trial (10 dias a partir de hoje) - apenas para admins
-      const trialEndDate = role === "admin" ? (() => {
+      // Calcular data de término do trial (10 dias a partir de hoje) - apenas para admin e nutricionistas
+      const trialEndDate = (role === "admin" || role === "nutritionist") ? (() => {
         const date = new Date();
         date.setDate(date.getDate() + 10);
         return date;
@@ -141,21 +157,21 @@ export const authService = {
       // Se o usuário tem role "user", criar automaticamente como cliente
       if (role === "user") {
         try {
-          // Buscar um admin/nutricionista padrão para associar o cliente
-          // Busca o primeiro admin disponível
+          // Buscar um nutricionista padrão para associar o cliente
+          // Busca o primeiro nutricionista disponível
           let nutritionistId = "";
           try {
             const usersQuery = query(
               collection(db, "users"),
-              where("role", "==", "admin")
+              where("role", "==", "nutritionist")
             );
             const usersSnapshot = await getDocs(usersQuery);
             if (!usersSnapshot.empty) {
               nutritionistId = usersSnapshot.docs[0].id;
             }
           } catch (error) {
-            console.warn("Erro ao buscar admin padrão:", error);
-            // Se não encontrar admin, deixa vazio e será associado depois
+            console.warn("Erro ao buscar nutricionista padrão:", error);
+            // Se não encontrar nutricionista, deixa vazio e será associado depois
           }
 
           const clientDoc = {
@@ -218,6 +234,27 @@ export const authService = {
       });
     } catch (error) {
       throw new Error("Erro ao observar estado de autenticação: " + error);
+    }
+  },
+
+  async deleteAccount(): Promise<void> {
+    try {
+      const firebaseUser = auth.currentUser;
+      if (!firebaseUser) {
+        throw new Error("Usuário não autenticado");
+      }
+
+      const userId = firebaseUser.uid;
+
+      // 1. Deletar documento do usuário no Firestore
+      const userDocRef = doc(db, "users", userId);
+      await deleteDoc(userDocRef);
+
+      // 2. Deletar conta do Firebase Authentication
+      await deleteUser(firebaseUser);
+    } catch (error) {
+      const message = getFirebaseErrorMessage(error as firebaseError | string);
+      throw new Error(message);
     }
   },
 };

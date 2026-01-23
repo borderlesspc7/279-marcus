@@ -30,6 +30,7 @@ import { RequestSubstitution } from "../pages/Diet/RequestSubstitution";
 import { MySubstitutions } from "../pages/Diet/MySubstitutions";
 import { FoodManagement } from "../pages/Food/FoodManagement";
 import { NotificationTest } from "../pages/NotificationTest/NotificationTest";
+import { Profile } from "../pages/Profile/Profile";
 import { NotificationProvider } from "../contexts/NotificationContext";
 import { ToastContainer } from "../components/ui/Toast/ToastContainer";
 
@@ -240,6 +241,17 @@ export default function AppRoutes() {
               <ProtectedRoutes>
                 <DashboardLayout>
                   <ClientSelfProfile />
+                </DashboardLayout>
+              </ProtectedRoutes>
+            }
+          />
+          {/* Rota para perfil do usuário (admin/nutricionista) */}
+          <Route
+            path={paths.perfil}
+            element={
+              <ProtectedRoutes>
+                <DashboardLayout>
+                  <Profile />
                 </DashboardLayout>
               </ProtectedRoutes>
             }

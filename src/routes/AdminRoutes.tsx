@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { paths } from "./paths";
 import { useAuth } from "../hooks/useAuth";
@@ -13,6 +13,25 @@ interface AdminRoutesProps {
 export default function AdminRoutes({ children }: AdminRoutesProps) {
   const { user, loading } = useAuth();
   const { isExpired, shouldBlock } = useTrial();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Atualizar estado do modal quando o usuário mudar
+  // Verificar localStorage e sessionStorage para decidir se deve mostrar
+  useEffect(() => {
+    if (user?.uid) {
+      const dontShowKey = `trial-block-dont-show-${user.uid}`;
+      const sessionDismissedKey = `trial-block-dismissed-${user.uid}`;
+      
+      // Não mostrar se o usuário optou por não mostrar mais (localStorage)
+      const dontShowPermanently = localStorage.getItem(dontShowKey) === "true";
+      
+      // Não mostrar se já foi fechado nesta sessão (sessionStorage)
+      const dismissedThisSession = sessionStorage.getItem(sessionDismissedKey) === "true";
+      
+      // Mostrar apenas se não foi dispensado permanentemente E não foi dispensado nesta sessão
+      setIsModalOpen(!dontShowPermanently && !dismissedThisSession);
+    }
+  }, [user?.uid]);
 
   // Mostrar tela de carregamento enquanto verifica autenticação
   if (loading) {
@@ -36,8 +55,9 @@ export default function AdminRoutes({ children }: AdminRoutesProps) {
     return <Navigate to={paths.login} replace />;
   }
 
-  // Verificar se o usuário é admin
-  if (user.role !== "admin") {
+  // Verificar se o usuário é admin ou nutricionista
+  // AdminRoutes é usado para rotas que requerem permissões de nutricionista
+  if (user.role !== "admin" && user.role !== "nutritionist") {
     return <Navigate to={paths.dashboard} replace />;
   }
 
@@ -50,15 +70,6 @@ export default function AdminRoutes({ children }: AdminRoutesProps) {
   // O modal pode ser fechado para permitir exploração, mas funcionalidades críticas devem ser bloqueadas
   // O modal sempre aparece ao fazer login/recarregar, exceto se o usuário optou por não mostrar mais
   if (shouldBlock) {
-    const [isModalOpen, setIsModalOpen] = React.useState(() => {
-      // Verificar se o usuário optou por não mostrar mais
-      if (user?.uid) {
-        const dontShowKey = `trial-block-dont-show-${user.uid}`;
-        return localStorage.getItem(dontShowKey) !== "true";
-      }
-      return true;
-    });
-    
     return (
       <>
         {isModalOpen && (

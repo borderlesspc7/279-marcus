@@ -11,13 +11,6 @@ import "./Form.css";
 
 type FormErrors = Partial<Record<keyof RegisterCredentials, string>>;
 
-const turnIntoAdmin = (email: string) => {
-  if (email === "admin@gmail.com") {
-    return "admin";
-  }
-  return "user";
-};
-
 export const RegisterForm: React.FC = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -84,7 +77,10 @@ export const RegisterForm: React.FC = () => {
         password: formData.password,
         confirmPassword: formData.confirmPassword,
         phone: formData.phone,
-        role: turnIntoAdmin(formData.email),
+        // Todo cadastro via esta tela é de NUTRICIONISTA,
+        // o cliente nunca se cadastra sozinho.
+        // Apenas um admin pode existir e deve ser criado manualmente.
+        role: "nutritionist",
       };
 
       await register(payload);

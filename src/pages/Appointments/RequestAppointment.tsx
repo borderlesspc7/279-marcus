@@ -67,12 +67,13 @@ export const RequestAppointment: React.FC = () => {
     // Buscar nutritionistId do cliente
     let nutritionistId = client.nutritionistId;
 
-    // Se o cliente não tem nutritionistId associado, buscar um admin padrão
+    // Se o cliente não tem nutritionistId associado, buscar um nutricionista padrão
     if (!nutritionistId) {
       try {
+        // Buscar primeiro nutricionista disponível
         const usersQuery = query(
           collection(db, "users"),
-          where("role", "==", "admin")
+          where("role", "==", "nutritionist")
         );
         const usersSnapshot = await getDocs(usersQuery);
         if (!usersSnapshot.empty) {

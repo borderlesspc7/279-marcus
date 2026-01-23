@@ -30,6 +30,8 @@ export const paths = {
   checkoutSuccess: "/checkout/sucesso",
   // Rotas para cliente
   clientePerfil: "/dashboard/cliente/perfil",
+  // Rota de perfil do usuário (admin/nutricionista)
+  perfil: "/dashboard/perfil",
   // Rota de teste
   notificationTest: "/dashboard/teste-notificacoes",
 };
