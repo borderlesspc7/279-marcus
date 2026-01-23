@@ -14,8 +14,8 @@ export const useTrial = (): TrialStatus => {
   const { user } = useAuth();
 
   return useMemo(() => {
-    // Se não for admin ou não tiver trialEndDate, não está em trial
-    if (!user || user.role !== "admin" || !user.trialEndDate) {
+    // Se não for admin/nutricionista ou não tiver trialEndDate, não está em trial
+    if (!user || (user.role !== "admin" && user.role !== "nutritionist") || !user.trialEndDate) {
       return {
         isTrial: false,
         isExpired: false,

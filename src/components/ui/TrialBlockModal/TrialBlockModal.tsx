@@ -17,17 +17,6 @@ export const TrialBlockModal: React.FC<TrialBlockModalProps> = ({ onClose }) => 
   const { daysRemaining, trialEndDate } = useTrial();
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
-  // Verificar se o usuário já optou por não mostrar mais
-  useEffect(() => {
-    if (user?.uid) {
-      const dontShowKey = `trial-block-dont-show-${user.uid}`;
-      const shouldNotShow = localStorage.getItem(dontShowKey) === "true";
-      if (shouldNotShow && onClose) {
-        onClose();
-      }
-    }
-  }, [user, onClose]);
-
   const formatDate = (date: Date | null) => {
     if (!date) return "";
     return new Intl.DateTimeFormat("pt-BR", {
@@ -47,10 +36,16 @@ export const TrialBlockModal: React.FC<TrialBlockModalProps> = ({ onClose }) => 
   };
 
   const handleClose = () => {
-    // Se o usuário marcou "não mostrar mais", salvar no localStorage
-    if (dontShowAgain && user?.uid) {
-      const dontShowKey = `trial-block-dont-show-${user.uid}`;
-      localStorage.setItem(dontShowKey, "true");
+    if (user?.uid) {
+      // Se o usuário marcou "não mostrar mais", salvar no localStorage (permanente)
+      if (dontShowAgain) {
+        const dontShowKey = `trial-block-dont-show-${user.uid}`;
+        localStorage.setItem(dontShowKey, "true");
+      } else {
+        // Se apenas fechou sem marcar, salvar no sessionStorage (apenas esta sessão)
+        const sessionDismissedKey = `trial-block-dismissed-${user.uid}`;
+        sessionStorage.setItem(sessionDismissedKey, "true");
+      }
     }
     if (onClose) {
       onClose();

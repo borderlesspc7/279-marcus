@@ -59,10 +59,16 @@ export const TrialWarningModal: React.FC<TrialWarningModalProps> = ({ onClose })
   };
 
   const handleClose = () => {
-    // Se o usuário marcou "não mostrar mais", salvar no localStorage
-    if (dontShowAgain && user?.uid) {
-      const dontShowKey = `trial-warning-dont-show-${user.uid}`;
-      localStorage.setItem(dontShowKey, "true");
+    if (user?.uid) {
+      // Se o usuário marcou "não mostrar mais", salvar no localStorage (permanente)
+      if (dontShowAgain) {
+        const dontShowKey = `trial-warning-dont-show-${user.uid}`;
+        localStorage.setItem(dontShowKey, "true");
+      } else {
+        // Se apenas fechou sem marcar, salvar no sessionStorage (apenas esta sessão)
+        const sessionDismissedKey = `trial-warning-dismissed-${user.uid}`;
+        sessionStorage.setItem(sessionDismissedKey, "true");
+      }
     }
     if (onClose) {
       onClose();
