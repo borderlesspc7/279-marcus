@@ -24,6 +24,7 @@
   transition: all 0.3s ease;
   background: white;
   font-family: inherit;
+  color: #111827;
 }
 
 .input-field__input:focus {

@@ -85,6 +85,36 @@ service cloud.firestore {
                      resource.data.nutritionistId == request.auth.uid;
     }
     
+    match /consultations/{consultationId} {
+      // Permite que usuários autenticados leiam e escrevam consultas
+      allow read, write: if request.auth != null;
+    }
+    
+    match /clientGoals/{goalId} {
+      // Permite que usuários autenticados leiam e escrevam objetivos de clientes
+      allow read, write: if request.auth != null;
+    }
+    
+    // Serviços dos nutricionistas
+    match /services/{serviceId} {
+      // Permite leitura para qualquer usuário autenticado (para mostrar serviços disponíveis)
+      allow read: if request.auth != null;
+      // Permite escrita apenas para o nutricionista dono do serviço
+      allow create: if request.auth != null && 
+                     request.resource.data.nutritionistId == request.auth.uid;
+      allow update, delete: if request.auth != null && 
+                             resource.data.nutritionistId == request.auth.uid;
+    }
+    
+    // Configurações de agenda dos nutricionistas
+    match /nutritionistSchedules/{scheduleId} {
+      // Permite leitura para qualquer usuário autenticado
+      allow read: if request.auth != null;
+      // Permite escrita apenas para o próprio nutricionista (scheduleId é o nutritionistId)
+      allow write: if request.auth != null && 
+                    request.auth.uid == scheduleId;
+    }
+    
     // Regra padrão: nega acesso a todas as outras coleções
     match /{document=**} {
       allow read, write: if false;
