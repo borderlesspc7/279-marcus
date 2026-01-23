@@ -76,7 +76,7 @@ export const ClientList: React.FC = () => {
     <div className="client-list">
       <div className="client-list__header">
         <div>
-          <h1 className="client-list__title">Meus Clientes</h1>
+          <h1 className="client-list__title">Meus Pacientes</h1>
           <p className="client-list__subtitle">
             Gerencie seus clientes e acompanhe o progresso
           </p>

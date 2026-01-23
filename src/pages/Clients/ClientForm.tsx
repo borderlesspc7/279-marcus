@@ -253,6 +253,9 @@ export const ClientForm: React.FC = () => {
             <p>
               <FaInfoCircle size={16} /> Ao cadastrar, uma conta de acesso será
               automaticamente criada para o cliente com o e-mail fornecido.
+              A <strong>senha inicial</strong> será a{" "}
+              <strong>data de nascimento (somente números)</strong>. Exemplo:
+              1990-05-12 → 12051990.
             </p>
           </div>
 
