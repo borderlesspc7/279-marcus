@@ -216,3 +216,27 @@
 .client-search__dropdown::-webkit-scrollbar-thumb:hover {
   background: #15803d;
 }
+
+/* Botão de adicionar novo cliente */
+.client-search__add-new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.875rem;
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  background: white;
+  color: #16a34a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 0 0 10px 10px;
+}
+
+.client-search__add-new:hover {
+  background: #f0fdf4;
+  color: #15803d;
+}

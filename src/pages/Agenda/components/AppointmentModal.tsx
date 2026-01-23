@@ -7,9 +7,11 @@ import {
   updateAppointment,
   deleteAppointment,
 } from "../../../services/appointmentService";
+import { getActiveServices } from "../../../services/serviceService";
 import { useAuth } from "../../../hooks/useAuth";
 import type { Client } from "../../../types/client";
 import type { Appointment } from "../../../types/appointment";
+import type { Service } from "../../../types/service";
 import "./AppointmentModal.css";
 
 interface AppointmentModalProps {
@@ -18,6 +20,7 @@ interface AppointmentModalProps {
   onSuccess: () => void;
   appointment?: Appointment | null;
   initialDate?: Date;
+  initialTime?: string;
 }
 
 export const AppointmentModal: React.FC<AppointmentModalProps> = ({
@@ -26,15 +29,22 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   onSuccess,
   appointment,
   initialDate,
+  initialTime,
 }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const lastProcessedAppointmentId = useRef<string | null>(null);
   const lastProcessedInitialDate = useRef<number | null>(null);
+  const lastProcessedInitialTime = useRef<string | null>(null);
+
+  // Services
+  const [services, setServices] = useState<Service[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
 
   // Form data
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [date, setDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -48,6 +58,12 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
     startTime?: string;
     endTime?: string;
   }>({});
+
+  useEffect(() => {
+    if (isOpen && user?.uid) {
+      loadServices();
+    }
+  }, [isOpen, user?.uid]);
 
   useEffect(() => {
     if (isOpen) {
@@ -64,26 +80,56 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
           setEndTime(appointment.endTime);
           setNotes(appointment.notes || "");
           setStatus(appointment.status);
+          
+          // Restaurar serviço se existir
+          if (appointment.serviceId && services.length > 0) {
+            const service = services.find(s => s.id === appointment.serviceId);
+            setSelectedService(service || null);
+          }
         }
       } else if (initialDate) {
         // Só atualizar se for uma data inicial diferente
         const initialDateTime = initialDate.getTime();
-        if (lastProcessedInitialDate.current !== initialDateTime) {
+        const shouldUpdateDate = lastProcessedInitialDate.current !== initialDateTime;
+        const shouldUpdateTime = lastProcessedInitialTime.current !== initialTime;
+        
+        if (shouldUpdateDate) {
           lastProcessedInitialDate.current = initialDateTime;
           setDate(formatDateForInput(initialDate));
           setStatus("scheduled");
+        }
+        
+        if (shouldUpdateTime && initialTime) {
+          lastProcessedInitialTime.current = initialTime;
+          setStartTime(initialTime);
         }
       }
     } else {
       // Limpar form ao fechar
       lastProcessedAppointmentId.current = null;
       lastProcessedInitialDate.current = null;
+      lastProcessedInitialTime.current = null;
       resetForm();
     }
-  }, [isOpen, appointment, initialDate]);
+  }, [isOpen, appointment, initialDate, initialTime, services]);
+
+  const loadServices = async () => {
+    if (!user?.uid) return;
+
+    try {
+      setLoadingServices(true);
+      const data = await getActiveServices(user.uid);
+      setServices(data);
+    } catch (err) {
+      console.error("Erro ao carregar serviços:", err);
+    } finally {
+      setLoadingServices(false);
+    }
+  };
 
   const resetForm = () => {
     setSelectedClient(null);
+    setSelectedService(null);
     setDate("");
     setStartTime("");
     setEndTime("");
@@ -92,6 +138,27 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
     setErrors({});
     setError(null);
   };
+
+  // Calcular horário de término automaticamente
+  const calculateEndTime = (start: string, durationMinutes: number): string => {
+    if (!start) return "";
+
+    const [hours, minutes] = start.split(":").map(Number);
+    const totalMinutes = hours * 60 + minutes + durationMinutes;
+    
+    const endHours = Math.floor(totalMinutes / 60) % 24;
+    const endMinutes = totalMinutes % 60;
+
+    return `${String(endHours).padStart(2, "0")}:${String(endMinutes).padStart(2, "0")}`;
+  };
+
+  // Atualizar horário de término quando serviço ou horário de início mudar
+  useEffect(() => {
+    if (selectedService && startTime && !appointment) {
+      const calculatedEndTime = calculateEndTime(startTime, selectedService.duration);
+      setEndTime(calculatedEndTime);
+    }
+  }, [selectedService, startTime, appointment]);
 
   const formatDateForInput = (date: Date): string => {
     // Normalizar a data para evitar problemas de timezone
@@ -153,6 +220,9 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
         startTime,
         endTime,
         notes,
+        serviceId: selectedService?.id,
+        serviceName: selectedService?.name,
+        servicePrice: selectedService?.price,
       };
 
       if (appointment) {
@@ -231,6 +301,39 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
             selectedClient={selectedClient}
             error={errors.client}
           />
+
+          {/* Seletor de Serviço */}
+          <div className="appointment-modal__field">
+            <label className="appointment-modal__label">
+              Serviço (Opcional)
+            </label>
+            <select
+              className="appointment-modal__input"
+              value={selectedService?.id || ""}
+              onChange={(e) => {
+                const service = services.find(s => s.id === e.target.value);
+                setSelectedService(service || null);
+              }}
+              disabled={loading || loadingServices}
+            >
+              <option value="">Nenhum serviço selecionado</option>
+              {services.map((service) => (
+                <option key={service.id} value={service.id}>
+                  {service.name} - {service.duration}min - R$ {service.price.toFixed(2)}
+                </option>
+              ))}
+            </select>
+            {loadingServices && (
+              <span className="appointment-modal__field-hint">
+                Carregando serviços...
+              </span>
+            )}
+            {!loadingServices && services.length === 0 && (
+              <span className="appointment-modal__field-hint">
+                Nenhum serviço cadastrado. Configure seus serviços em "Editar Horários" → "Serviços".
+              </span>
+            )}
+          </div>
 
           {/* Data */}
           <div className="appointment-modal__field">

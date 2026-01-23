@@ -23,6 +23,12 @@
   gap: 1rem;
 }
 
+.agenda__header-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .agenda__title {
   font-size: 2rem;
   font-weight: 700;
@@ -36,7 +42,8 @@
   margin: 0;
 }
 
-.agenda__add-button {
+.agenda__add-button,
+.agenda__schedule-button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -132,12 +139,68 @@
   font-family: inherit;
 }
 
+/* CORREÇÃO DE ALINHAMENTO: Box-sizing uniforme */
+.rbc-time-view *,
+.rbc-time-view *::before,
+.rbc-time-view *::after {
+  box-sizing: border-box;
+}
+
+/* CORREÇÃO DE ALINHAMENTO: Largura consistente nos gutters */
+.rbc-time-header-gutter,
+.rbc-time-gutter {
+  min-width: 72px !important;
+  max-width: 72px !important;
+  width: 72px !important;
+  flex: 0 0 72px !important;
+  background: #f9fafb;
+}
+
+/* CORREÇÃO DE ALINHAMENTO: Remover overflow que causa desalinhamento */
+.rbc-time-view {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: visible;
+}
+
+.rbc-time-header {
+  overflow: visible;
+}
+
+/* CORREÇÃO DE ALINHAMENTO: Bordas verticais consistentes no header */
+.rbc-time-header-content {
+  border-left: none;
+}
+
 .rbc-header {
   padding: 1rem 0.5rem;
   font-weight: 600;
   color: #1f2937;
   border-bottom: 2px solid #e5e7eb;
+  border-left: 1px solid #e5e7eb;
   background: #f9fafb;
+}
+
+.rbc-header:first-child {
+  border-left: none;
+}
+
+/* CORREÇÃO DE ALINHAMENTO: Bordas verticais consistentes no conteúdo */
+.rbc-day-slot {
+  border-left: 1px solid #e5e7eb;
+}
+
+.rbc-day-slot:first-child {
+  border-left: none;
+}
+
+/* CORREÇÃO DE ALINHAMENTO: Esconder allday cell se não usada */
+.rbc-allday-cell {
+  display: none;
+}
+
+.rbc-time-header-content .rbc-row {
+  border-bottom: none;
 }
 
 .rbc-today {
@@ -196,8 +259,7 @@
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
 }
 
-.rbc-month-view,
-.rbc-time-view {
+.rbc-month-view {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   overflow: hidden;
@@ -207,13 +269,50 @@
   border-top: 1px solid #f3f4f6;
 }
 
+/* Linha indicadora do horário atual */
 .rbc-current-time-indicator {
   background-color: #ef4444;
   height: 2px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  pointer-events: none;
 }
 
-.rbc-time-header-content {
-  border-left: 1px solid #e5e7eb;
+/* Bolinha no início da linha indicadora */
+.rbc-current-time-indicator::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #ef4444;
+}
+
+/* Coluna de horários (gutter) - bordas */
+.rbc-time-gutter .rbc-timeslot-group {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Labels de horário */
+.rbc-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  padding: 0 8px;
+}
+
+/* Garantir alinhamento consistente nos time slots */
+.rbc-timeslot-group {
+  min-height: 60px;
+}
+
+.rbc-time-column {
+  display: flex;
+  flex-direction: column;
 }
 
 .rbc-day-slot .rbc-time-slot {
@@ -222,6 +321,17 @@
 
 .rbc-time-content {
   border-top: 2px solid #e5e7eb;
+  overflow-y: auto;
+}
+
+/* Garantir que os eventos não quebrem o layout */
+.rbc-day-slot .rbc-events-container {
+  margin-right: 0;
+}
+
+/* Remover bordas duplicadas no conteúdo */
+.rbc-time-content > * + * > * {
+  border-left: none;
 }
 
 .rbc-agenda-view {
@@ -259,7 +369,13 @@
     flex-direction: column;
   }
 
-  .agenda__add-button {
+  .agenda__header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .agenda__add-button,
+  .agenda__schedule-button {
     width: 100%;
     justify-content: center;
   }

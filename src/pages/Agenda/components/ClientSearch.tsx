@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { FaSearch, FaUser, FaTimes } from "react-icons/fa";
+import { FaSearch, FaUser, FaTimes, FaPlus } from "react-icons/fa";
 import { getClientsByNutritionist } from "../../../services/clientService";
 import { useAuth } from "../../../hooks/useAuth";
+import { QuickClientForm } from "./QuickClientForm";
 import type { Client } from "../../../types/client";
 import "./ClientSearch.css";
 
@@ -22,6 +23,7 @@ export const ClientSearch: React.FC<ClientSearchProps> = ({
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isQuickFormOpen, setIsQuickFormOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const loadClients = useCallback(async () => {
@@ -93,6 +95,16 @@ export const ClientSearch: React.FC<ClientSearchProps> = ({
     setIsOpen(true);
   };
 
+  const handleQuickFormSuccess = (newClient: Client) => {
+    // Adicionar novo cliente à lista
+    setClients((prev) => [newClient, ...prev]);
+    // Selecionar automaticamente
+    onSelect(newClient);
+    setIsQuickFormOpen(false);
+    setSearchTerm("");
+    setIsOpen(false);
+  };
+
   return (
     <div className="client-search" ref={wrapperRef}>
       <label className="client-search__label">
@@ -142,37 +154,58 @@ export const ClientSearch: React.FC<ClientSearchProps> = ({
         <div className="client-search__dropdown">
           {loading ? (
             <div className="client-search__loading">Carregando clientes...</div>
-          ) : filteredClients.length === 0 ? (
-            <div className="client-search__empty">
-              {searchTerm
-                ? "Nenhum cliente encontrado"
-                : "Nenhum cliente cadastrado"}
-            </div>
           ) : (
-            <ul className="client-search__list">
-              {filteredClients.map((client) => (
-                <li
-                  key={client.id}
-                  className="client-search__item"
-                  onClick={() => handleSelect(client)}
-                >
-                  <div className="client-search__item-avatar">
-                    <FaUser />
-                  </div>
-                  <div className="client-search__item-info">
-                    <span className="client-search__item-name">
-                      {client.fullName}
-                    </span>
-                    <span className="client-search__item-email">
-                      {client.email} • {client.phone}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <>
+              {filteredClients.length === 0 ? (
+                <div className="client-search__empty">
+                  {searchTerm
+                    ? "Nenhum cliente encontrado"
+                    : "Nenhum cliente cadastrado"}
+                </div>
+              ) : (
+                <ul className="client-search__list">
+                  {filteredClients.map((client) => (
+                    <li
+                      key={client.id}
+                      className="client-search__item"
+                      onClick={() => handleSelect(client)}
+                    >
+                      <div className="client-search__item-avatar">
+                        <FaUser />
+                      </div>
+                      <div className="client-search__item-info">
+                        <span className="client-search__item-name">
+                          {client.fullName}
+                        </span>
+                        <span className="client-search__item-email">
+                          {client.email} • {client.phone}
+                        </span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              
+              <button
+                type="button"
+                className="client-search__add-new"
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsQuickFormOpen(true);
+                }}
+              >
+                <FaPlus /> Cadastrar novo cliente
+              </button>
+            </>
           )}
         </div>
       )}
+
+      <QuickClientForm
+        isOpen={isQuickFormOpen}
+        onClose={() => setIsQuickFormOpen(false)}
+        onSuccess={handleQuickFormSuccess}
+      />
     </div>
   );
 };

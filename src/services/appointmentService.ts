@@ -50,6 +50,9 @@ export const createAppointment = async (
       endTime: appointmentData.endTime,
       notes: appointmentData.notes || "",
       status: "scheduled",
+      serviceId: appointmentData.serviceId || null,
+      serviceName: appointmentData.serviceName || null,
+      servicePrice: appointmentData.servicePrice || null,
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     };

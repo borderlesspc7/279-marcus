@@ -11,6 +11,9 @@ export interface Appointment {
   createdAt: Date;
   updatedAt: Date;
   requestedBy?: string; // UID do cliente que solicitou
+  serviceId?: string; // ID do serviço selecionado
+  serviceName?: string; // Nome do serviço (para manter histórico)
+  servicePrice?: number; // Preço do serviço (para manter histórico)
 }
 
 export interface CreateAppointmentData {
@@ -20,6 +23,9 @@ export interface CreateAppointmentData {
   startTime: string;
   endTime: string;
   notes?: string;
+  serviceId?: string;
+  serviceName?: string;
+  servicePrice?: number;
 }
 
 export interface UpdateAppointmentData {

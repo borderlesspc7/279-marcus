@@ -2,12 +2,15 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Calendar, momentLocalizer, type View } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { FaPlus, FaSpinner } from "react-icons/fa";
+import { FaPlus, FaSpinner, FaClock } from "react-icons/fa";
 import { Button } from "../../components/ui/Button/Button";
 import { AppointmentModal } from "./components/AppointmentModal";
+import { EditScheduleModal } from "./components/EditScheduleModal";
 import { getAppointmentsByNutritionist } from "../../services/appointmentService";
+import { getOrCreateSchedule, getMinMaxWorkingHours } from "../../services/scheduleService";
 import { useAuth } from "../../hooks/useAuth";
 import type { Appointment, CalendarEvent } from "../../types/appointment";
+import type { NutritionistSchedule } from "../../types/schedule";
 import "./Agenda.css";
 
 // Configurar locale para português
@@ -31,18 +34,21 @@ const messages = {
 };
 
 export const Agenda: React.FC = () => {
-  const { user } = useAuth();
+  const { user, reloadUser } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<View>("week");
   const [date, setDate] = useState(new Date());
+  const [schedule, setSchedule] = useState<NutritionistSchedule | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [initialTime, setInitialTime] = useState<string | undefined>(undefined);
 
   const loadAppointments = useCallback(async () => {
     if (!user?.uid) return;
@@ -81,9 +87,20 @@ export const Agenda: React.FC = () => {
     setEvents(calendarEvents);
   }, [appointments]);
 
+  const loadSchedule = useCallback(async () => {
+    if (!user?.uid) return;
+    try {
+      const scheduleData = await getOrCreateSchedule(user.uid);
+      setSchedule(scheduleData);
+    } catch (err) {
+      console.error("Erro ao carregar configuração de horários:", err);
+    }
+  }, [user?.uid]);
+
   useEffect(() => {
     loadAppointments();
-  }, [loadAppointments]);
+    loadSchedule();
+  }, [loadAppointments, loadSchedule]);
 
   useEffect(() => {
     convertAppointmentsToEvents();
@@ -91,7 +108,13 @@ export const Agenda: React.FC = () => {
 
   const handleSelectSlot = ({ start }: { start: Date; end: Date }) => {
     setSelectedAppointment(null);
-    setSelectedDate(start);
+    
+    // Extrair data e horário do slot clicado
+    const clickedDate = start;
+    const clickedTime = `${String(start.getHours()).padStart(2, '0')}:${String(start.getMinutes()).padStart(2, '0')}`;
+    
+    setSelectedDate(clickedDate);
+    setInitialTime(clickedTime);
     setIsModalOpen(true);
   };
 
@@ -105,6 +128,7 @@ export const Agenda: React.FC = () => {
     setIsModalOpen(false);
     setSelectedAppointment(null);
     setSelectedDate(undefined);
+    setInitialTime(undefined);
   };
 
   const handleSuccess = () => {
@@ -114,7 +138,19 @@ export const Agenda: React.FC = () => {
   const handleNewAppointment = () => {
     setSelectedAppointment(null);
     setSelectedDate(new Date());
+    setInitialTime(undefined);
     setIsModalOpen(true);
+  };
+
+  const handleEditSchedule = () => {
+    setIsScheduleModalOpen(true);
+  };
+
+  const handleScheduleSuccess = async (updatedUser: User) => {
+    // Atualizar o usuário no contexto com os dados atualizados
+    reloadUser(updatedUser);
+    // Recarregar configuração de horários
+    await loadSchedule();
   };
 
   const eventStyleGetter = (event: CalendarEvent) => {
@@ -167,13 +203,22 @@ export const Agenda: React.FC = () => {
             Gerencie seus agendamentos e compromissos
           </p>
         </div>
-        <Button
-          variant="primary"
-          onClick={handleNewAppointment}
-          className="agenda__add-button"
-        >
-          <FaPlus /> Novo Agendamento
-        </Button>
+        <div className="agenda__header-actions">
+          <Button
+            variant="secondary"
+            onClick={handleEditSchedule}
+            className="agenda__schedule-button"
+          >
+            <FaClock /> Editar Horários
+          </Button>
+          <Button
+            variant="primary"
+            onClick={handleNewAppointment}
+            className="agenda__add-button"
+          >
+            <FaPlus /> Novo Agendamento
+          </Button>
+        </div>
       </div>
 
       {error && (
@@ -205,8 +250,32 @@ export const Agenda: React.FC = () => {
           views={["month", "week", "day", "agenda"]}
           step={30}
           timeslots={2}
-          min={new Date(0, 0, 0, 7, 0, 0)}
-          max={new Date(0, 0, 0, 20, 0, 0)}
+          min={
+            schedule
+              ? (() => {
+                  const { minHour } = getMinMaxWorkingHours(schedule);
+                  return new Date(0, 0, 0, minHour, 0, 0);
+                })()
+              : user?.workStartTime
+              ? (() => {
+                  const [hour, minute] = user.workStartTime.split(":").map(Number);
+                  return new Date(0, 0, 0, hour, minute, 0);
+                })()
+              : new Date(0, 0, 0, 7, 0, 0)
+          }
+          max={
+            schedule
+              ? (() => {
+                  const { maxHour } = getMinMaxWorkingHours(schedule);
+                  return new Date(0, 0, 0, maxHour, 0, 0);
+                })()
+              : user?.workEndTime
+              ? (() => {
+                  const [hour, minute] = user.workEndTime.split(":").map(Number);
+                  return new Date(0, 0, 0, hour, minute, 0);
+                })()
+              : new Date(0, 0, 0, 20, 0, 0)
+          }
           defaultView="week"
           culture="pt-BR"
         />
@@ -252,6 +321,13 @@ export const Agenda: React.FC = () => {
         onSuccess={handleSuccess}
         appointment={selectedAppointment}
         initialDate={selectedDate}
+        initialTime={initialTime}
+      />
+
+      <EditScheduleModal
+        isOpen={isScheduleModalOpen}
+        onClose={() => setIsScheduleModalOpen(false)}
+        onSuccess={handleScheduleSuccess}
       />
     </div>
   );
