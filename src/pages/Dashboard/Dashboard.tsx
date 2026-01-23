@@ -19,7 +19,6 @@ export const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const { info } = useNotifications();
   const isAdmin = user?.role === "admin";
-  const isNutritionist = user?.role === "nutritionist";
   const isUser = user?.role === "user";
   const [occupancyPeriod, setOccupancyPeriod] = useState<
     "day" | "week" | "month"

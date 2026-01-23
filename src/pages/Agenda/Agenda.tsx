@@ -11,6 +11,7 @@ import { getOrCreateSchedule, getMinMaxWorkingHours } from "../../services/sched
 import { useAuth } from "../../hooks/useAuth";
 import type { Appointment, CalendarEvent } from "../../types/appointment";
 import type { NutritionistSchedule } from "../../types/schedule";
+import type { User } from "../../types/user";
 import "./Agenda.css";
 
 // Configurar locale para português

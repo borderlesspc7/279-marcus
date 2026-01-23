@@ -130,7 +130,7 @@ export const AddConsultationModal: React.FC<AddConsultationModalProps> = ({
               value={weight}
               onChange={setWeight}
               placeholder="Ex: 70.5"
-              step="0.1"
+              step={0.1}
               disabled={loading}
             />
             <InputField
@@ -139,7 +139,7 @@ export const AddConsultationModal: React.FC<AddConsultationModalProps> = ({
               value={height}
               onChange={setHeight}
               placeholder="Ex: 175"
-              step="0.1"
+              step={0.1}
               disabled={loading}
             />
           </div>
@@ -151,7 +151,7 @@ export const AddConsultationModal: React.FC<AddConsultationModalProps> = ({
               value={bodyFat}
               onChange={setBodyFat}
               placeholder="Ex: 20.5"
-              step="0.1"
+              step={0.1}
               disabled={loading}
             />
             <InputField
@@ -160,7 +160,7 @@ export const AddConsultationModal: React.FC<AddConsultationModalProps> = ({
               value={muscleMass}
               onChange={setMuscleMass}
               placeholder="Ex: 50.0"
-              step="0.1"
+              step={0.1}
               disabled={loading}
             />
           </div>

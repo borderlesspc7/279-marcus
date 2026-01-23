@@ -1,11 +1,7 @@
 import {
-  collection,
   doc,
   getDoc,
   setDoc,
-  query,
-  where,
-  getDocs,
   Timestamp,
 } from "firebase/firestore";
 import { db } from "../lib/firebaseconfig";
@@ -17,8 +13,6 @@ const SCHEDULES_COLLECTION = "nutritionistSchedules";
  * Retorna configuração padrão de agenda (8h-18h, segunda a sexta)
  */
 export const getDefaultSchedule = (): DaySchedule[] => {
-  const weekdayNames = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-  
   return [0, 1, 2, 3, 4, 5, 6].map((weekday) => ({
     weekday: weekday as 0 | 1 | 2 | 3 | 4 | 5 | 6,
     isActive: weekday >= 1 && weekday <= 5, // Segunda a sexta ativas por padrão

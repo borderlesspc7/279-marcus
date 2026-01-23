@@ -135,7 +135,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({
               value={currentValue}
               onChange={setCurrentValue}
               placeholder="Ex: 80"
-              step="0.1"
+              step={0.1}
               disabled={loading}
             />
             <InputField
@@ -144,7 +144,7 @@ export const AddGoalModal: React.FC<AddGoalModalProps> = ({
               value={targetValue}
               onChange={setTargetValue}
               placeholder="Ex: 75"
-              step="0.1"
+              step={0.1}
               disabled={loading}
             />
             <InputField

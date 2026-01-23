@@ -34,7 +34,7 @@ export const EditScheduleModal: React.FC<EditScheduleModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const { user, reloadUser } = useAuth();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [loadingSchedule, setLoadingSchedule] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -187,9 +187,6 @@ export const EditScheduleModal: React.FC<EditScheduleModalProps> = ({
       setError(null);
 
       await createOrUpdateSchedule(user.uid, { daySchedules });
-      
-      // Recarregar dados do usuário
-      await reloadUser();
       
       onSuccess(user);
       onClose();

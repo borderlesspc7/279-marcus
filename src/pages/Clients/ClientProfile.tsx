@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  FaArrowLeft,
   FaEdit,
   FaTrash,
   FaPlus,
@@ -1329,12 +1328,12 @@ export const ClientProfile: React.FC = () => {
                 </div>
                 {(goal.currentValue !== null || goal.targetValue !== null) && (
                   <div className="client-profile__goal-progress">
-                    {goal.currentValue !== null && goal.targetValue !== null && (
+                    {goal.currentValue != null && goal.targetValue != null && goal.targetValue > 0 && (
                       <div className="client-profile__goal-progress-bar">
                         <div
                           className="client-profile__goal-progress-fill"
                           style={{
-                            width: `${Math.min((goal.currentValue / goal.targetValue) * 100, 100)}%`,
+                            width: `${Math.min(((goal.currentValue ?? 0) / (goal.targetValue ?? 1)) * 100, 100)}%`,
                           }}
                         />
                       </div>
