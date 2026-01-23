@@ -21,6 +21,35 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+.master-stats-card--clickable {
+  cursor: pointer;
+  position: relative;
+}
+
+.master-stats-card--clickable::after {
+  content: "👁️";
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.25rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.master-stats-card--clickable:hover::after {
+  opacity: 0.6;
+}
+
+.master-stats-card--clickable:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  border: 2px solid #3b82f6;
+}
+
+.master-stats-card--clickable:active {
+  transform: translateY(-2px);
+}
+
 .master-stats-card__icon {
   width: 48px;
   height: 48px;

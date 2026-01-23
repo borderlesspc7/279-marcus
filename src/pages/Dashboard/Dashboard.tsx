@@ -19,6 +19,7 @@ export const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const { info } = useNotifications();
   const isAdmin = user?.role === "admin";
+  const isNutritionist = user?.role === "nutritionist";
   const isUser = user?.role === "user";
   const [occupancyPeriod, setOccupancyPeriod] = useState<
     "day" | "week" | "month"
@@ -92,16 +93,61 @@ export const Dashboard: React.FC = () => {
     );
   }
 
+  // Dashboard Master (PRD005) - APENAS para Admin
+  if (isAdmin) {
+    return (
+      <div className="dashboard">
+        <div className="dashboard__header">
+          <div>
+            <h1 className="dashboard__title">Dashboard Administrativo</h1>
+            <p className="dashboard__subtitle">
+              Visão geral das métricas de negócio e engajamento do sistema
+            </p>
+          </div>
+          <div className="dashboard__date">
+            {new Date().toLocaleDateString("pt-BR", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </div>
+        </div>
+
+        <div className="dashboard__grid">
+          {/* Métricas do Sistema (PRD 005) */}
+          <div className="dashboard__card dashboard__card--full">
+            <div className="dashboard__card-header">
+              <h2 className="dashboard__card-title">Métricas do Sistema (PRD 005)</h2>
+              <p className="dashboard__card-subtitle">
+                Visão geral das métricas de negócio e engajamento - Clique nos cards para ver detalhes
+              </p>
+            </div>
+            <MasterStatsCards />
+          </div>
+
+          {/* Gráfico de Engajamento */}
+          <div className="dashboard__card dashboard__card--extra-large">
+            <div className="dashboard__card-header">
+              <h2 className="dashboard__card-title">Gráfico de Engajamento</h2>
+              <p className="dashboard__card-subtitle">
+                Total de Agendamentos e Dietas Salvas (Agregação Geral)
+              </p>
+            </div>
+            <EngagementChart />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Dashboard Nutricionista - Para nutricionistas (admin mas não master admin)
   return (
     <div className="dashboard">
       <div className="dashboard__header">
         <div>
           <h1 className="dashboard__title">Dashboard</h1>
-          <p className="dashboard__subtitle">
-            {isAdmin
-              ? "Visão geral do sistema"
-              : "Visão geral do seu consultório"}
-          </p>
+          <p className="dashboard__subtitle">Visão geral do seu consultório</p>
         </div>
         <div className="dashboard__date">
           {new Date().toLocaleDateString("pt-BR", {
@@ -114,37 +160,12 @@ export const Dashboard: React.FC = () => {
       </div>
 
       <div className="dashboard__grid">
-        {/* Dashboard Master - Apenas para Admin */}
-        {isAdmin && (
-          <>
-            <div className="dashboard__card dashboard__card--full">
-              <div className="dashboard__card-header">
-                <h2 className="dashboard__card-title">Métricas do Sistema (PRD 005)</h2>
-                <p className="dashboard__card-subtitle">
-                  Visão geral das métricas de negócio e engajamento
-                </p>
-              </div>
-              <MasterStatsCards />
-            </div>
-
-            <div className="dashboard__card dashboard__card--large">
-              <div className="dashboard__card-header">
-                <h2 className="dashboard__card-title">Gráfico de Engajamento</h2>
-                <p className="dashboard__card-subtitle">
-                  Total de Agendamentos e Dietas Salvas (Agregação Geral)
-                </p>
-              </div>
-              <EngagementChart />
-            </div>
-          </>
-        )}
-
         {/* Cards de Estatísticas */}
         <div className="dashboard__card dashboard__card--full">
           <StatsCards />
         </div>
 
-        {/* Ocupação de Agenda - Visível para todos */}
+        {/* Ocupação de Agenda */}
         <div className="dashboard__card dashboard__card--large">
           <div className="dashboard__card-header">
             <h2 className="dashboard__card-title">Ocupação de Agenda</h2>
@@ -175,7 +196,7 @@ export const Dashboard: React.FC = () => {
           <OccupancyChart period={occupancyPeriod} />
         </div>
 
-        {/* Agenda Resumida - Visível para todos */}
+        {/* Agenda Resumida */}
         <div className="dashboard__card">
           <div className="dashboard__card-header">
             <h2 className="dashboard__card-title">Agenda Resumida</h2>
@@ -183,7 +204,7 @@ export const Dashboard: React.FC = () => {
           <ScheduleSummary />
         </div>
 
-        {/* Aniversariantes do Dia - Visível para todos */}
+        {/* Aniversariantes do Dia */}
         <div className="dashboard__card">
           <div className="dashboard__card-header">
             <h2 className="dashboard__card-title">🎉 Aniversariantes do Dia</h2>
@@ -191,24 +212,21 @@ export const Dashboard: React.FC = () => {
           <BirthdayCard />
         </div>
 
-        {/* Gráfico Financeiro - Apenas para Admin */}
-        {isAdmin && (
-          <div className="dashboard__card dashboard__card--large">
-            <div className="dashboard__card-header">
-              <h2 className="dashboard__card-title">Financeiro</h2>
-            </div>
-            <FinancialChart />
+        {/* Gráfico Financeiro */}
+        <div className="dashboard__card dashboard__card--large">
+          <div className="dashboard__card-header">
+            <h2 className="dashboard__card-title">Financeiro</h2>
           </div>
-        )}
+          <FinancialChart />
+        </div>
 
-        {/* Demografia de Clientes - Visível para todos */}
+        {/* Demografia de Clientes */}
         <div className="dashboard__card dashboard__card--large">
           <div className="dashboard__card-header">
             <h2 className="dashboard__card-title">Perfil de Clientes</h2>
           </div>
           <ClientDemographics />
         </div>
-
       </div>
     </div>
   );

@@ -84,6 +84,10 @@
   grid-column: span 2;
 }
 
+.dashboard__card--extra-large {
+  grid-column: span 3;
+}
+
 .dashboard__card--full {
   grid-column: 1 / -1;
 }
@@ -91,6 +95,10 @@
 @media (max-width: 1200px) {
   .dashboard__card--large {
     grid-column: span 1;
+  }
+
+  .dashboard__card--extra-large {
+    grid-column: span 2;
   }
 
   .dashboard__card--full {

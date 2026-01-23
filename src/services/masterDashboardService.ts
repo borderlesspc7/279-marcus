@@ -24,19 +24,31 @@ const PLAN_PRICES = {
 };
 
 /**
- * Busca todos os nutricionistas (usuários com role "admin")
+ * Busca todos os nutricionistas (usuários com role "nutritionist" ou "admin")
  */
 export const getAllNutritionists = async (): Promise<NutritionistStatus[]> => {
   try {
-    const q = query(
+    // Buscar nutricionistas e admins
+    const nutritionistsQuery = query(
+      collection(db, USERS_COLLECTION),
+      where("role", "==", "nutritionist")
+    );
+    const adminsQuery = query(
       collection(db, USERS_COLLECTION),
       where("role", "==", "admin")
     );
+    
+    const [nutritionistsSnapshot, adminsSnapshot] = await Promise.all([
+      getDocs(nutritionistsQuery),
+      getDocs(adminsQuery)
+    ]);
+    
+    // Combinar resultados
+    const allDocs = [...nutritionistsSnapshot.docs, ...adminsSnapshot.docs];
 
-    const querySnapshot = await getDocs(q);
     const now = new Date();
 
-    return querySnapshot.docs.map((doc) => {
+    return allDocs.map((doc) => {
       const data = doc.data();
       const trialEndDate = data.trialEndDate
         ? (data.trialEndDate instanceof Timestamp

@@ -8,12 +8,14 @@ import {
 } from "react-icons/fa";
 import { getMasterDashboardMetrics } from "../../../services/masterDashboardService";
 import { FaSpinner } from "react-icons/fa";
+import { NutritionistDetailsModal } from "./NutritionistDetailsModal";
 import "./MasterStatsCards.css";
 
 export const MasterStatsCards: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [modalOpen, setModalOpen] = useState<"trial" | "active" | null>(null);
 
   useEffect(() => {
     const loadMetrics = async () => {
@@ -87,8 +89,11 @@ export const MasterStatsCards: React.FC = () => {
         </div>
       </div>
 
-      {/* Nutricionistas Ativos */}
-      <div className="master-stats-card master-stats-card--users">
+      {/* Nutricionistas Ativos - CLICÁVEL */}
+      <div 
+        className="master-stats-card master-stats-card--users master-stats-card--clickable"
+        onClick={() => setModalOpen("active")}
+      >
         <div className="master-stats-card__icon">
           <FaUsers />
         </div>
@@ -96,20 +101,23 @@ export const MasterStatsCards: React.FC = () => {
           <h3 className="master-stats-card__label">Nutricionistas Ativos</h3>
           <p className="master-stats-card__value">{metrics.activePayingNutritionists}</p>
           <p className="master-stats-card__subtitle">
-            {metrics.totalNutritionists} total
+            {metrics.totalNutritionists} total • Clique para ver detalhes
           </p>
         </div>
       </div>
 
-      {/* Nutricionistas em Trial */}
-      <div className="master-stats-card master-stats-card--trial">
+      {/* Nutricionistas em Trial - CLICÁVEL */}
+      <div 
+        className="master-stats-card master-stats-card--trial master-stats-card--clickable"
+        onClick={() => setModalOpen("trial")}
+      >
         <div className="master-stats-card__icon">
           <FaUsers />
         </div>
         <div className="master-stats-card__content">
           <h3 className="master-stats-card__label">Em Trial</h3>
           <p className="master-stats-card__value">{metrics.trialNutritionists}</p>
-          <p className="master-stats-card__subtitle">Período de teste</p>
+          <p className="master-stats-card__subtitle">Período de teste • Clique para ver detalhes</p>
         </div>
       </div>
 
@@ -166,6 +174,20 @@ export const MasterStatsCards: React.FC = () => {
           <p className="master-stats-card__subtitle">Próximos 12 meses</p>
         </div>
       </div>
+
+      {/* Modais de Detalhes */}
+      <NutritionistDetailsModal
+        isOpen={modalOpen === "trial"}
+        onClose={() => setModalOpen(null)}
+        filterType="trial"
+        title="Nutricionistas em Trial"
+      />
+      <NutritionistDetailsModal
+        isOpen={modalOpen === "active"}
+        onClose={() => setModalOpen(null)}
+        filterType="active"
+        title="Nutricionistas Ativos"
+      />
     </div>
   );
 };

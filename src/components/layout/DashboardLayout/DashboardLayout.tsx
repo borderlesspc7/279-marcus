@@ -14,15 +14,23 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 }) => {
   const { user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Garantir que o modal apareça sempre ao fazer login/recarregar
   // (a menos que o usuário tenha optado por não mostrar mais)
   useEffect(() => {
     if (user?.uid) {
       const dontShowKey = `trial-warning-dont-show-${user.uid}`;
-      const shouldNotShow = localStorage.getItem(dontShowKey) === "true";
-      setIsModalOpen(!shouldNotShow);
+      const sessionDismissedKey = `trial-warning-dismissed-${user.uid}`;
+      
+      // Não mostrar se o usuário optou por não mostrar mais (localStorage)
+      const dontShowPermanently = localStorage.getItem(dontShowKey) === "true";
+      
+      // Não mostrar se já foi fechado nesta sessão (sessionStorage)
+      const dismissedThisSession = sessionStorage.getItem(sessionDismissedKey) === "true";
+      
+      // Mostrar apenas se não foi dispensado permanentemente E não foi dispensado nesta sessão
+      setIsModalOpen(!dontShowPermanently && !dismissedThisSession);
     }
   }, [user]);
 

@@ -6,11 +6,13 @@ import {
   FaBars,
   FaTimes,
   FaCheck,
+  FaClock,
 } from "react-icons/fa";
 import { useAuth } from "../../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { paths } from "../../../routes/paths";
 import { useNotifications } from "../../../hooks/useNotifications";
+import { useTrial } from "../../../hooks/useTrial";
 import "./Header.css";
 
 interface HeaderProps {
@@ -25,11 +27,13 @@ export const Header: React.FC<HeaderProps> = ({
   const { user, logOut } = useAuth();
   const navigate = useNavigate();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { isTrial, daysRemaining, isExpired, trialEndDate } = useTrial();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // Fechar dropdowns ao clicar fora
+  // Fechar dropdown de notificações ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -48,6 +52,26 @@ export const Header: React.FC<HeaderProps> = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showNotifications]);
+
+  // Fechar dropdown do menu do usuário ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showUserMenu]);
 
   const handleLogout = async () => {
     try {
@@ -123,6 +147,33 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="header__right">
+        {/* Indicador de Trial */}
+        {isTrial && (
+          <div
+            className={`header__trial-indicator ${
+              daysRemaining !== null && daysRemaining <= 3 && !isExpired
+                ? "header__trial-indicator--warning"
+                : ""
+            }`}
+          >
+            <FaClock size={16} />
+            <span className="header__trial-text">
+              {isExpired ? (
+                <span className="header__trial-expired">Trial Expirado</span>
+              ) : daysRemaining !== null ? (
+                <>
+                  <span className="header__trial-days">{daysRemaining}</span>
+                  <span className="header__trial-label">
+                    {daysRemaining === 1 ? "dia restante" : "dias restantes"}
+                  </span>
+                </>
+              ) : (
+                "Trial Ativo"
+              )}
+            </span>
+          </div>
+        )}
+
         {/* Notificações */}
         <div className="header__notifications" ref={notificationsRef}>
           <button
@@ -190,7 +241,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Menu do usuário */}
-        <div className="header__user">
+        <div className="header__user" ref={userMenuRef}>
           <button
             className="header__user-btn"
             onClick={() => setShowUserMenu(!showUserMenu)}
@@ -202,7 +253,11 @@ export const Header: React.FC<HeaderProps> = ({
                 {user?.name || "Usuário"}
               </span>
               <span className="header__user-role">
-                {user?.role === "admin" ? "Administrador" : "Nutricionista"}
+                {user?.role === "admin" 
+                  ? "Administrador" 
+                  : user?.role === "nutritionist" 
+                  ? "Nutricionista" 
+                  : "Paciente"}
               </span>
             </div>
           </button>
@@ -218,7 +273,13 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div className="header__dropdown-divider"></div>
               <div className="header__dropdown-content">
-                <button className="header__dropdown-item">
+                <button 
+                  className="header__dropdown-item"
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    navigate(paths.perfil);
+                  }}
+                >
                   <FaUserCircle size={16} />
                   <span>Meu Perfil</span>
                 </button>

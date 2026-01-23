@@ -29,8 +29,10 @@ interface MenuItem {
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const isNutritionist = user?.role === "nutritionist";
+  const isAdminOrNutritionist = isAdmin || isNutritionist;
 
-  // Menu para admin (nutricionista)
+  // Menu para admin e nutricionista
   const adminMenuItems: MenuItem[] = [
     {
       path: "/dashboard",
@@ -40,7 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
     {
       path: "/dashboard/clientes",
       icon: <FaUsers size={20} />,
-      label: "Clientes",
+      label: "Pacientes",
       adminOnly: true,
     },
     {
@@ -111,7 +113,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
   ];
 
   // Filtrar menu baseado no role
-  const menuItems = isAdmin ? adminMenuItems : userMenuItems;
+  const menuItems = isAdminOrNutritionist ? adminMenuItems : userMenuItems;
 
   return (
     <aside
