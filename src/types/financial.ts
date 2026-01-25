@@ -26,6 +26,7 @@ export interface CreateIncomeData {
   appointmentId?: string;
   clientId?: string;
   clientName?: string;
+  paymentStatus?: "paid" | "pending";
 }
 
 export interface CreateExpenseData {

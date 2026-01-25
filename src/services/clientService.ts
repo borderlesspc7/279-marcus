@@ -11,7 +11,7 @@ import {
   orderBy,
   Timestamp,
 } from "firebase/firestore";
-import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { db } from "../lib/firebaseconfig";
 import { clientAuth } from "../lib/clientFirebaseConfig";
 import type {
