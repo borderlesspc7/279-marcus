@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "./InputField.css";
 
 interface InputFieldProps {
@@ -29,25 +31,42 @@ export default function InputField({
   max,
   step,
 }: InputFieldProps) {
+  const [showPassword, setShowPassword] = useState(false);
+  const isPassword = type === "password";
+  const inputType = isPassword && showPassword ? "text" : type;
+
   return (
     <div className="input-field">
       <label className="input-field__label">
         {label}
         {required && <span className="input-field__required">*</span>}
       </label>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={`input-field__input ${
-          error ? "input-field__input--error" : ""
-        }`}
-        disabled={disabled}
-        min={min}
-        max={max}
-        step={step}
-      />
+      <div className="input-field__wrapper">
+        <input
+          type={inputType}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={`input-field__input ${
+            error ? "input-field__input--error" : ""
+          } ${isPassword ? "input-field__input--password" : ""}`}
+          disabled={disabled}
+          min={min}
+          max={max}
+          step={step}
+        />
+        {isPassword && (
+          <button
+            type="button"
+            className="input-field__toggle-password"
+            onClick={() => setShowPassword(!showPassword)}
+            disabled={disabled}
+            aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        )}
+      </div>
       {error && <span className="input-field__error">{error}</span>}
     </div>
   );

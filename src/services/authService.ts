@@ -32,6 +32,8 @@ export const authService = {
 
   async login(credentials: LoginCredentials): Promise<User> {
     try {
+      console.log("🟡 authService.login chamado com email:", credentials.email);
+      console.log("🟡 Tentando autenticar no Firebase Auth...");
       const userCredential = await signInWithEmailAndPassword(
         auth,
         credentials.email,
@@ -39,11 +41,38 @@ export const authService = {
       );
 
       const firebaseUser = userCredential.user;
+      console.log("🟡 Autenticação Firebase bem-sucedida. UID:", firebaseUser.uid);
+      console.log("🟡 Buscando documento do usuário no Firestore...");
       const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
 
       if (!userDoc.exists()) {
+        console.error("🔴 Documento do usuário não encontrado na coleção 'users'! UID:", firebaseUser.uid);
+        
+        // Verificar se é um cliente tentando fazer login como nutricionista
+        console.log("🟡 Verificando se é um cliente...");
+        try {
+          const clientsQuery = query(
+            collection(db, "clients"),
+            where("authUid", "==", firebaseUser.uid)
+          );
+          const clientsSnapshot = await getDocs(clientsQuery);
+          
+          if (!clientsSnapshot.empty) {
+            console.error("🔴 Este é um cliente! Use a página de login de clientes.");
+            throw new Error(
+              "Esta conta é de um cliente/paciente. " +
+              "Por favor, use a página de login de clientes para fazer login."
+            );
+          }
+        } catch (clientCheckError) {
+          // Se der erro na query (falta de índice), continuar com o erro original
+          console.warn("⚠️ Erro ao verificar se é cliente:", clientCheckError);
+        }
+        
         throw new Error("Usuário não encontrado");
       }
+      
+      console.log("🟡 Documento do usuário encontrado no Firestore!");
 
       const userData = userDoc.data();
       // Converter Timestamps para Date se necessário

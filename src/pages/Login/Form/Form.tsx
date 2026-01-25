@@ -17,11 +17,23 @@ export default function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    console.log("🔵 handleSubmit chamado! Email:", email, "Password:", password ? "***" : "(vazio)");
+    
+    // Validação básica
+    if (!email || !password) {
+      console.warn("⚠️ Campos vazios! Email:", email, "Password:", password ? "preenchido" : "vazio");
+      return;
+    }
+    
     setIsLoading(true);
     clearError();
     try {
+      console.log("🔵 Chamando login do useAuth...");
       await login({ email, password });
+      console.log("🔵 Login concluído com sucesso!");
     } catch (error) {
+      console.error("🔴 Erro no handleSubmit:", error);
       // Erro já é tratado pelo AuthContext
     } finally {
       setIsLoading(false);
@@ -79,11 +91,22 @@ export default function LoginForm() {
           disabled={isLoading}
           variant="primary"
           className="login-form__submit-btn"
+          onClick={(e) => {
+            console.log("🔵 Botão clicado! Tipo:", e?.type);
+            // Não fazer preventDefault aqui - deixar o form onSubmit tratar
+          }}
         >
           {isLoading ? "Entrando..." : "Entrar"}
         </Button>
 
-        <a href="#" className="login-form__forgot-password">
+        <a 
+          href="#" 
+          className="login-form__forgot-password"
+          onClick={(e) => {
+            e.preventDefault();
+            console.log("Link 'Esqueceu sua senha?' clicado");
+          }}
+        >
           Esqueceu sua senha?
         </a>
 
@@ -95,6 +118,13 @@ export default function LoginForm() {
           <p>Não tem uma conta?</p>
           <Link to={paths.register} className="login-form__register-btn">
             Criar conta
+          </Link>
+        </div>
+
+        <div className="login-form__client-link">
+          <p>É um paciente/cliente?</p>
+          <Link to={paths.clientLogin} className="login-form__client-btn">
+            Fazer login como cliente
           </Link>
         </div>
       </form>

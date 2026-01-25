@@ -6,6 +6,7 @@ import { FaPlus, FaSpinner, FaClock } from "react-icons/fa";
 import { Button } from "../../components/ui/Button/Button";
 import { AppointmentModal } from "./components/AppointmentModal";
 import { EditScheduleModal } from "./components/EditScheduleModal";
+import { AppointmentRequestsList } from "./components/AppointmentRequestsList";
 import { getAppointmentsByNutritionist } from "../../services/appointmentService";
 import { getOrCreateSchedule, getMinMaxWorkingHours } from "../../services/scheduleService";
 import { useAuth } from "../../hooks/useAuth";
@@ -34,6 +35,8 @@ const messages = {
   showMore: (total: number) => `+ Ver mais ${total}`,
 };
 
+type TabType = "agenda" | "requests";
+
 export const Agenda: React.FC = () => {
   const { user, reloadUser } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -43,6 +46,7 @@ export const Agenda: React.FC = () => {
   const [view, setView] = useState<View>("week");
   const [date, setDate] = useState(new Date());
   const [schedule, setSchedule] = useState<NutritionistSchedule | null>(null);
+  const [activeTab, setActiveTab] = useState<TabType>("agenda");
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
@@ -136,6 +140,11 @@ export const Agenda: React.FC = () => {
     loadAppointments();
   };
 
+  const handleRequestApprove = () => {
+    // Recarregar agenda quando uma solicitação é aprovada
+    loadAppointments();
+  };
+
   const handleNewAppointment = () => {
     setSelectedAppointment(null);
     setSelectedDate(new Date());
@@ -195,6 +204,62 @@ export const Agenda: React.FC = () => {
     );
   }
 
+  const renderCalendar = (isSplitView: boolean = false) => (
+    <div className={`agenda__calendar-wrapper ${isSplitView ? "agenda__calendar-wrapper--split" : ""}`}>
+      <Calendar
+        localizer={localizer}
+        events={events}
+        startAccessor="start"
+        endAccessor="end"
+        messages={messages}
+        view={view}
+        onView={setView}
+        date={date}
+        onNavigate={setDate}
+        onSelectSlot={handleSelectSlot}
+        onSelectEvent={handleSelectEvent}
+        selectable
+        popup
+        eventPropGetter={eventStyleGetter}
+        style={{ 
+          height: isSplitView ? "calc(100vh - 300px)" : "calc(100vh - 250px)", 
+          minHeight: isSplitView ? "400px" : "600px" 
+        }}
+        views={["month", "week", "day", "agenda"]}
+        step={30}
+        timeslots={2}
+        min={
+          schedule
+            ? (() => {
+                const { minHour } = getMinMaxWorkingHours(schedule);
+                return new Date(0, 0, 0, minHour, 0, 0);
+              })()
+            : user?.workStartTime
+            ? (() => {
+                const [hour, minute] = user.workStartTime.split(":").map(Number);
+                return new Date(0, 0, 0, hour, minute, 0);
+              })()
+            : new Date(0, 0, 0, 7, 0, 0)
+        }
+        max={
+          schedule
+            ? (() => {
+                const { maxHour } = getMinMaxWorkingHours(schedule);
+                return new Date(0, 0, 0, maxHour, 0, 0);
+              })()
+            : user?.workEndTime
+            ? (() => {
+                const [hour, minute] = user.workEndTime.split(":").map(Number);
+                return new Date(0, 0, 0, hour, minute, 0);
+              })()
+            : new Date(0, 0, 0, 20, 0, 0)
+        }
+        defaultView="week"
+        culture="pt-BR"
+      />
+    </div>
+  );
+
   return (
     <div className="agenda">
       <div className="agenda__header">
@@ -222,6 +287,28 @@ export const Agenda: React.FC = () => {
         </div>
       </div>
 
+      {/* Sistema de Abas */}
+      <div className="agenda__tabs">
+        <button
+          className={`agenda__tab ${
+            activeTab === "agenda" ? "agenda__tab--active" : ""
+          }`}
+          onClick={() => setActiveTab("agenda")}
+          type="button"
+        >
+          Agenda
+        </button>
+        <button
+          className={`agenda__tab ${
+            activeTab === "requests" ? "agenda__tab--active" : ""
+          }`}
+          onClick={() => setActiveTab("requests")}
+          type="button"
+        >
+          Solicitações
+        </button>
+      </div>
+
       {error && (
         <div className="agenda__error">
           <p>{error}</p>
@@ -231,90 +318,54 @@ export const Agenda: React.FC = () => {
         </div>
       )}
 
-      <div className="agenda__calendar-wrapper">
-        <Calendar
-          localizer={localizer}
-          events={events}
-          startAccessor="start"
-          endAccessor="end"
-          messages={messages}
-          view={view}
-          onView={setView}
-          date={date}
-          onNavigate={setDate}
-          onSelectSlot={handleSelectSlot}
-          onSelectEvent={handleSelectEvent}
-          selectable
-          popup
-          eventPropGetter={eventStyleGetter}
-          style={{ height: "calc(100vh - 250px)", minHeight: "600px" }}
-          views={["month", "week", "day", "agenda"]}
-          step={30}
-          timeslots={2}
-          min={
-            schedule
-              ? (() => {
-                  const { minHour } = getMinMaxWorkingHours(schedule);
-                  return new Date(0, 0, 0, minHour, 0, 0);
-                })()
-              : user?.workStartTime
-              ? (() => {
-                  const [hour, minute] = user.workStartTime.split(":").map(Number);
-                  return new Date(0, 0, 0, hour, minute, 0);
-                })()
-              : new Date(0, 0, 0, 7, 0, 0)
-          }
-          max={
-            schedule
-              ? (() => {
-                  const { maxHour } = getMinMaxWorkingHours(schedule);
-                  return new Date(0, 0, 0, maxHour, 0, 0);
-                })()
-              : user?.workEndTime
-              ? (() => {
-                  const [hour, minute] = user.workEndTime.split(":").map(Number);
-                  return new Date(0, 0, 0, hour, minute, 0);
-                })()
-              : new Date(0, 0, 0, 20, 0, 0)
-          }
-          defaultView="week"
-          culture="pt-BR"
-        />
-      </div>
-
-      <div className="agenda__legend">
-        <h3 className="agenda__legend-title">Legenda:</h3>
-        <div className="agenda__legend-items">
-          <div className="agenda__legend-item">
-            <span
-              className="agenda__legend-color"
-              style={{ backgroundColor: "#667eea" }}
-            ></span>
-            <span>Agendado</span>
+      {/* Conteúdo baseado na aba ativa */}
+      {activeTab === "agenda" ? (
+        <>
+          {renderCalendar(false)}
+          <div className="agenda__legend">
+            <h3 className="agenda__legend-title">Legenda:</h3>
+            <div className="agenda__legend-items">
+              <div className="agenda__legend-item">
+                <span
+                  className="agenda__legend-color"
+                  style={{ backgroundColor: "#667eea" }}
+                ></span>
+                <span>Agendado</span>
+              </div>
+              <div className="agenda__legend-item">
+                <span
+                  className="agenda__legend-color"
+                  style={{ backgroundColor: "#10b981" }}
+                ></span>
+                <span>Concluído</span>
+              </div>
+              <div className="agenda__legend-item">
+                <span
+                  className="agenda__legend-color"
+                  style={{ backgroundColor: "#ef4444" }}
+                ></span>
+                <span>Cancelado</span>
+              </div>
+              <div className="agenda__legend-item">
+                <span
+                  className="agenda__legend-color"
+                  style={{ backgroundColor: "#f59e0b" }}
+                ></span>
+                <span>Faltou</span>
+              </div>
+            </div>
           </div>
-          <div className="agenda__legend-item">
-            <span
-              className="agenda__legend-color"
-              style={{ backgroundColor: "#10b981" }}
-            ></span>
-            <span>Concluído</span>
+        </>
+      ) : (
+        <div className="agenda__split-view">
+          <div className="agenda__split-view-left">
+            {renderCalendar(true)}
           </div>
-          <div className="agenda__legend-item">
-            <span
-              className="agenda__legend-color"
-              style={{ backgroundColor: "#ef4444" }}
-            ></span>
-            <span>Cancelado</span>
-          </div>
-          <div className="agenda__legend-item">
-            <span
-              className="agenda__legend-color"
-              style={{ backgroundColor: "#f59e0b" }}
-            ></span>
-            <span>Faltou</span>
+          <div className="agenda__split-view-right">
+            <AppointmentRequestsList onApprove={handleRequestApprove} />
           </div>
         </div>
-      </div>
+      )}
 
       <AppointmentModal
         isOpen={isModalOpen}

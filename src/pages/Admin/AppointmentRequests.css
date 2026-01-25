@@ -159,6 +159,19 @@
   }
 }
 
+/* Estilos para quando está embedado na agenda */
+.appointment-requests--embedded {
+  padding: 0;
+  max-width: none;
+  margin: 0;
+}
+
+.appointment-requests--embedded .appointment-requests__list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 @media (max-width: 768px) {
   .appointment-requests__actions {
     flex-direction: column;

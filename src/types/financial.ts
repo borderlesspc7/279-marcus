@@ -11,6 +11,7 @@ export interface FinancialTransaction {
   appointmentId?: string; // ID da consulta que gerou a receita
   clientId?: string; // ID do cliente (se vinculado a consulta)
   clientName?: string; // Nome do cliente (para facilitar visualização)
+  paymentStatus?: "paid" | "pending"; // Status do pagamento (pago/pendente)
   // Para despesas (expense)
   category?: string; // categoria da despesa (opcional)
   createdAt: Date;
@@ -40,6 +41,9 @@ export interface UpdateTransactionData {
   description?: string;
   date?: Date;
   category?: string;
+  paymentStatus?: "paid" | "pending";
+  clientId?: string;
+  clientName?: string;
 }
 
 export interface FinancialSummary {

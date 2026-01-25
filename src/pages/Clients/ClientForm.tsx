@@ -21,6 +21,7 @@ export const ClientForm: React.FC = () => {
     gender: "feminino",
     height: undefined,
     weight: undefined,
+    password: "",
   });
 
   const [formErrors, setFormErrors] = useState<Partial<CreateClientData>>({});
@@ -54,6 +55,12 @@ export const ClientForm: React.FC = () => {
 
     if (!formData.birthDate) {
       errors.birthDate = "Data de nascimento é obrigatória";
+    }
+
+    if (!formData.password) {
+      errors.password = "Senha é obrigatória";
+    } else if (formData.password.length < 6) {
+      errors.password = "Senha deve ter pelo menos 6 caracteres";
     }
 
     setFormErrors(errors);
@@ -247,15 +254,28 @@ export const ClientForm: React.FC = () => {
                 step={0.1}
               />
             </div>
+
+            <div className="client-form__section">
+              <h2 className="client-form__section-title">Acesso do Cliente</h2>
+
+              <InputField
+                label="Senha"
+                type="password"
+                value={formData.password}
+                onChange={(value) => handleInputChange("password", value)}
+                placeholder="Digite a senha para o cliente"
+                error={formErrors.password}
+                required
+                disabled={loading}
+              />
+            </div>
           </div>
 
           <div className="client-form__info">
             <p>
               <FaInfoCircle size={16} /> Ao cadastrar, uma conta de acesso será
-              automaticamente criada para o cliente com o e-mail fornecido.
-              A <strong>senha inicial</strong> será a{" "}
-              <strong>data de nascimento (somente números)</strong>. Exemplo:
-              1990-05-12 → 12051990.
+              automaticamente criada para o cliente com o e-mail e senha fornecidos.
+              O cliente poderá usar essas credenciais para fazer login no sistema.
             </p>
           </div>
 

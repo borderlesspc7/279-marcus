@@ -52,6 +52,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: nowrap;
 }
 
 /* Cards de Resumo */
@@ -250,6 +251,16 @@
   transition: all 0.2s;
   font-weight: 500;
   min-width: 140px;
+}
+
+.financeiro__date-input select {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 0.875rem;
+  color: #1f2937;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 .financeiro__date-input:hover {
@@ -486,6 +497,27 @@
   flex-shrink: 0;
 }
 
+.financeiro__transaction-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  margin-top: 0.375rem;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.financeiro__transaction-status--paid {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.financeiro__transaction-status--pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
 .financeiro__transaction-actions {
   display: flex;
   flex-direction: column;
@@ -494,6 +526,7 @@
   padding-left: 1rem;
   border-left: 1px solid #e5e7eb;
   margin-left: 1rem;
+  min-width: 120px;
 }
 
 .financeiro__transaction-value {

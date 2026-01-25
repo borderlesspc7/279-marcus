@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaCalendarAlt, FaClock, FaSave, FaSpinner } from "react-icons/fa";
 import { Button } from "../../components/ui/Button/Button";
 import { useAuth } from "../../hooks/useAuth";
+import { clientAuth } from "../../lib/clientFirebaseConfig";
 import { getClientByAuthUid } from "../../services/clientService";
 import { createAppointmentRequest } from "../../services/appointmentService";
 import { getDocs, query, collection, where } from "firebase/firestore";
 import { db } from "../../lib/firebaseconfig";
+import { paths } from "../../routes/paths";
 import type { Client } from "../../types/client";
 import "./RequestAppointment.css";
 
@@ -24,14 +26,19 @@ export const RequestAppointment: React.FC = () => {
 
   useEffect(() => {
     const loadClient = async () => {
-      if (!user?.uid) {
-        navigate("/login");
+      // Verificar se é um cliente autenticado (clientAuth) ou nutricionista (user)
+      const clientAuthUser = clientAuth.currentUser;
+      const authUid = clientAuthUser?.uid || user?.uid;
+
+      if (!authUid) {
+        // Se não está autenticado, redirecionar para login de clientes
+        navigate(paths.clientLogin);
         return;
       }
 
       try {
         setLoadingClient(true);
-        const clientData = await getClientByAuthUid(user.uid);
+        const clientData = await getClientByAuthUid(authUid);
         
         if (!clientData) {
           setError("Cliente não encontrado. Entre em contato com o suporte.");
@@ -93,6 +100,10 @@ export const RequestAppointment: React.FC = () => {
       setLoading(true);
       const appointmentDate = new Date(date);
       
+      // Obter o UID correto (pode ser do cliente autenticado ou do nutricionista)
+      const clientAuthUser = clientAuth.currentUser;
+      const authUid = clientAuthUser?.uid || user?.uid || client.id;
+      
       await createAppointmentRequest(
         {
           clientId: client.id,
@@ -103,7 +114,7 @@ export const RequestAppointment: React.FC = () => {
           notes: notes || undefined,
         },
         nutritionistId,
-        user!.uid
+        authUid
       );
 
       navigate("/dashboard/minhas-consultas", {

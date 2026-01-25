@@ -7,7 +7,6 @@ import {
   FaCalculator,
   FaChartLine,
   FaAppleAlt,
-  FaDatabase,
   FaUtensils,
   FaExchangeAlt,
 } from "react-icons/fa";
@@ -52,12 +51,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       adminOnly: true,
     },
     {
-      path: "/dashboard/admin/appointment-requests",
-      icon: <FaCalendarAlt size={20} />,
-      label: "Solicitações",
-      adminOnly: true,
-    },
-    {
       path: "/dashboard/calculadora",
       icon: <FaCalculator size={20} />,
       label: "Calculadora de Dieta",
@@ -67,12 +60,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen }) => {
       path: "/dashboard/financeiro",
       icon: <FaChartLine size={20} />,
       label: "Financeiro",
-      adminOnly: true,
-    },
-    {
-      path: "/dashboard/admin/import-taco",
-      icon: <FaDatabase size={20} />,
-      label: "Importar TACO",
       adminOnly: true,
     },
     {

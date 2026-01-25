@@ -43,16 +43,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (credentials: LoginCredentials) => {
     try {
+      console.log("🟢 AuthContext.login chamado com:", credentials.email);
       setLoading(true);
       setError(null);
+      console.log("🟢 Chamando authService.login...");
       const user = await authService.login(credentials);
+      console.log("🟢 authService.login retornou user:", user ? user.email : "null");
       setUser(user);
       setLoading(false);
+      console.log("🟢 Login concluído no AuthContext!");
     } catch (error) {
+      console.error("🔴 Erro no AuthContext.login:", error);
       const message = getFirebaseErrorMessage(error as FirebaseError | string);
       setError(message);
       setLoading(false);
       setUser(null);
+      throw error; // Re-lançar para o componente poder tratar
     }
   };
 

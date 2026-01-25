@@ -11,7 +11,7 @@ import {
   orderBy,
   Timestamp,
 } from "firebase/firestore";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, deleteUser } from "firebase/auth";
 import { db } from "../lib/firebaseconfig";
 import { clientAuth } from "../lib/clientFirebaseConfig";
 import type {
@@ -41,18 +41,19 @@ export const createClient = async (
 ): Promise<string> => {
   try {
     // 1. Criar conta de acesso no Firebase Auth (instância separada para clientes)
-    // Senha inicial = data de nascimento (apenas dígitos, formato DDMMAAAA ou AAAAMMDD)
-    // Exemplo: 1990-05-12 -> 12051990
-    const birthDigits = clientData.birthDate.replace(/\D/g, "");
-    const initialPassword = birthDigits;
+    // Senha definida pelo nutricionista
+    if (!clientData.password || clientData.password.length < 6) {
+      throw new Error("A senha deve ter pelo menos 6 caracteres");
+    }
 
     const userCredential = await createUserWithEmailAndPassword(
       clientAuth,
       clientData.email,
-      initialPassword
+      clientData.password
     );
 
     const clientUid = userCredential.user.uid;
+    console.log("Cliente criado no Firebase Auth. UID:", clientUid, "Email:", clientData.email);
 
     // 2. Criar registro do cliente no Firestore
     const clientDoc = {
@@ -69,7 +70,27 @@ export const createClient = async (
       updatedAt: Timestamp.now(),
     };
 
+    console.log("Criando documento no Firestore com authUid:", clientUid);
     const docRef = await addDoc(collection(db, CLIENTS_COLLECTION), clientDoc);
+    console.log("Documento criado no Firestore. ID:", docRef.id, "authUid salvo:", clientUid);
+
+    // Verificar se foi salvo corretamente (com pequeno delay para garantir que foi indexado)
+    await new Promise(resolve => setTimeout(resolve, 100));
+    const savedDoc = await getDoc(docRef);
+    if (savedDoc.exists()) {
+      const savedData = savedDoc.data();
+      console.log("Verificação: Documento salvo com authUid:", savedData.authUid);
+      if (savedData.authUid !== clientUid) {
+        console.error("ERRO: authUid salvo não corresponde ao UID do Auth!", {
+          esperado: clientUid,
+          salvo: savedData.authUid,
+        });
+      } else {
+        console.log("✅ Verificação OK: authUid salvo corretamente!");
+      }
+    } else {
+      console.error("ERRO: Documento não encontrado após criação!");
+    }
 
     return docRef.id;
   } catch (error) {
@@ -139,42 +160,170 @@ export const getClientById = async (
   }
 };
 
-export const getClientByAuthUid = async (
-  authUid: string
+export const getClientByEmail = async (
+  email: string
 ): Promise<Client | null> => {
   try {
+    console.log("Buscando cliente com email:", email);
     const q = query(
       collection(db, CLIENTS_COLLECTION),
-      where("authUid", "==", authUid)
+      where("email", "==", email)
     );
 
     const querySnapshot = await getDocs(q);
 
     if (querySnapshot.empty) {
+      console.warn("Nenhum cliente encontrado com email:", email);
       return null;
     }
 
     const clientDoc = querySnapshot.docs[0];
+    const clientData = clientDoc.data();
+    console.log("Cliente encontrado por email:", {
+      id: clientDoc.id,
+      email: clientData.email,
+      fullName: clientData.fullName,
+      authUid: clientData.authUid,
+    });
+    
     return {
       id: clientDoc.id,
-      ...clientDoc.data(),
-      createdAt: clientDoc.data().createdAt.toDate(),
-      updatedAt: clientDoc.data().updatedAt.toDate(),
+      ...clientData,
+      createdAt: clientData.createdAt.toDate(),
+      updatedAt: clientData.updatedAt.toDate(),
     } as Client;
   } catch (error) {
-    console.error("Erro ao buscar cliente por authUid:", error);
+    console.error("Erro ao buscar cliente por email:", error);
     throw error;
+  }
+};
+
+export const getClientByAuthUid = async (
+  authUid: string
+): Promise<Client | null> => {
+  try {
+    console.log("🔍 Buscando cliente com authUid:", authUid);
+    
+    // SEMPRE fazer busca manual primeiro para garantir que funciona
+    // A query pode falhar por falta de índice ou outros problemas
+    console.log("📋 Buscando todos os clientes para busca manual...");
+    const allClientsQuery = query(collection(db, CLIENTS_COLLECTION));
+    const allSnapshot = await getDocs(allClientsQuery);
+    
+    console.log(`📊 Total de clientes no Firestore: ${allSnapshot.docs.length}`);
+    
+    // Buscar manualmente pelo authUid
+    const foundDoc = allSnapshot.docs.find((doc) => {
+      const data = doc.data();
+      const docAuthUid = data.authUid;
+      const match = docAuthUid === authUid;
+      if (match) {
+        console.log(`✅ MATCH encontrado! Cliente ID: ${doc.id}, Email: ${data.email}`);
+      }
+      return match;
+    });
+    
+    if (foundDoc) {
+      console.log("✅ Cliente encontrado via busca manual!");
+      const clientData = foundDoc.data();
+      console.log("📄 Dados do cliente encontrado:", {
+        id: foundDoc.id,
+        email: clientData.email,
+        fullName: clientData.fullName,
+        authUid: clientData.authUid,
+      });
+      
+      return {
+        id: foundDoc.id,
+        ...clientData,
+        createdAt: clientData.createdAt.toDate(),
+        updatedAt: clientData.updatedAt.toDate(),
+      } as Client;
+    }
+    
+    // Se não encontrou, logar todos os authUids para debug
+    console.warn("⚠️ Cliente não encontrado. Listando todos os authUids para debug:");
+    allSnapshot.docs.forEach((doc) => {
+      const data = doc.data();
+      console.log(`  - Cliente ID: ${doc.id}, Email: ${data.email}, authUid: "${data.authUid || "NÃO TEM"}"`);
+    });
+    console.error(`❌ Cliente não encontrado. authUid procurado: "${authUid}"`);
+    
+    // Tentar também com query (pode funcionar se houver índice)
+    try {
+      const q = query(
+        collection(db, CLIENTS_COLLECTION),
+        where("authUid", "==", authUid)
+      );
+      const querySnapshot = await getDocs(q);
+      if (!querySnapshot.empty) {
+        console.log("✅ Cliente encontrado via query do Firestore!");
+        const clientDoc = querySnapshot.docs[0];
+        const clientData = clientDoc.data();
+        return {
+          id: clientDoc.id,
+          ...clientData,
+          createdAt: clientData.createdAt.toDate(),
+          updatedAt: clientData.updatedAt.toDate(),
+        } as Client;
+      }
+    } catch (queryError) {
+      console.warn("⚠️ Query do Firestore falhou (pode ser falta de índice):", queryError);
+    }
+    
+    return null;
+
+  } catch (error) {
+    console.error("❌ Erro ao buscar cliente por authUid:", error);
+    
+    // Em caso de erro, tentar buscar todos e filtrar manualmente
+    try {
+      console.warn("🔄 Tentando busca alternativa após erro...");
+      const allSnapshot = await getDocs(collection(db, CLIENTS_COLLECTION));
+      console.log(`📊 Busca alternativa: ${allSnapshot.docs.length} documentos encontrados`);
+      
+      const found = allSnapshot.docs.find((doc) => {
+        const data = doc.data();
+        const docAuthUid = data.authUid;
+        const match = docAuthUid === authUid;
+        if (match) {
+          console.log(`✅ MATCH na busca alternativa! Cliente ID: ${doc.id}`);
+        }
+        return match;
+      });
+      
+      if (found) {
+        console.log("✅ Cliente encontrado na busca alternativa!");
+        const clientData = found.data();
+        return {
+          id: found.id,
+          ...clientData,
+          createdAt: clientData.createdAt.toDate(),
+          updatedAt: clientData.updatedAt.toDate(),
+        } as Client;
+      } else {
+        console.error("❌ Cliente não encontrado na busca alternativa. authUid procurado:", authUid);
+      }
+    } catch (fallbackError) {
+      console.error("❌ Erro na busca alternativa:", fallbackError);
+    }
+    
+    // Se não conseguiu encontrar, retornar null ao invés de lançar erro
+    // Isso permite que o fallback por email funcione
+    return null;
   }
 };
 
 export const updateClient = async (
   clientId: string,
-  data: Partial<CreateClientData>
+  data: Partial<CreateClientData & { authUid?: string }>
 ): Promise<void> => {
   try {
     const docRef = doc(db, CLIENTS_COLLECTION, clientId);
+    // Remover password do update (não deve ser atualizado via updateClient)
+    const { password, ...updateData } = data;
     await updateDoc(docRef, {
-      ...data,
+      ...updateData,
       updatedAt: Timestamp.now(),
     });
   } catch (error) {
@@ -185,8 +334,56 @@ export const updateClient = async (
 
 export const deleteClient = async (clientId: string): Promise<void> => {
   try {
-    const docRef = doc(db, CLIENTS_COLLECTION, clientId);
-    await deleteDoc(docRef);
+    // 1. Buscar o cliente para obter o authUid antes de deletar
+    const clientDocRef = doc(db, CLIENTS_COLLECTION, clientId);
+    const clientDoc = await getDoc(clientDocRef);
+    
+    if (!clientDoc.exists()) {
+      throw new Error("Cliente não encontrado");
+    }
+
+    const clientData = clientDoc.data();
+    const authUid = clientData.authUid as string | undefined;
+
+    // 2. Deletar documento do cliente no Firestore
+    await deleteDoc(clientDocRef);
+
+    // 3. Tentar deletar a conta do Firebase Auth via Cloud Function
+    // Nota: Não podemos deletar outro usuário diretamente do cliente.
+    // A solução ideal é usar uma Cloud Function com Admin SDK.
+    if (authUid) {
+      try {
+        // Tentar chamar Cloud Function se existir
+        // Se não existir, a conta ficará "órfã" no Auth, mas o documento foi deletado
+        const functionsUrl = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL;
+        if (functionsUrl) {
+          const response = await fetch(`${functionsUrl}/deleteClientAuth`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ authUid }),
+          });
+          
+          if (!response.ok) {
+            console.warn(
+              `Não foi possível deletar a conta do Firebase Auth (UID: ${authUid}). ` +
+              `O documento do Firestore foi deletado, mas a conta do Auth permanece.`
+            );
+          }
+        } else {
+          console.warn(
+            `Conta do Firebase Auth (UID: ${authUid}) não foi deletada. ` +
+            `Configure VITE_FIREBASE_FUNCTIONS_URL para habilitar deleção automática. ` +
+            `O documento do Firestore foi deletado, mas a conta do Auth permanece ativa.`
+          );
+        }
+      } catch (authError) {
+        console.error("Erro ao tentar deletar conta do Firebase Auth:", authError);
+        // Não lançar erro aqui, pois o documento do Firestore já foi deletado
+        // A conta do Auth ficará "órfã", mas isso não impede o funcionamento do sistema
+      }
+    }
   } catch (error) {
     console.error("Erro ao deletar cliente:", error);
     throw error;

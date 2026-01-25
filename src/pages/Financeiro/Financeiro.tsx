@@ -19,8 +19,11 @@ import {
   deleteTransaction,
   getFinancialSummary,
 } from "../../services/financialService";
+import { getClientsByNutritionist } from "../../services/clientService";
 import type { FinancialTransaction } from "../../types/financial";
+import type { Client } from "../../types/client";
 import { ExpenseModal } from "./components/ExpenseModal";
+import { IncomeModal } from "./components/IncomeModal";
 import "./Financeiro.css";
 
 export const Financeiro: React.FC = () => {
@@ -35,7 +38,10 @@ export const Financeiro: React.FC = () => {
     expenseCount: 0,
   });
   const [filter, setFilter] = useState<"all" | "income" | "expense">("all");
+  const [clientFilter, setClientFilter] = useState<string | null>(null);
+  const [clients, setClients] = useState<Client[]>([]);
   const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [showIncomeModal, setShowIncomeModal] = useState(false);
   const [editingTransaction, setEditingTransaction] =
     useState<FinancialTransaction | null>(null);
   const [dateFilter, setDateFilter] = useState<{
@@ -45,7 +51,20 @@ export const Financeiro: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, [user, filter, dateFilter]);
+  }, [user, filter, dateFilter, clientFilter]);
+
+  useEffect(() => {
+    const loadClients = async () => {
+      if (!user?.uid) return;
+      try {
+        const clientsData = await getClientsByNutritionist(user.uid);
+        setClients(clientsData);
+      } catch (error) {
+        console.error("Erro ao carregar clientes:", error);
+      }
+    };
+    loadClients();
+  }, [user?.uid]);
 
   const loadData = async () => {
     if (!user?.uid) return;
@@ -101,14 +120,22 @@ export const Financeiro: React.FC = () => {
   };
 
   const handleEdit = (transaction: FinancialTransaction) => {
+    setEditingTransaction(transaction);
     if (transaction.type === "expense") {
-      setEditingTransaction(transaction);
       setShowExpenseModal(true);
+    } else {
+      setShowIncomeModal(true);
     }
   };
 
-  const handleCloseModal = () => {
+  const handleCloseExpenseModal = () => {
     setShowExpenseModal(false);
+    setEditingTransaction(null);
+    loadData();
+  };
+
+  const handleCloseIncomeModal = () => {
+    setShowIncomeModal(false);
     setEditingTransaction(null);
     loadData();
   };
@@ -179,13 +206,28 @@ export const Financeiro: React.FC = () => {
             Gerencie suas receitas e despesas
           </p>
         </div>
-        <Button
-          variant="primary"
-          onClick={() => setShowExpenseModal(true)}
-          className="financeiro__add-button"
-        >
-          <FaPlus /> Adicionar Despesa
-        </Button>
+        <div style={{ display: "flex", gap: "0.75rem" }}>
+          <Button
+            variant="primary"
+            onClick={() => {
+              setEditingTransaction(null);
+              setShowIncomeModal(true);
+            }}
+            className="financeiro__add-button"
+          >
+            <FaPlus /> Adicionar Receita
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setEditingTransaction(null);
+              setShowExpenseModal(true);
+            }}
+            className="financeiro__add-button"
+          >
+            <FaPlus /> Adicionar Despesa
+          </Button>
+        </div>
       </div>
 
       {/* Cards de Resumo */}
@@ -275,6 +317,34 @@ export const Financeiro: React.FC = () => {
               Despesas
             </button>
           </div>
+        </div>
+
+        <div className="financeiro__filter-group">
+          <FaUser size={16} />
+          <span className="financeiro__filter-label">Cliente:</span>
+          <select
+            className="financeiro__date-input"
+            value={clientFilter || ""}
+            onChange={(e) => setClientFilter(e.target.value || null)}
+            style={{ minWidth: "200px" }}
+          >
+            <option value="">Todos os clientes</option>
+            {clients.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.fullName}
+              </option>
+            ))}
+          </select>
+          {clientFilter && (
+            <button
+              className="financeiro__filter-btn financeiro__filter-btn--clear"
+              onClick={() => setClientFilter(null)}
+              title="Limpar filtro de cliente"
+              style={{ marginLeft: "0.5rem" }}
+            >
+              Limpar
+            </button>
+          )}
         </div>
 
         <div className="financeiro__filter-group">
@@ -368,6 +438,17 @@ export const Financeiro: React.FC = () => {
                       <span>Cliente: {transaction.clientName}</span>
                     </div>
                   )}
+                  {transaction.type === "income" && transaction.paymentStatus && (
+                    <div
+                      className={`financeiro__transaction-status financeiro__transaction-status--${transaction.paymentStatus}`}
+                    >
+                      <span>
+                        {transaction.paymentStatus === "paid"
+                          ? "✓ Pago"
+                          : "⏳ Pendente"}
+                      </span>
+                    </div>
+                  )}
                   {transaction.category && (
                     <div className="financeiro__transaction-category">
                       <FaTag size={12} />
@@ -380,24 +461,22 @@ export const Financeiro: React.FC = () => {
                     {transaction.type === "income" ? "+" : "-"}
                     {formatCurrency(transaction.amount)}
                   </div>
-                  {transaction.type === "expense" && (
-                    <div className="financeiro__transaction-buttons">
-                      <button
-                        className="financeiro__transaction-btn financeiro__transaction-btn--edit"
-                        onClick={() => handleEdit(transaction)}
-                        title="Editar"
-                      >
-                        <FaEdit />
-                      </button>
-                      <button
-                        className="financeiro__transaction-btn financeiro__transaction-btn--delete"
-                        onClick={() => handleDelete(transaction.id)}
-                        title="Excluir"
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  )}
+                  <div className="financeiro__transaction-buttons">
+                    <button
+                      className="financeiro__transaction-btn financeiro__transaction-btn--edit"
+                      onClick={() => handleEdit(transaction)}
+                      title="Editar"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="financeiro__transaction-btn financeiro__transaction-btn--delete"
+                      onClick={() => handleDelete(transaction.id)}
+                      title="Excluir"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -409,7 +488,15 @@ export const Financeiro: React.FC = () => {
       {showExpenseModal && (
         <ExpenseModal
           transaction={editingTransaction}
-          onClose={handleCloseModal}
+          onClose={handleCloseExpenseModal}
+        />
+      )}
+
+      {/* Modal de Receita */}
+      {showIncomeModal && (
+        <IncomeModal
+          transaction={editingTransaction}
+          onClose={handleCloseIncomeModal}
         />
       )}
     </div>

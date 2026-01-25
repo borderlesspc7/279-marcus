@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaTimes, FaSave, FaSpinner } from "react-icons/fa";
 import { Button } from "../../../components/ui/Button/Button";
+import InputField from "../../../components/ui/InputField/InputField";
 import { createClient } from "../../../services/clientService";
 import { useAuth } from "../../../hooks/useAuth";
 import type { Client, CreateClientData } from "../../../types/client";
@@ -29,6 +30,7 @@ export const QuickClientForm: React.FC<QuickClientFormProps> = ({
     gender: "feminino",
     height: undefined,
     weight: undefined,
+    password: "",
   });
 
   const [formErrors, setFormErrors] = useState<Partial<CreateClientData>>({});
@@ -65,6 +67,12 @@ export const QuickClientForm: React.FC<QuickClientFormProps> = ({
 
     if (!formData.birthDate) {
       errors.birthDate = "Data de nascimento é obrigatória";
+    }
+
+    if (!formData.password) {
+      errors.password = "Senha é obrigatória";
+    } else if (formData.password.length < 6) {
+      errors.password = "Senha deve ter pelo menos 6 caracteres";
     }
 
     setFormErrors(errors);
@@ -124,6 +132,7 @@ export const QuickClientForm: React.FC<QuickClientFormProps> = ({
       gender: "feminino",
       height: undefined,
       weight: undefined,
+      password: "",
     });
     setFormErrors({});
     setError(null);
@@ -269,6 +278,19 @@ export const QuickClientForm: React.FC<QuickClientFormProps> = ({
                 <option value="outro">Outro</option>
               </select>
             </div>
+          </div>
+
+          <div className="quick-client-form__field">
+            <InputField
+              label="Senha"
+              type="password"
+              value={formData.password}
+              onChange={(value) => handleInputChange("password", value)}
+              placeholder="Digite a senha para o cliente"
+              error={formErrors.password}
+              required
+              disabled={loading}
+            />
           </div>
 
           <div className="quick-client-form__actions">

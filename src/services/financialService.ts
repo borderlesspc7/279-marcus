@@ -39,6 +39,7 @@ export const createIncome = async (
       appointmentId: data.appointmentId || null,
       clientId: data.clientId || null,
       clientName: data.clientName || null,
+      paymentStatus: data.paymentStatus || "pending",
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
     };
@@ -89,16 +90,15 @@ export const getTransactionsByNutritionist = async (
   type?: "income" | "expense"
 ): Promise<FinancialTransaction[]> => {
   try {
+    // Buscar todas as transações do nutricionista (sem filtro de tipo)
+    // Isso evita problemas de índice composto no Firestore
     let q = query(
       collection(db, TRANSACTIONS_COLLECTION),
       where("nutritionistId", "==", nutritionistId),
       orderBy("date", "desc")
     );
 
-    if (type) {
-      q = query(q, where("type", "==", type));
-    }
-
+    // Aplicar filtros de data no Firestore (mais eficiente)
     if (startDate) {
       q = query(q, where("date", ">=", Timestamp.fromDate(startDate)));
     }
@@ -108,7 +108,8 @@ export const getTransactionsByNutritionist = async (
 
     const querySnapshot = await getDocs(q);
 
-    return querySnapshot.docs.map((doc) => {
+    // Converter para array de transações
+    let transactions = querySnapshot.docs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,
@@ -118,6 +119,13 @@ export const getTransactionsByNutritionist = async (
         updatedAt: data.updatedAt.toDate(),
       } as FinancialTransaction;
     });
+
+    // Filtrar por tipo no cliente (JavaScript) para evitar problemas de índice
+    if (type) {
+      transactions = transactions.filter((t) => t.type === type);
+    }
+
+    return transactions;
   } catch (error) {
     console.error("Erro ao buscar transações:", error);
     throw error;
@@ -156,12 +164,30 @@ export const updateTransaction = async (
   try {
     const docRef = doc(db, TRANSACTIONS_COLLECTION, transactionId);
     const updateData: Record<string, unknown> = {
-      ...data,
       updatedAt: Timestamp.now(),
     };
 
+    // Atualizar apenas os campos fornecidos
+    if (data.amount !== undefined) {
+      updateData.amount = data.amount;
+    }
+    if (data.description !== undefined) {
+      updateData.description = data.description;
+    }
     if (data.date) {
       updateData.date = Timestamp.fromDate(data.date);
+    }
+    if (data.category !== undefined) {
+      updateData.category = data.category || null;
+    }
+    if (data.paymentStatus !== undefined) {
+      updateData.paymentStatus = data.paymentStatus;
+    }
+    if (data.clientId !== undefined) {
+      updateData.clientId = data.clientId || null;
+    }
+    if (data.clientName !== undefined) {
+      updateData.clientName = data.clientName || null;
     }
 
     await updateDoc(docRef, updateData);

@@ -38,6 +38,7 @@ export interface CreateClientData {
   gender: "masculino" | "feminino" | "outro";
   height?: number; // altura em cm
   weight?: number; // peso em kg
+  password: string; // senha definida pelo nutricionista
 }
 
 // Histórico de Consultas

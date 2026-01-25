@@ -260,6 +260,43 @@
   transform: translateY(0);
 }
 
+.login-form__client-link {
+  text-align: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.login-form__client-link p {
+  margin: 0 0 12px 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.login-form__client-btn {
+  display: inline-block;
+  padding: 10px 24px;
+  background: transparent;
+  color: #3b82f6;
+  text-decoration: none;
+  border: 1px solid #3b82f6;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 13px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-form__client-btn:hover {
+  background: #3b82f6;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.login-form__client-btn:active {
+  transform: translateY(0);
+}
+
 @media (max-width: 768px) {
   .login-form {
     padding: 24px;
